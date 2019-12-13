@@ -7,15 +7,15 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
 
-String url = 'https://warungislamibogor-store.alamraya.site/api/';
-String noapiurl = 'https://warungislamibogor-store.alamraya.site/';
+String url = '';
+String noapiurl = '';
 
 // Custom api / Laravel Passport
-String key = "`e`!-gu@v}l@'[]xNrl(}n/gUSf[0`fs:Z9}I{?/|%bJ]i=Wp=hDUn70y>X^Hi(";
+String key = "";
 
 // Laravel Get Login Passport
-String clientsecret = '0zxvmtgG2PkVw0NfQ0HwxjKYHVbhoaFBZyDlmJEp';
-String clientId = '2';
+String clientsecret = '';
+String clientId = '';
 String grantType = 'password';
 
 class Login{
