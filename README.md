@@ -1,13 +1,13 @@
 # Request Api Helper Flutter V 1.0.0
  Helper Request Post , get , Map builder (Support Passport Laravel)
  
- in dependendencies
-  dio:
-  http:
-  shared_preferences:
-  fluttertoast:	
+ > in dependendencies
+  - dio:
+  - http:
+  - shared_preferences:
+  - fluttertoast:	
 	
- how to use ?
+ > how to use ?
  
  import 'package:(your_name_project)/core/api.dart';
    
@@ -20,8 +20,8 @@
  dynamic response = await RequestGet (name: 'sell(your link)', customrequest:''(if null you can use '') ).getdata();
  print(dynamic);
   example : 
-     name : sell,
-     customrequest : '?id=1',
+     - name : sell,
+     - customrequest : '?id=1',
      
  > send request post;
  
