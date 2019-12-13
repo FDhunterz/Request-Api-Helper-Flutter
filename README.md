@@ -6,7 +6,9 @@
   - http:
   - shared_preferences:
   - fluttertoast:	
-	
+  
+  <hr>
+  
  > how to use ?
  
  import 'package:(your_name_project)/core/api.dart';
@@ -15,14 +17,19 @@
   - url (yoururl.com/api/) 
   - clientsecret (for passport laravel);
  
+  <hr>
+ 
  > send request get;
  
  dynamic response = await RequestGet (name: 'sell(your link)', customrequest:''(if null you can use '') ).getdata();
  print(dynamic);
+  
   example : 
-     - name : sell,
-     - customrequest : '?id=1',
-     
+  - name : sell,
+  - customrequest : '?id=1',
+ 
+  <hr>
+ 
  > send request post;
  
  dynamic body = {
@@ -33,10 +40,11 @@
  dynamic response = await RequestPost(name : 'checkout',body : body, msg:"checkout done").sendrequest();
   
   example :
-    name : link name,
-    customurl : link url (https://www.my.com/api/),
-    msg : if success trigger toast,
+  - name : link name,
+  - customurl : link url (https://www.my.com/api/),
+  - msg : if success trigger toast,
     
+  <hr>
  
  > send request map / array;
  
@@ -53,10 +61,12 @@
  List singlehead = ['bank','note'];
  List singlevalue = ['12389712398723','my checkout'];
  
-// parse List to Map
+parse List to Map <br>
+
 Map<String,dynamic> parsemap = BuildArray(singlelist: singlehead , singlevalue:  singlevalue , list: head , value: value).withsinglearray(); 
 
-// send to server
+send to server<br>
+
  await ArrayRequestSend(customurl: 'https://mywebsite/api/' ,nama: 'checkout/save',msg: "Checkout complete" , requestbody: parsemap).senddata();
 
  
