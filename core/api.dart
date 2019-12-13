@@ -7,15 +7,15 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
 
-String url = '';
-String noapiurl = '';
+String url = 'https://warungislamibogor-store.alamraya.site/api/';
+String noapiurl = 'https://warungislamibogor-store.alamraya.site/';
 
 // Custom api / Laravel Passport
-String key = "";
+String key = "`e`!-gu@v}l@'[]xNrl(}n/gUSf[0`fs:Z9}I{?/|%bJ]i=Wp=hDUn70y>X^Hi(";
 
 // Laravel Get Login Passport
-String clientsecret = '';
-String clientId = '';
+String clientsecret = '0zxvmtgG2PkVw0NfQ0HwxjKYHVbhoaFBZyDlmJEp';
+String clientId = '2';
 String grantType = 'password';
 
 class Login{
@@ -90,16 +90,18 @@ class RequestGet{
   RequestGet({Key key , this.name , this.header , this.withbody , this.customrequest , this.customurl});
 
   getdata() async {
-    if(customurl != null || customurl != ''){
+
+    if(customurl != null && customurl != ''){
       url = customurl;
     }
+
 
     try{
       dynamic acc = await session.getString('token_type');
       dynamic auth = await  session.getString('access_token');
       String token = "$acc $auth" ;
       
-      final data = await http.get(url+name+customrequest,
+      final data = await http.get(url + name + customrequest,
         headers : {
           'Accept' : 'application/json',
           'Authorization' : token,
@@ -134,7 +136,7 @@ class RequestPost{
   String customurl;
   RequestPost({Key key , this.name , this.header,this.body,this.msg , this.customurl});
   sendrequest() async {
-    if(customurl != null || customurl != ''){
+    if(customurl != null && customurl != ''){
       url = customurl;
     }
 
