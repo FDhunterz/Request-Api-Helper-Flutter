@@ -175,12 +175,12 @@ class RequestPost{
 }
 
 class ArrayRequestSend{
-  var nama;
+  var name;
   var request;
   Map<String,dynamic> requestbody;
   var msg;
   var customurl;
-  ArrayRequestSend({Key key , this.nama , this.request, this.requestbody , this.msg , this.customurl});
+  ArrayRequestSend({Key key , this.name , this.request, this.requestbody , this.msg , this.customurl});
     senddata() async {
     if(customurl != '' || customurl != null){
       url = customurl;
@@ -191,7 +191,7 @@ class ArrayRequestSend{
       Dio dio = new Dio();
 
       Response sendpostapi = await dio.post(
-        url+nama,
+        url+name,
         data: requestbody,
       );
       
