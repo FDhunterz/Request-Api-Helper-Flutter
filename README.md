@@ -11,6 +11,8 @@
   
  > how to use ?
  
+ - Copy core to lib
+ 
  import 'package:(your_name_project)/core/api.dart';
    
  in setting api.dart change :
