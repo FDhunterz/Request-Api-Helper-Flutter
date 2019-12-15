@@ -6,23 +6,26 @@ import 'package:growtopia/core/session.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
+import 'env.dart';
 
-String url = 'https://warungislamibogor-store.alamraya.site/api/';
-String noapiurl = 'https://warungislamibogor-store.alamraya.site/';
+// core login
 
-// Custom api / Laravel Passport
-String key = "`e`!-gu@v}l@'[]xNrl(}n/gUSf[0`fs:Z9}I{?/|%bJ]i=Wp=hDUn70y>X^Hi(";
-
-// Laravel Get Login Passport
-String clientsecret = '0zxvmtgG2PkVw0NfQ0HwxjKYHVbhoaFBZyDlmJEp';
-String clientId = '2';
-String grantType = 'password';
-
-class Login{
+class Auth{
   Session session = new Session();
-  final nama;
+  final username;
   final password;
-  Login({Key key , this.nama, this.password});
+  final name;
+  List getDataInt;
+  List getDataString;
+  List getDataBool;
+  List nameStringsession;
+  List dataStringsession;
+  List nameIntsession;
+  List dataIntsession;
+  List nameBoolsession;
+  List dataBoolsession;
+
+  Auth({Key key , this.nameStringsession, this.dataStringsession, this.nameIntsession, this.dataIntsession, this.nameBoolsession, this.dataBoolsession,this.name ,this.username, this.password , this.getDataInt , this.getDataBool , this.getDataString});
 
 
   proses() async {
@@ -31,7 +34,7 @@ class Login{
         'grant_type': grantType,
         'client_id': clientId,
         'client_secret': clientsecret,
-        "username": nama,
+        "username": username,
         "password": password,
       }, headers: {
         'Accept': 'application/json',
@@ -47,12 +50,12 @@ class Login{
           session.saveString('access_token', getresponse['access_token']);
           session.saveString('token_type', getresponse['token_type']);
         }
-      Fluttertoast.showToast(msg:'Berhasil Menyimpan Token');
+      Fluttertoast.showToast(msg:'Token saved');
       await getuser();
-      return 'sukses';
+      return 'success';
     }else{
       Fluttertoast.showToast(msg:'Error Code ${sendlogin.statusCode}');
-      return 'gagal';
+      return 'failure';
     }
    } on SocketException catch (_) {
       Fluttertoast.showToast(msg:'Connection Timed Out');
@@ -63,20 +66,60 @@ class Login{
       //   position: ToastPosition.bottom,
       // );
     }
-    return 'ada yang aneh';
+    return 'Something Wrong';
   }
 
   getuser() async {
-    dynamic getresponse = await RequestGet(name: 'user').getdata();
+    dynamic getresponse = await RequestGet(name: name,customrequest: '').getdata();
     // print(getresponse['cm_name']);
     if(getresponse.length > 0 ){
-      session.saveString('cm_name', getresponse['cm_name']);
-      Fluttertoast.showToast(msg:'Login Telah Berhasil');
-      String nama = await session.getString('cm_name');
-      Fluttertoast.showToast(msg:'berhasil login $nama');
+      
+      if(nameStringsession != null){  
+        for(var i = 0; i < nameStringsession.length ; i++){
+          session.saveString(nameStringsession[i], getresponse[dataStringsession != null ? dataStringsession[i] : nameStringsession[i]]);
+        }
+      }
+      
+      if(nameIntsession != null){
+        for(var i = 0; i < nameIntsession.length ; i++){
+          session.saveInteger(nameIntsession[i], getresponse[dataIntsession != null ? dataIntsession[i] : nameIntsession[i]]);
+        }
+      }
+
+      if(nameBoolsession != null){
+        for(var i = 0; i < nameBoolsession.length ; i++){
+          session.saveBool(nameBoolsession[i], getresponse[dataBoolsession != null ? dataBoolsession[i] : nameBoolsession[i]]);
+        }
+      }
+
+      Fluttertoast.showToast(msg:'Login Success');
     }else{
-    Fluttertoast.showToast(msg:'Akun Anda Tidak Ditemukan');
+    Fluttertoast.showToast(msg:'Profile Not Found');
     }
+  }
+
+  getsession() async {
+    Map <String,dynamic> result = new Map();
+    if(getDataString != null){    
+      for(var i = 0 ; i < getDataString.length;i++){
+        result[getDataString[i]] = await session.getString(getDataString[i]);
+      }
+    }
+
+    if(getDataInt != null){
+      for(var i = 0 ; i < getDataInt.length;i++){
+        result[getDataInt[i]] = await session.getInteger(getDataInt[i]);
+      }
+    }
+
+    if(getDataBool != null){    
+      for(var i = 0 ; i < getDataBool.length;i++){
+        result[getDataBool[i]] = await session.getBool(getDataBool[i]);
+      }
+    }
+
+
+    return result;
   }
 }
 
@@ -113,7 +156,7 @@ class RequestGet{
       return dataresponse;
     }else{
       Fluttertoast.showToast(msg:'Error Code ${data.statusCode}');
-      return 'gagal';
+      return 'failure';
     }
 
     } on SocketException catch (_) {
