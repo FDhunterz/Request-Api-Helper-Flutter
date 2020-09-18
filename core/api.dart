@@ -1,8 +1,7 @@
 import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:growtopia/core/session.dart';
+import 'session.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
@@ -28,7 +27,7 @@ class Auth{
   Auth({Key key , this.nameStringsession, this.dataStringsession, this.nameIntsession, this.dataIntsession, this.nameBoolsession, this.dataBoolsession,this.name ,this.username, this.password , this.getDataInt , this.getDataBool , this.getDataString});
 
 
-  proses() async {
+  login() async {
    try{
     final sendlogin = await http.post(noapiurl+'oauth/token', body: {
         'grant_type': grantType,
@@ -52,24 +51,22 @@ class Auth{
         }
       Fluttertoast.showToast(msg:'Token saved');
       await getuser();
-      return 'success';
+      return print('success');
     }else{
       Fluttertoast.showToast(msg:'Error Code ${sendlogin.statusCode}');
-      return 'failure';
+      return print('failure');
     }
    } on SocketException catch (_) {
       Fluttertoast.showToast(msg:'Connection Timed Out');
     } on TimeoutException catch (_){
       Fluttertoast.showToast(msg:'Request Timeout, try again');
     } catch (e) {
-      // Fluttertoast.showToast(msg:e.toString(),
-      //   position: ToastPosition.bottom,
-      // );
+      print(e.toString());
     }
-    return 'Something Wrong';
+    return Fluttertoast.showToast(msg:'Request Not Send to Url');
   }
 
-  getuser() async {
+  getUser() async {
     dynamic getresponse = await RequestGet(name: name,customrequest: '').getdata();
     // print(getresponse['cm_name']);
     if(getresponse.length > 0 ){
@@ -130,7 +127,10 @@ class RequestGet{
   bool withbody;
   final header;
   String customurl;
-  RequestGet({Key key , this.name , this.header , this.withbody , this.customrequest , this.customurl});
+  String errorMessage;
+  String successMessage;
+  bool logResponse;
+  RequestGet({Key key , this.name , this.header , this.withbody , this.customrequest , this.customurl, this.errorMessage,this.logResponse, this.successMessage});
 
   getdata() async {
 
@@ -151,11 +151,21 @@ class RequestGet{
         },
       );
       dynamic dataresponse = json.decode(data.body);
-      print(dataresponse.toString());
-      if(data.statusCode == 200){
+
+      if(logResponse == true){
+        print(dataresponse.toString());
+      }
+      
+    if(data.statusCode == 200){
+      if(successMessage != null && successMessage != ''){
+        Fluttertoast.showToast(msg:successMessage);
+      }
       return dataresponse;
     }else{
-      Fluttertoast.showToast(msg:'Error Code ${data.statusCode}');
+      if(errorMessage != null && errorMessage != ''){
+        Fluttertoast.showToast(msg:errorMessage);
+      }
+      print('${data.statusCode}');
       return 'failure';
     }
 
@@ -165,7 +175,7 @@ class RequestGet{
       Fluttertoast.showToast(msg:'Request Timeout, try again',);
     } catch (e) {
       print(e.toString());
-      Fluttertoast.showToast(msg:e.toString(),);
+      Fluttertoast.showToast(msg:e.toString());
     }
   }
 }
@@ -175,9 +185,12 @@ class RequestPost{
   String name;
   dynamic body;
   final header;
-  final msg;
+  String errorMessage;
+  String successMessage;
+  bool logResponse;
   String customurl;
-  RequestPost({Key key , this.name , this.header,this.body,this.msg , this.customurl});
+
+  RequestPost({Key key , this.name , this.header,this.body , this.customurl,this.errorMessage,this.logResponse, this.successMessage});
   sendrequest() async {
     if(customurl != null && customurl != ''){
       url = customurl;
@@ -197,12 +210,15 @@ class RequestPost{
       );
       dynamic dataresponse = json.decode(data.body);
       if(data.statusCode == 200){
-        if(msg != null){
-          Fluttertoast.showToast(msg:msg);
+        if(successMessage != null && successMessage != ''){
+          Fluttertoast.showToast(msg:successMessage);
         }
       return dataresponse;
     }else{
-      Fluttertoast.showToast(msg:'Error Code ${data.statusCode}');
+      print('Error Code ${data.statusCode}');
+      if(errorMessage != null && errorMessage != ''){
+          Fluttertoast.showToast(msg:errorMessage);
+      }
       return 'gagal';
     }
 
@@ -215,54 +231,4 @@ class RequestPost{
       Fluttertoast.showToast(msg:e.toString(),);
     }
   }
-}
-
-class ArrayRequestSend{
-  var name;
-  var request;
-  Map<String,dynamic> requestbody;
-  var msg;
-  var customurl;
-  ArrayRequestSend({Key key , this.name , this.request, this.requestbody , this.msg , this.customurl});
-    senddata() async {
-    if(customurl != '' || customurl != null){
-      url = customurl;
-    }
-    // Map data;
-    try {
-
-      Dio dio = new Dio();
-
-      Response sendpostapi = await dio.post(
-        url+name,
-        data: requestbody,
-      );
-      
-      print(sendpostapi.statusCode.toString());
-      if (sendpostapi.statusCode == 200) {
-        dynamic sendpostapiJson = sendpostapi.statusMessage;
-        // Fluttertoast.showToast(msg:"from response $sendpostapiJson, ${sendpostapi.data}");
-        Fluttertoast.showToast(msg:sendpostapiJson);
-        if(msg != null){
-          Fluttertoast.showToast(msg:msg);
-        }
-          // Fluttertoast.showToast(msg:msg);
-        return 'success';
-      } else {
-        Fluttertoast.showToast(msg:'Error Code : ${sendpostapi.statusCode}');
-      }
-    } on TimeoutException catch (_) {
-      return 'Timed out, try again';
-    } on SocketException catch (_) {
-      return 'Hosting not found';
-    } on DioError catch (e) {
-      Fluttertoast.showToast(msg:e.toString());
-    } catch (e) {
-      Fluttertoast.showToast(msg:e.toString());
-    }
-  }
-}
-
-class ArrayImageSend{
-
 }
