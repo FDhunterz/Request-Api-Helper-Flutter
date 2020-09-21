@@ -1,8 +1,7 @@
-# Request Api Helper Flutter V 1.0.1 REV 1
- Helper Request Post , get , Map builder (Support Passport Laravel)
+# Request Api Helper Flutter V 2.0.2
+ Helper Request Post , get , login passport (Passport Laravel)
  
  > in dependendencies
-  - dio:
   - http:
   - shared_preferences:
   - fluttertoast:	
@@ -13,7 +12,7 @@
  
  - Copy core to lib
  
- import 'package:(your_name_project)/core/api.dart';
+ import api.dart in your dart project
    
  in setting env.dart change :
   - url (yoururl.com/api/) 
@@ -26,57 +25,47 @@
  - make function
  
  signin() async {
-
-    // for return of API
-    
-    List sessionint = ['cm_id'];
-
-    // for return of API
-
-    List sessionString = ['cm_name','cm_code','cm_email','cm_nphone'];
-
-    // for title In SharedPreference type Integer
-
-    List headsessionint = ['id'];
-
-    // for title In SharedPreference type String
-  
-    List headsessionString = ['name','code','email','telepon'];
-
-    dynamic check = await Auth(name: 'user', username: 'alpha' , password: '123456' , nameStringsession: headsessionString, nameIntsession: headsessionint,dataStringsession: sessionString , dataIntsession: sessionint).getuser();
-
-    print(check);
-
+    <br>
+    // login process (token auto saved)
+    <br>
+    await Auth(username: 'alpha' , password: '123456').login();
+    <br>
   }
   
- > get Session data Easy
+ > get , save , delete , clear Session data Easy
  - create function 
  
- showaccount() async {
-    
-    // title of Shared Preference String
-    
-    List sessionString = ['name'];
-    
-    // title of Shared Preference Interger
-    
-    List sessionInt = ['id'];
-    
-    dynamic result = await Auth(getDataString:sessionString , getDataInt: sessionInt).getsession();
-    
-    print(result); 
-  
+ sessionTutorial() async {
+    <br>
+    // save all Type <br>
+    // caution : name head must be different from other type data<br>
+    await Session().save('my_name','Faizal'); <br>
+    await Session().save('my_number',1); <br>
+    await Session().save('my_bool',true); <br>
+  <br>
+   // load all type <br>
+   String myname = await Session().load('my_name);<br>
+   int myint = await Session().load('my_int);<br>
+   bool mybool = await Session().load('my_bool);<br>
+   <br>
+   // delete all type<br>
+   await Session.delete('my_name');<br>
+   <br>
+   // clear all data<br>
+   await Session.clear();<br>
   }
   
  
  > send request get;
  
- dynamic response = await RequestGet (name: 'sell(your link)', customrequest:''(if null you can use '') ).getdata();
- print(dynamic);
+ dynamic response = await Get(name: 'sell(your link)') ).request();
   
   example : 
   - name : sell,
   - customrequest : '?id=1',
+  - successMessage (nullable),
+  - errorMessage (nullable),
+  - logResponse (bool),
  
   <hr>
  
@@ -87,45 +76,13 @@
     'item' : 10,
  }
  
- dynamic response = await RequestPost(name : 'checkout',body : body, msg:"checkout done").sendrequest();
+ dynamic response = await Post(name : 'checkout',body : body, successMessage:'Thanks For Buying' , errorMessage:'Problem With Server').request();
   
   example :
   - name : link name,
   - customurl : link url (https://www.my.com/api/),
-  - msg : if success trigger toast,
+  - successMessage (nullable),
+  - errorMessage (nullable),
+  - logResponse (bool),
     
   <hr>
- 
- > send request map / array;
- 
- first make List ;
- List header = ['id','name','something'];
- List value = [];
- 
- for(var i = 0 < i < response.length;i++){
-    value.add(response[i]['id']);
-    value.add(response[i]['name']);
-    value.add(response[i]['something']);
- }
- 
- List singlehead = ['bank','note'];
- List singlevalue = ['12389712398723','my checkout'];
- 
-parse List to Map <br>
-
-Map<String,dynamic> parsemap = BuildArray(singlelist: singlehead , singlevalue:  singlevalue , list: head , value: value).withsinglearray(); 
-
-send to server<br>
-
- await ArrayRequestSend(customurl: 'https://mywebsite/api/' ,name: 'checkout/save',msg: "Checkout complete" , requestbody: parsemap).senddata();
-
- 
- Note options : 
-  - singlehead = for 1 singgle value;
-  - singlevalue = only 1 value;
-  - list = for many value,
-  - value = value of list,
- functions :
- array() = for many value,
- withsinglearray = singgle array + many value include;
- 
