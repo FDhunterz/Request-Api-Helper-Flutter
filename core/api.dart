@@ -32,7 +32,7 @@ class Auth{
 
   login() async {
    try{
-    final sendlogin = await http.post(noapiurl+'auth', body: {
+    final sendlogin = await http.post(noapiurl+'oauth/token', body: {
         'grant_type': grantType,
         'client_id': clientId,
         'client_secret': clientsecret,
@@ -50,12 +50,14 @@ class Auth{
           Fluttertoast.showToast(msg:getresponse['hint']);
         } else if (getresponse['token_type'] == 'Bearer') {
           print(getresponse['access_token']);
-          session.saveString('access_token', getresponse['access_token']);
-          session.saveString('token_type', getresponse['token_type']);
+          session.save('access_token', getresponse['access_token']);
+          session.save('token_type', getresponse['token_type']);
         }
       Fluttertoast.showToast(msg:'Token saved');
       // await getUser();
       return print('success');
+    }else if(sendlogin.statusCode == 401){
+      Fluttertoast.showToast(msg:'Password / Username Salah');
     }else{
       Fluttertoast.showToast(msg:'Error Code ${sendlogin.statusCode}');
       return print('failure');
@@ -65,6 +67,7 @@ class Auth{
     } on TimeoutException catch (_){
       return Fluttertoast.showToast(msg:'Request Timeout, try again');
     } catch (e) {
+      print('error Exception');
       return print(e.toString());
     }
   }
@@ -77,13 +80,7 @@ class Auth{
       if(nameSession != null){  
         for(var i = 0; i < nameSession.length ; i++){
           if(responseData[i]){
-            if(getresponse[responseData[i]] is String){
-              session.saveString(nameSession[i], getresponse[responseData[i]]);
-            }else if(getresponse[responseData[i]] is int){
-              session.saveInteger(nameSession[i], getresponse[responseData[i]]);
-            }else if(getresponse[responseData[i]] is bool){
-              session.saveBool(nameSession[i], getresponse[responseData[i]]);
-            }
+            session.save(nameSession[i], getresponse[responseData[i]]);
           }
         }
       }
@@ -97,13 +94,7 @@ class Auth{
     Map <String,dynamic> result = new Map();
     if(getData != null){    
       for(var i = 0 ; i < getData.length;i++){
-        if(result[getData[i]] is String){
-          result[getData[i]] = await session.getString(getData[i]);
-        }else if(result[getData[i]] is int){
-          result[getData[i]] = await session.getInteger(getData[i]);
-        }else if(result[getData[i]] is bool){
-          result[getData[i]] = await session.getBool(getData[i]);
-        }
+        result[getData[i]] = await session.load(getData[i]);
       }
     }
     return result;
@@ -112,34 +103,50 @@ class Auth{
 
 class Get{
   Session session = new Session();
+  /// location : 127.0.0.1/myapps/api/['this is name']
+  /// 
+  /// name = store_data;
   String name;
+  /// location : 127.0.0.1/myapps/api/store_data['this is custom request']
+  /// 
+  /// ex : customrequest : '?id=1'
+  /// 
   String customrequest = '';
-  bool withbody;
-  final header;
-  String customurl;
+  /// ex full custom url : google.com/api/myapps/store_data
+  /// 
+  /// custom request to get data from other website or server
+  /// 
+  String customUrl;
+  /// show error message 
   String errorMessage;
+  /// show success message 
   String successMessage;
+  /// show log print response 
   bool logResponse;
-  Get({Key key , this.name , this.header , this.withbody , this.customrequest , this.customurl, this.errorMessage,this.logResponse, this.successMessage});
+  Get({Key key , this.name , this.customrequest , this.customUrl, this.errorMessage,this.logResponse, this.successMessage});
 
   request() async {
-
-    if(customurl != null && customurl != ''){
-      url = customurl;
-    }
-
-
+    dynamic data;
     try{
-      dynamic acc = await session.getString('token_type');
-      dynamic auth = await  session.getString('access_token');
+      dynamic acc = await session.load('token_type');
+      dynamic auth = await  session.load('access_token');
       String token = "$acc $auth" ;
       
-      final data = await http.get(url + name + customrequest,
-        headers : {
-          'Accept' : 'application/json',
-          'Authorization' : token,
-        },
-      );
+      if(customUrl != null && customUrl != ''){
+        data = await http.get(customUrl,
+          headers : {
+            'Accept' : 'application/json',
+            'Authorization' : token,
+          },
+        );
+      }else{
+        data = await http.get(url + name + customrequest,
+          headers : {
+            'Accept' : 'application/json',
+            'Authorization' : token,
+          },
+        );
+      }
       dynamic dataresponse = json.decode(data.body);
 
       if(logResponse == true){
@@ -156,7 +163,7 @@ class Get{
         Fluttertoast.showToast(msg:errorMessage);
       }
       print('${data.statusCode}');
-      return 'failure';
+      return 'Failed, Code ${data.statusCode}';
     }
 
     } on SocketException catch (_) {
@@ -172,33 +179,61 @@ class Get{
 
 class Post{
   Session session = new Session();
+  /// location : 127.0.0.1/myapps/api/['this is name']
+  /// 
+  /// name = store_data;
   String name;
+  /// 'dynamic' type 
+  /// 
+  /// body = { 'id' : this.id , 'type' : 'owner'  }
+  /// 
   dynamic body;
-  final header;
+  /// show error message 
   String errorMessage;
+  /// show success message 
   String successMessage;
+  /// show log print response 
   bool logResponse;
-  String customurl;
+  /// ex full custom url : google.com/api/myapps/store_data
+  /// 
+  /// custom request to get data from other website or server
+  /// 
+  String customUrl;
+  /// set custom header on request format 
+  /// {  properties : value , other
+  /// }
+  /// 
+  dynamic customHeader;
 
-  Post({Key key , this.name , this.header,this.body , this.customurl,this.errorMessage,this.logResponse, this.successMessage});
+  Post({Key key , this.name,this.body , this.customUrl,this.errorMessage,this.logResponse, this.successMessage , this.customHeader});
   request() async {
-    if(customurl != null && customurl != ''){
-      url = customurl;
-    }
 
+    dynamic data;
     try{
-      dynamic acc = await session.getString('token_type');
-      dynamic auth = await  session.getString('access_token');
+      dynamic acc = await session.load('token_type');
+      dynamic auth = await  session.load('access_token');
       String token = "$acc $auth" ;
 
-      final data = await http.post(url+name,
-        body : body,
-        headers : {
-          'Accept' : 'application/json',
-          'Authorization' : token,
-        },
-      );
+      if(customUrl != null && customUrl != ''){
+        data = await http.post(customUrl,
+          body : body,
+          headers : customHeader,
+        );
+      }else{
+        data = await http.post(url+name,
+          body : body,
+          headers : {
+            'Accept' : 'application/json',
+            'Authorization' : token,
+          },
+        );
+      }
+
       dynamic dataresponse = json.decode(data.body);
+      if(logResponse == true){
+        print(dataresponse.toString());
+      }
+
       if(data.statusCode == 200){
         if(successMessage != null && successMessage != ''){
           Fluttertoast.showToast(msg:successMessage);
@@ -209,7 +244,7 @@ class Post{
       if(errorMessage != null && errorMessage != ''){
           Fluttertoast.showToast(msg:errorMessage);
       }
-      return 'gagal';
+      return 'Failed, Code ${data.statusCode}';
     }
 
     } on SocketException catch (_) {

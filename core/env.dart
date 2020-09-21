@@ -1,4 +1,7 @@
+// example https://this.com/api/
 String url = '';
+
+// example https://this.com/
 String noapiurl = '';
 
 // Custom api / Laravel Passport
