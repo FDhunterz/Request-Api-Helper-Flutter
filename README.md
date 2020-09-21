@@ -62,11 +62,16 @@
   
   example : 
   - name : sell,
-  - customrequest : '?id=1',
+  - customRequest : '?id=1',
   - successMessage (nullable),
   - errorMessage (nullable),
   - logResponse (bool),
- 
+  
+  <br>
+  <br>
+  // customUrl<br>
+  dynamic response = await Get(customUrl:'https://jsonplaceholder.typicode.com/todos/1',logResponse:true).request();
+  
   <hr>
  
  > send request post;
@@ -84,5 +89,11 @@
   - successMessage (nullable),
   - errorMessage (nullable),
   - logResponse (bool),
+  
+  <br>
+  <br>
+  // customUrl<br>
+  dynamic response = await Post(customUrl:'https://jsonplaceholder.typicode.com/todos/1',logResponse:true).request();
+  
     
   <hr>
