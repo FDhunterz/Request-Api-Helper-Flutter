@@ -70,7 +70,7 @@
   <br>
   <br>
   // customUrl<br>
-  dynamic response = await Get(customUrl:'https://jsonplaceholder.typicode.com/todos/1',logResponse:true).request();
+  dynamic response = await Get(customUrl:'https://jsonplaceholder.typicode.com/todos/1' ,logResponse:true).request();
   
   <hr>
  
@@ -93,7 +93,7 @@
   <br>
   <br>
   // customUrl<br>
-  dynamic response = await Post(customUrl:'https://jsonplaceholder.typicode.com/todos/1',logResponse:true).request();
+  dynamic response = await Post(customUrl:'https://jsonplaceholder.typicode.com/todos/1' ,logResponse:true).request();
   
     
   <hr>
