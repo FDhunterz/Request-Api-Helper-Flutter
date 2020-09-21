@@ -127,24 +127,30 @@ class Get{
 
   request() async {
     dynamic data;
+    dynamic header;
     try{
       dynamic acc = await session.load('token_type');
       dynamic auth = await  session.load('access_token');
       String token = "$acc $auth" ;
+
+      if(auth != null || auth != ''){
+        header = {
+          'Accept' : 'application/json',
+          'Authorization' : token,
+        };
+      }else{
+        header = {
+          'Accept' : 'application/json',
+        };
+      }
       
       if(customUrl != null && customUrl != ''){
         data = await http.get(customUrl,
-          headers : {
-            'Accept' : 'application/json',
-            'Authorization' : token,
-          },
+          headers : header
         );
       }else{
         data = await http.get(url + name + customrequest,
-          headers : {
-            'Accept' : 'application/json',
-            'Authorization' : token,
-          },
+          headers : header
         );
       }
       dynamic dataresponse = json.decode(data.body);
@@ -209,10 +215,22 @@ class Post{
   request() async {
 
     dynamic data;
+    dynamic header;
     try{
       dynamic acc = await session.load('token_type');
       dynamic auth = await  session.load('access_token');
       String token = "$acc $auth" ;
+
+      if(auth != null || auth != ''){
+        header = {
+          'Accept' : 'application/json',
+          'Authorization' : token,
+        };
+      }else{
+        header = {
+          'Accept' : 'application/json',
+        };
+      }
 
       if(customUrl != null && customUrl != ''){
         data = await http.post(customUrl,
@@ -222,10 +240,7 @@ class Post{
       }else{
         data = await http.post(url+name,
           body : body,
-          headers : {
-            'Accept' : 'application/json',
-            'Authorization' : token,
-          },
+          headers : header,
         );
       }
 
