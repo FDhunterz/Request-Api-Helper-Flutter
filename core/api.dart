@@ -156,7 +156,7 @@ class Get{
       }
       dynamic dataresponse = json.decode(data.body);
       if(logResponse == true){
-        await Response().start(dataresponse,1,false);
+        await Response().start(dataresponse,1);
       }
       
     if(data.statusCode == 200){
@@ -246,7 +246,7 @@ class Post{
 
       dynamic dataresponse = json.decode(data.body);
       if(logResponse == true){
-        await Response().start(dataresponse,1,false);
+        await Response().start(dataresponse,1);
       }
 
       if(data.statusCode == 200){
