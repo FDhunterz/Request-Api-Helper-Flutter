@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
 import 'env.dart';
+import 'response.dart';
 
 // core login
 
@@ -154,9 +155,8 @@ class Get{
         );
       }
       dynamic dataresponse = json.decode(data.body);
-
       if(logResponse == true){
-        print(dataresponse.toString());
+        await Response().start(dataresponse,1);
       }
       
     if(data.statusCode == 200){
@@ -246,7 +246,7 @@ class Post{
 
       dynamic dataresponse = json.decode(data.body);
       if(logResponse == true){
-        print(dataresponse.toString());
+        await Response().start(dataresponse,1);
       }
 
       if(data.statusCode == 200){
