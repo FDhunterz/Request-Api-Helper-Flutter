@@ -44,9 +44,9 @@
     await Session().save('my_bool',true); <br>
   <br>
    // load all type <br>
-   String myname = await Session().load('my_name);<br>
-   int myint = await Session().load('my_int);<br>
-   bool mybool = await Session().load('my_bool);<br>
+   String myname = await Session().load('my_name');<br>
+   int myint = await Session().load('my_int');<br>
+   bool mybool = await Session().load('my_bool');<br>
    <br>
    // delete all type<br>
    await Session.delete('my_name');<br>
