@@ -28,7 +28,10 @@ class Auth{
   /// 
   /// work with nameSession
   List nameSession;
-  Auth({Key key , this.nameSession, this.responseData , this.getData , this.name ,@required this.username,@required this.password});
+  /// show Exception
+  bool exception = false;
+
+  Auth({Key key , this.nameSession, this.responseData , this.getData , this.name ,@required this.username,@required this.password, this.exception});
 
 
   login() async {
@@ -60,7 +63,9 @@ class Auth{
     }else if(sendlogin.statusCode == 401){
       Fluttertoast.showToast(msg:'Password / Username Salah');
     }else{
-      Fluttertoast.showToast(msg:'Error Code ${sendlogin.statusCode}');
+      if(exception){
+        Fluttertoast.showToast(msg:'Error Code ${sendlogin.statusCode}');
+      }
       return print('failure');
     }
    } on SocketException catch (_) {
@@ -69,7 +74,11 @@ class Auth{
       return Fluttertoast.showToast(msg:'Request Timeout, try again');
     } catch (e) {
       print('error Exception');
-      return print(e.toString());
+      if(exception){
+        Fluttertoast.showToast(msg:'Error Exception');
+        Fluttertoast.showToast(msg:e.toString());
+        return print(e.toString());
+      }
     }
   }
 
@@ -124,7 +133,9 @@ class Get{
   String successMessage;
   /// show log print response 
   bool logResponse;
-  Get({Key key , this.name , this.customrequest , this.customUrl, this.errorMessage,this.logResponse, this.successMessage});
+  /// show Exception
+  bool exception = false;
+  Get({Key key , this.name , this.customrequest , this.customUrl, this.errorMessage,this.logResponse, this.successMessage, this.exception});
 
   request() async {
     dynamic data;
@@ -168,6 +179,9 @@ class Get{
       if(errorMessage != null && errorMessage != ''){
         Fluttertoast.showToast(msg:errorMessage);
       }
+      if(exception){
+        Fluttertoast.showToast(msg:dataresponse);
+      }
       print('${data.statusCode}');
       return 'Failed, Code ${data.statusCode}';
     }
@@ -177,8 +191,11 @@ class Get{
     } on TimeoutException catch (_){
       Fluttertoast.showToast(msg:'Request Timeout, try again',);
     } catch (e) {
-      print(e.toString());
-      Fluttertoast.showToast(msg:e.toString());
+      if(exception){
+        Fluttertoast.showToast(msg:'Error Exception');
+        Fluttertoast.showToast(msg:e.toString());
+        print(e.toString());
+      }
     }
   }
 }
@@ -210,8 +227,11 @@ class Post{
   /// }
   /// 
   dynamic customHeader;
+  /// show Exception
+  bool exception = false;
 
-  Post({Key key , this.name,this.body , this.customUrl,this.errorMessage,this.logResponse, this.successMessage , this.customHeader});
+
+  Post({Key key , this.name,this.body , this.customUrl,this.errorMessage,this.logResponse, this.successMessage , this.customHeader , this.exception});
   request() async {
 
     dynamic data;
@@ -259,16 +279,24 @@ class Post{
       if(errorMessage != null && errorMessage != ''){
           Fluttertoast.showToast(msg:errorMessage);
       }
+      if(exception){
+        Fluttertoast.showToast(msg:dataresponse);
+      }
       return 'Failed, Code ${data.statusCode}';
     }
+
+    
 
     } on SocketException catch (_) {
       Fluttertoast.showToast(msg:'Connection Timed Out',);
     } on TimeoutException catch (_){
       Fluttertoast.showToast(msg:'Request Timeout, try again',);
     } catch (e) {
-      print(e.toString());
-      Fluttertoast.showToast(msg:e.toString(),);
+      if(exception){
+        Fluttertoast.showToast(msg:'Error Exception');
+        Fluttertoast.showToast(msg:e.toString());
+        print(e.toString());
+      }
     }
   }
 }
