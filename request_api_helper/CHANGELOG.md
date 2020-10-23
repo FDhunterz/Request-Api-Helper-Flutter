@@ -1,3 +1,8 @@
+## 2.0.6+1 - Bug in logResponse.
+
+* adding States for call setstate other class
+* Fixing Bug logResponse
+
 ## 2.0.5 - Return Message.
 
 * default SuccessMessage & ErrorMessage

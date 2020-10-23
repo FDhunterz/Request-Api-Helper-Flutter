@@ -79,7 +79,6 @@ class Auth{
 
 
   login() async {
-  print(url);
    try{
     final sendlogin = await http.post(noapiurl+'oauth/token', body: {
         'grant_type': grantType,
@@ -125,34 +124,6 @@ class Auth{
         return print(e.toString());
       }
     }
-  }
-
-  getUser() async {
-    dynamic getresponse = await Get(name: name,customrequest: '',exception: false).request();
-    // print(getresponse['cm_name']);
-    if(getresponse.length > 0 ){
-      
-      if(nameSession != null){  
-        for(var i = 0; i < nameSession.length ; i++){
-          if(responseData[i]){
-            session.save(nameSession[i], getresponse[responseData[i]]);
-          }
-        }
-      }
-      Fluttertoast.showToast(msg:'Login Success');
-    }else{
-    Fluttertoast.showToast(msg:'Profile Not Found');
-    }
-  }
-
-  getsession() async {
-    Map <String,dynamic> result = new Map();
-    if(getData != null){    
-      for(var i = 0 ; i < getData.length;i++){
-        result[getData[i]] = await session.load(getData[i]);
-      }
-    }
-    return result;
   }
 }
 
@@ -455,8 +426,8 @@ class Response{
   dynamic edited;
   dynamic total;
   int loopLvl = 0;
-  String tab = '  ';
-  String tabLvl = '';
+  String tabLvl = ' ';
+  String tab;
   Map<dynamic,dynamic> thisarrlvl = <dynamic,dynamic>{};
   Map<dynamic,dynamic> thisendkey = <dynamic,dynamic>{};
   
@@ -473,46 +444,36 @@ class Response{
    bool arrobj = arrayobject;
    
    if(thisarrlvl[lvl] is Map){
-      if(lvl == 1){
-        tabLvl = '';
-      }
-      if(arrobj == true){          
-      }else{
-        tabLvl += '$tab';
+      tab = '';
+      for(int i = 0; i < lvl - 1;i++){
+        tab += tabLvl;
       }
       thisarrlvl[lvl].forEach((key,value){
-         if(lvl == 1){
-           tabLvl = '';
-         }
          if(value is String || value is int || value is bool){ 
-          print('$tabLvl$key : $value');
+          print('$tab$key : $value');
          }else if(value is List){
-           print('$tabLvl $key [');
+           if(value.length > 0){
+             print('$tab$key [');
+           }else{
+             print('$tab$key []');
+           }
            thisarrlvl[lvl + 1] = value;
            replaceArr(thisarrlvl[lvl + 1],lvl + 1,arrobj,key);
          }else{
-           print('$tabLvl$key');
+           print('$tab$key');
            thisarrlvl[lvl + 1] = value;
            replaceArr(thisarrlvl[lvl + 1],lvl + 1,arrobj);
          }
       });
     }else if(thisarrlvl[lvl] is List){
+      
      dynamic inlist = '';
       for(int i = 0; i < thisarrlvl[lvl].length;i++){
-         if(lvl == 1){
-           tabLvl = '';
-         }
-         if(thisarrlvl[lvl][i] is Map){
-           if(lvl > 1){
-             if(i == 0){           
-               tabLvl += '$tab';
-             }
-           }
-         }else{
-           if(i == 0){
-             tabLvl += '$tab';
-           } 
-         }
+          tab = '';
+          for(int i = 0; i < lvl - 1;i++){
+            tab += tabLvl;
+          }
+
          if(thisarrlvl[lvl][i] is String || thisarrlvl[lvl][i] is int || thisarrlvl[lvl][i] is bool)     
          {  
            inlist += '${thisarrlvl[lvl][i]}, ';
@@ -530,21 +491,22 @@ class Response{
             if(thisarrlvl[lvl][i] is Map){
                if(i == thisarrlvl[lvl].length - 1){
                   if(lvl > 1){
-                    print('$tabLvl], // End ${thisendkey[lvl]}');
+                    print('$tab], /// End ${thisendkey[lvl]}');
                   }
                }
             }
          }
       } 
       if(inlist != ''){
-       print('$tabLvl $inlist], // End ${thisendkey[lvl]}');
+        print('$tabLvl $inlist], // End ${thisendkey[lvl]}');
       }
       arrobj = false;
     }else{
-      if(lvl == 1){
-        tabLvl = '';
+      tab = '';
+      for(int i = 0; i < lvl - 1;i++){
+        tab += tabLvl;
       }
-      print('$tabLvl${thisarrlvl[lvl]}');
+      print('$tab${thisarrlvl[lvl]}');
     }
   }
 }
@@ -611,3 +573,44 @@ class Session {
   }
 }
 
+class States extends State{
+  /// this is function (){ any function };
+  VoidCallback setStates;
+
+  /// target to Set State<>
+  List<State> states;
+
+  /// example
+  /// 
+  ///       class BottomNavbars extends State<BottomNavbar>{
+  ///         setRefresh(){
+  ///           refresh = false;
+  ///         }
+  /// 
+  ///         getRefresh(){
+  ///           return refresh;
+  ///         }
+  ///       }
+  /// 
+  /// refresh : BottomNavbar()
+  dynamic refresh;
+  
+
+  States({ @required this.setStates , @required this.states, @required this.refresh});
+
+  rebuildWidgetss() async {
+    if (states != null) {
+      if(await refresh.getRefresh() == true){
+        states.forEach((s) {
+          if (s != null && s.mounted) s.setState(setStates ??(){});
+        });
+      }
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    print(
+        "This build function will never be called. it has to be overriden here because State interface requires this");
+    return null;
+  }  
+}
