@@ -165,7 +165,7 @@ class Get{
       dynamic auth = await  session.load('access_token');
       String token = "$acc $auth" ;
 
-      if(auth != null || auth != ''){
+      if(auth != null && auth != ''){
         header = {
           'Accept' : 'application/json',
           'Authorization' : token,
@@ -206,8 +206,8 @@ class Get{
       if(exception){
         Fluttertoast.showToast(msg:dataresponse);
       }
-      print('${data.statusCode}');
-      return 'Failed, Code ${data.statusCode}';
+      print('Failed, Code ${data.statusCode}');
+      return {'statusCode' : data.statusCode};
     }
 
     } on SocketException catch (_) {
@@ -314,7 +314,7 @@ class Post{
       dynamic auth = await  session.load('access_token');
       String token = "$acc $auth" ;
 
-      if(auth != null || auth != ''){
+      if(auth != null && auth != ''){
         header = {
           'Accept' : 'application/json',
           'Authorization' : token,
@@ -359,7 +359,7 @@ class Post{
       if(exception){
         Fluttertoast.showToast(msg:dataresponse);
       }
-      return 'Failed, Code ${data.statusCode}';
+      return {'statusCode' : data.statusCode};
     }
 
     
