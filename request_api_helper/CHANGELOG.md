@@ -1,3 +1,6 @@
+## 2.1.0 - Server Swither
+* Server Switcher button
+
 ## 2.0.6+1 - Bug in logResponse.
 
 * adding States for call setstate other class

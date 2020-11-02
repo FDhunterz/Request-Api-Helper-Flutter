@@ -1,6 +1,6 @@
 name: request_api_helper
 description: http, shared_preferences helper for Lavarel and other.
-version: 2.0.6+3
+version: 2.1.0+4
 homepage: https://github.com/FDhunterz/Request-Api-Helper-Flutter-V-2.0.2
 
 environment:
