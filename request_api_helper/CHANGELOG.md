@@ -1,3 +1,6 @@
+## 2.1.0+5
+* Readme Update
+
 ## 2.1.0 - Server Swither
 * Server Switcher button
 

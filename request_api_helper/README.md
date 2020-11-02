@@ -1,41 +1,180 @@
-# request_api_helper
+# Request Api Helper
 
-## 1.Setting inside main
+Post, Get, Save, Helper for Flutter;
 
-Env(<br>
-    confurl: 'https://url/api/',<br>
-    confnoapiurl:  'https://url/',<br>
-    confclientId: 'client id laravel',<br>
-    confclientsecret: 'client secret laravel',<br>
-    confgrantType: 'password',<br>
-).save();<br>
+## Installation
 
-set login first<br>
+Add this to your package's pubspec.yaml file:
 
-Auth(username: 'your username',password:'your password', exception:false).login()<br>
+```bash
+dependencies:
+  request_api_helper:
+```
 
-## 2.how to use Get / Post http?
+## Usage
 
-dynamic response = await Post(<br>
-    name: (route after /api/),<br>
-    body: {<br>
-        'example' : 'this example',<br>
-    },<br>
-    logResponse: true/false (to see response processed),<br>
-    exception : true/false (show exception Error),<br>
-).request();<br>
+```dart
+import 'package:request_api_helper/request_api_helper.dart';
+```
 
-optional customUrl, example = 'https://example.com/api/custom/request/v1' [full url needed].<br>
-optional customHeader.<br>
+## 1 . Setting Env
+use static Env in main like this (Release):
 
-## 3.how to save / load shared_preference?
+```dart
+// == 200 response dynamic
+// != 200 response {'statusCode' : other int code}
 
-Session().save('name','FDhunter');<br>
-Session().save('number',12390123);<br>
-Session().save('login',true);<br>
-<br>
-note : name session must be different.<br>
+void main(
+  Env(
+    confurl: 'http://rootUrl/api/',
+    confnoapiurl: 'http://rootUrl/'
+  ).save();
+  runApp(MyApp());
+}
 
-String name = await Session().load('name');<br>
-int number = await Session().load('number');<br>
-bool loginState = await Session().load('login');<br>
+```
+
+or use Server Switcher (Team Developing)
+
+```dart
+
+ServerSwitcher(
+ servers: [
+   {'name' : 'Server 1' , 'id' : 'http://rootUrl/'},
+   {'name' : 'Server 2' , 'id' : 'http://rootUrl2/'},
+ ]
+)
+
+```
+
+## 2 . Make Login And Saving Token
+First you must make login request.
+
+```dart
+login() async {
+======================= GET DATA FROM SERVER
+
+// == 200 response dynamic
+// != 200 response {'statusCode' : other int code}
+dynamic response = await Post( 
+ name: 'login', // full url http://rootUrl/api/login
+ exception : true, // error exception, false to hide
+ successMessage : 'default',
+ errorMessage : 'Try Again!',
+ logResponse : false, // showing server response
+ timeout : true, // if timeout true .request(context)
+).request(context); 
+
+// note : 
+
+// successMessage : 'default' auto show message from server [200]
+// { 'message' : 'Thanks For Buy' }
+
+// errorMessage : 'default' auto show message from server [!=200]
+// { 'message' : 'Error You Must Login' }
+
+// timeout : CustomTimeout() // for routing to your custom view
+
+======================= Process Data
+// ex : response is 
+// {'token' : 'mytoken' , 'user' : {'name' : 'MIAUW' , 'id' : 1}}
+
+if(response != null){
+  if(response['statusCode'] == null){
+
+    // important
+    await Session().save('access_token', response['token']);
+    await Session().save('token_type', 'Bearer');
+
+    // auto save different type data
+    await Session().save('user_name',response['user']['name']);
+    await Session().save('user_id',response['user']['id']);
+  }
+}
+
+}
+```
+
+## 3 . Use Post / Get After Saving Token
+
+Post
+
+```dart
+Map<String,dynamic> mydata = await Post( 
+ name: 'data/employee', // full url http://rootUrl/api/data/employee
+ exception : true,
+ logResponse : true,
+ timeout : true, 
+).request(context); 
+
+if(mydata != null){
+ if(mydata['statusCode'] == null){
+  // success return
+ }{
+  // error return
+ }
+ // no response
+}
+
+```
+
+Get
+
+```dart
+Map<String,dynamic> mydata = await Get( 
+ name: 'data/employee', // full url http://rootUrl/api/data/employee
+ exception : true,
+ logResponse : true,
+ timeout : true, 
+ customRequest : '?mydata=$yourdata',
+).request(context); 
+
+if(mydata != null){
+ if(mydata['statusCode'] == null){
+  // success return
+ }{
+  // error return
+ }
+ // no response
+}
+
+```
+
+## 4 . Use Post / Get other Url?
+
+
+```dart
+Map<String,dynamic> mydata = await Post( 
+ name: 'image/myimage', // full url http://google.com/api/image/myimage
+ customUrl : 'http://google.com/api/',
+ customHeader : {
+   'your header' : 'this header',
+ },
+ body : {
+   'mybody' : 'myvalue',
+ }
+ exception : true,
+ logResponse : true,
+ timeout : true, 
+).request(context); 
+```
+
+## 4 . What is Session?
+
+session is Shared preferences plugin, implement :
+
+save to Shared Preferences
+```dart
+await Session().save('myname','MIAUW'); // String
+await Session().save('myint',100); // int
+await Session().save('mybool',false); // bool
+
+```
+
+load from Shared Preferences
+```dart
+String mystring = await Session().load('myname'); // String
+int myint = await Session().load('myint'); // int
+bool mybool = await Session().load('mybool'); // bool
+
+```
