@@ -14,9 +14,13 @@ void main() {
       confgrantType: 'password',
     ).save();
 
-    await Auth(username: 'developer',password: '123456',exception: true).login();
+    // await Auth(username: 'developer',password: '123456',exception: true).login();
 
-    await Post(name: 'test/list', logResponse: true,exception: true).request();
+    await Post(
+      name: 'test/list', 
+      logResponse: true,
+      exception: true,
+    ).request();
   });
 }
 

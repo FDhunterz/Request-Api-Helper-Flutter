@@ -1,3 +1,6 @@
+## 2.1.1 - Image
+* Post add attribute file
+
 ## 2.1.0+5
 * Readme Update
 

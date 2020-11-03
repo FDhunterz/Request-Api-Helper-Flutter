@@ -2,6 +2,17 @@
 
 Post, Get, Save, Helper for Flutter;
 
+## New Updates
+```dart
+  Post {
+    ...
+    ...
+    ...
+    file : file, // String path of file
+    fileRequestName : 'images' // request name of file
+  }.request()
+```
+
 ## Installation
 
 Add this to your package's pubspec.yaml file:

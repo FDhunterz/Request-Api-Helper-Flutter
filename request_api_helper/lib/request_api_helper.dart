@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
 import 'timeout.dart';
+import 'package:http_parser/http_parser.dart';
 
 // example https://this.com/api/
 String url;
@@ -304,14 +305,18 @@ class Post{
   ///
   ///use timeout=your_route
   dynamic timeout;
+  /// request body for file
+  String fileRequestName;
+  String file;
 
 
 
-  Post({Key key , this.name,this.body , this.customUrl,this.errorMessage,this.logResponse, this.successMessage , this.customHeader ,@required this.exception, this.timeout});
+  Post({Key key , this.name,this.body , this.customUrl,this.errorMessage,this.logResponse, this.successMessage , this.customHeader ,@required this.exception, this.timeout, this.file , this.fileRequestName});
   request([context]) async {
 
     dynamic data;
     dynamic header;
+    dynamic res;
     try{
       dynamic acc = await session.load('token_type');
       dynamic auth = await  session.load('access_token');
@@ -328,24 +333,49 @@ class Post{
         };
       }
 
-      if(customUrl != null && customUrl != ''){
-        data = await http.post(customUrl,
-          body : body,
-          headers : customHeader,
+      if(file != null){
+        var request;
+        if(customUrl != null && customUrl != ''){
+          request = http.MultipartRequest('POST', Uri.parse(customUrl));
+          customHeader == null ?? request.headers.addAll(customHeader);
+        }else{
+          request = http.MultipartRequest('POST', Uri.parse(url+name));
+          request.headers.addAll(header);
+        }
+
+        if(body is Map){
+          body.forEach((k,v){
+            request.fields[k] = v;
+          });
+        }
+
+        request.files.add(await http.MultipartFile.fromPath(
+          fileRequestName ?? 'file', file,
+          contentType: MediaType('application', file.split('.').last)
+          )
         );
+
+        res = await request.send();
       }else{
-        data = await http.post(url+name,
-          body : body,
-          headers : header,
-        );
+        if(customUrl != null && customUrl != ''){
+          data = await http.post(customUrl,
+            body : body,
+            headers : customHeader,
+          );
+        }else{
+          data = await http.post(url+name,
+            body : body,
+            headers : header,
+          );
+        }
       }
 
-      dynamic dataresponse = json.decode(data.body);
+      dynamic dataresponse = json.decode(file != null ? await res.stream.bytesToString() : data.body);
       if(logResponse == true){
         await Response().start(dataresponse,1,false);
       }
 
-      if(data.statusCode == 200){
+      if(file != null ? res.statusCode == 200 : data.statusCode == 200){
         if(successMessage == 'default'){
           Fluttertoast.showToast(msg:dataresponse['message']);
         }else if(successMessage != null && successMessage != ''){
@@ -353,7 +383,7 @@ class Post{
         }
       return dataresponse;
     }else{
-      print('Error Code ${data.statusCode}');
+      print('Error Code ${file != null ? res.statusCode : data.statusCode}');
       if(errorMessage == 'default'){
           Fluttertoast.showToast(msg:dataresponse['message']);
       }else if(errorMessage != null && errorMessage != ''){
@@ -362,7 +392,7 @@ class Post{
       if(exception){
         Fluttertoast.showToast(msg:dataresponse);
       }
-      return {'statusCode' : data.statusCode};
+      return {'statusCode' : file != null ? res.statusCode : data.statusCode};
     }
 
     
