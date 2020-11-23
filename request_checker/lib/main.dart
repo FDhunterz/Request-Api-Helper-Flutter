@@ -33,15 +33,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   postWithName() async {
     dynamic data = await Post(
-      exception: false,
+      exception: true,
       name: 'launcher/list',
       timeoutRedirect: true,
       socketRedirect: true,
       onException: (v)=> print(v),
+      timeout: 60000,
     ).request(context);
 
     if(data != null){
       if(data['statusCode'] == null){
+        print(data);
         // no error [200]
       }else{
         // error code != [200]
@@ -100,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             ServerSwitcher(
               servers: [
-                {'my Server' : 'https://scool.alamraya.site'}
+                {'name': 'my Server' , 'id' : 'http://192.168.0.117/scool/'}
               ],
             ),
 

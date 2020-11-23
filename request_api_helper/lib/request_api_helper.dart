@@ -136,19 +136,21 @@ class Get{
       }
       String _request = '?';
 
-      if(body is Map){
-        int _counter = 0;
-        body.forEach((key, value) {
-          ++_counter;
-          if(value == null){
-            return Fluttertoast.showToast(msg:'$key No Have a Value');
-          }
-          if(!(_counter == body.length)){
-            _request += '$key=$value&';
-          }else{
-            _request += '$key=$value';
-          }
-        });
+      if(body != null){
+        if(body is Map){
+          int _counter = 0;
+          body.forEach((key, value) {
+            ++_counter;
+            if(value == null){
+              return Fluttertoast.showToast(msg:'$key No Have a Value');
+            }
+            if(!(_counter == body.length)){
+              _request += '$key=$value&';
+            }else{
+              _request += '$key=$value';
+            }
+          });
+        }
       }
       
       if(customUrl != null && customUrl != ''){
@@ -359,10 +361,12 @@ class Post{
           request.headers.addAll(header);
         }
 
-        if(body is Map){
-          body.forEach((k,v){
-            request.fields[k] = v;
-          });
+        if(body != null){
+          if(body is Map){
+              body.forEach((k,v){
+              request.fields[k] = v;
+            });
+          }
         }
 
         request.files.add(await http.MultipartFile.fromPath(

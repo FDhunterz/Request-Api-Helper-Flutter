@@ -136,19 +136,21 @@ class Get{
       }
       String _request = '?';
 
-      if(body is Map){
-        int _counter = 0;
-        body.forEach((key, value) {
-          ++_counter;
-          if(value == null){
-            return Fluttertoast.showToast(msg:'$key No Have a Value');
-          }
-          if(!(_counter == body.length)){
-            _request += '$key=$value&';
-          }else{
-            _request += '$key=$value';
-          }
-        });
+      if(body != null){
+        if(body is Map){
+          int _counter = 0;
+          body.forEach((key, value) {
+            ++_counter;
+            if(value == null){
+              return Fluttertoast.showToast(msg:'$key No Have a Value');
+            }
+            if(!(_counter == body.length)){
+              _request += '$key=$value&';
+            }else{
+              _request += '$key=$value';
+            }
+          });
+        }
       }
       
       if(customUrl != null && customUrl != ''){
@@ -343,11 +345,13 @@ class Post{
         };
       }
 
-      body.forEach((k,v){
-        if(v == null){
-          return Fluttertoast.showToast(msg:'$k No Have Value');
-        }
-      });
+      if(body != null){
+        body.forEach((k,v){
+          if(v == null){
+            return Fluttertoast.showToast(msg:'$k No Have Value');
+          }
+        });
+      }
 
       if(file != null){
         var request;
@@ -359,10 +363,12 @@ class Post{
           request.headers.addAll(header);
         }
 
-        if(body is Map){
-          body.forEach((k,v){
-            request.fields[k] = v;
-          });
+        if(body != null){
+          if(body is Map){
+              body.forEach((k,v){
+              request.fields[k] = v;
+            });
+          }
         }
 
         request.files.add(await http.MultipartFile.fromPath(
@@ -379,6 +385,7 @@ class Post{
             headers : customHeader,
           ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
         }else{
+          print(url+name);
           data = await http.post(url+name,
             body : body,
             headers : header,
