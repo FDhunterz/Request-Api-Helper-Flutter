@@ -20,6 +20,7 @@ void main() {
       onTimeout: ()=> print('timeout loh'),
       onSocket: ()=> print('internet tidak tersambung'),
       onException: (val)=> print(val),
+      
       body: {
         'lol' : 'a',
         'anjit' : 'anjim'

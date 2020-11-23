@@ -11,6 +11,7 @@
 * (String)socketMessage -> added
 * Get customRequest -> String - changed body -> Map
 * null body checked
+* remove Auth()
 
 ## 2.1.1 - Image
 * Post add attribute file

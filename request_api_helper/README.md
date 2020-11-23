@@ -4,13 +4,19 @@ Post, Get, Save, Helper for Flutter;
 
 ## New Updates
 ```dart
-  Post {
+  await Post / Get {
     ...
-    ...
-    ...
-    file : file, // String path of file
-    fileRequestName : 'images' // request name of file
-  }.request()
+    beforeSend: ()=> print('loading...'), // before send
+    onTimeout: ()=> print('timeout loh'), // if timeout Exception
+    onSocket: ()=> print('internet tidak tersambung'), // if socket Exception
+    onException: (val)=> print(val), // if Exception with Code
+    timeout: 20000, // default 10000 ms
+    onComplete : (v) => print(v), // return Raw HTTP
+    socketMessage : 'Error Connection', // return toast
+    timeoutMessage : 'Error Connection', // return toast
+    socketRedirect : true , // redirect to ...
+    timeoutRedirect : true , // redirect to ...
+  }.request(context)
 ```
 
 ## Installation
@@ -73,7 +79,9 @@ dynamic response = await Post(
  successMessage : 'default',
  errorMessage : 'Try Again!',
  logResponse : false, // showing server response
- timeout : true, // if timeout true .request(context)
+ timeout : 20000, 
+ timeoutRedirect : true // if true .request(context)
+ socketRedirect : true // if true .request(context)
 ).request(context); 
 
 // note : 
@@ -115,7 +123,9 @@ Map<String,dynamic> mydata = await Post(
  name: 'data/employee', // full url http://rootUrl/api/data/employee
  exception : true,
  logResponse : true,
- timeout : true, 
+ timeout : 20000, 
+ timeoutRedirect : true,
+ socketRedirect : true 
 ).request(context); 
 
 if(mydata != null){
@@ -136,8 +146,12 @@ Map<String,dynamic> mydata = await Get(
  name: 'data/employee', // full url http://rootUrl/api/data/employee
  exception : true,
  logResponse : true,
- timeout : true, 
- customRequest : '?mydata=$yourdata',
+ timeout : 20000, 
+ timeoutRedirect : true,
+ socketRedirect : true 
+ body : {
+  'mydata' : 'yourdata'
+ },
 ).request(context); 
 
 if(mydata != null){
@@ -168,6 +182,17 @@ Map<String,dynamic> mydata = await Post(
  logResponse : true,
  timeout : true, 
 ).request(context); 
+```
+
+## File Upload
+```dart
+  Post {
+    ...
+    ...
+    ...
+    file : file, // String path of file
+    fileRequestName : 'images' // request name of file
+  }.request()
 ```
 
 
