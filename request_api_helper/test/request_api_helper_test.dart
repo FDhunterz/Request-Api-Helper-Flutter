@@ -5,22 +5,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:request_api_helper/request_api_helper.dart';
 
 void main() {
-  test('adds one to input values', () async {
-    Env(
-      confurl: 'https://url/api/',
-      confnoapiurl:  'https://url/',
+  Env(
+      confurl: 'https://scool.alamraya.site/api/',
+      confnoapiurl:  'https://scool.alamraya.site/',
       confclientId: '',
       confclientsecret: '',
       confgrantType: 'password',
     ).save();
-
-    // await Auth(username: 'developer',password: '123456',exception: true).login();
-
-    await Post(
-      name: 'test/list', 
-      logResponse: true,
+  test('adds one to input values', () async {
+    dynamic response = await Get(
+      name: 'launcher/list',
       exception: true,
+      beforeSend: ()=> print('a'),
+      onTimeout: ()=> print('timeout loh'),
+      onSocket: ()=> print('internet tidak tersambung'),
+      onException: (val)=> print(val),
+      body: {
+        'lol' : 'a',
+        'anjit' : 'anjim'
+      }
+      // timeout: 3000,
     ).request();
+
+    print(response);
   });
 }
 

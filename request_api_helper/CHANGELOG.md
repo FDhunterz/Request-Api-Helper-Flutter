@@ -1,3 +1,17 @@
+## 2.1.2 - Raw Response
+* onComplete(v) -> added
+* beforeSend() -> added
+* onTimeout() -> added
+* onSocket() -> added
+* timeout -changed before -> dynamic | after -> int 
+* onException(v)->added 
+* (dynamic) timeoutRedirect -> added
+* (dynamic) socketRedirect -> added
+* (String)timeoutMessage -> added
+* (String)socketMessage -> added
+* Get customRequest -> String - changed body -> Map
+* null body checked
+
 ## 2.1.1 - Image
 * Post add attribute file
 
