@@ -385,7 +385,6 @@ class Post{
             headers : customHeader,
           ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
         }else{
-          print(url+name);
           data = await http.post(url+name,
             body : body,
             headers : header,
