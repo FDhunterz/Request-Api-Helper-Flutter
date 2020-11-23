@@ -345,11 +345,13 @@ class Post{
         };
       }
 
-      body.forEach((k,v){
-        if(v == null){
-          return Fluttertoast.showToast(msg:'$k No Have Value');
-        }
-      });
+      if(body != null){
+        body.forEach((k,v){
+          if(v == null){
+            return Fluttertoast.showToast(msg:'$k No Have Value');
+          }
+        });
+      }
 
       if(file != null){
         var request;
@@ -383,6 +385,7 @@ class Post{
             headers : customHeader,
           ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
         }else{
+          print(url+name);
           data = await http.post(url+name,
             body : body,
             headers : header,
