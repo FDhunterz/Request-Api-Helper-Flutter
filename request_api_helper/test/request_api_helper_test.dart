@@ -6,12 +6,9 @@ import 'package:request_api_helper/request_api_helper.dart';
 
 void main() {
   Env(
-      confurl: 'https://scool.alamraya.site/api/',
-      confnoapiurl:  'https://scool.alamraya.site/',
-      confclientId: '',
-      confclientsecret: '',
-      confgrantType: 'password',
-    ).save();
+    confurl: 'https://scool.alamraya.site/api/',
+    confnoapiurl:  'https://scool.alamraya.site/',
+  ).save();
   test('adds one to input values', () async {
     dynamic response = await Get(
       name: 'launcher/list',

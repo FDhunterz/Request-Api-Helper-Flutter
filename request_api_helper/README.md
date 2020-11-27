@@ -4,11 +4,19 @@ Post, Get, Save, Helper for Flutter;
 
 ## New Updates
 ```dart
+  Env(
+    timeout: 10,
+    errorMessage: 'Call Programmer',
+    successMessage: 'default',
+    exception: true,
+    beforeSend: ()=>print('hi this is me')
+  ).saveConfiguration();
+  
   await Post / Get {
     ...
     beforeSend: ()=> print('loading...'), // before send
-    onTimeout: ()=> print('timeout loh'), // if timeout Exception
-    onSocket: ()=> print('internet tidak tersambung'), // if socket Exception
+    onTimeout: ()=> print('this is timeout'), // if timeout Exception
+    onSocket: ()=> print('internet not connected'), // if socket Exception
     onException: (val)=> print(val), // if Exception with Code
     timeout: 20000, // default 10000 ms
     onComplete : (v) => print(v), // return Raw HTTP
@@ -17,6 +25,9 @@ Post, Get, Save, Helper for Flutter;
     socketRedirect : true , // redirect to ...
     timeoutRedirect : true , // redirect to ...
   }.request(context)
+
+  await Session.save('myname','hunter');
+  String name = await Session.load('myname');
 ```
 
 ## Installation

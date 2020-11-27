@@ -1,4 +1,10 @@
-## 2.1.2 - Raw Response
+## 2.2.1 - Change Function
+* Session().save() to Session.save()
+* onError(code,response) -> added
+* onSuccess(response) -> added
+* Env save Request Configuration global 
+
+## 2.2.0 - Raw Response
 * onComplete(v) -> added
 * beforeSend() -> added
 * onTimeout() -> added
@@ -16,9 +22,8 @@
 ## 2.1.1 - Image
 * Post add attribute file
 
-## 2.1.0+5
+## 2.1.0+5 - Readme
 * Readme Update
-
 ## 2.1.0 - Server Swither
 * Server Switcher button
 

@@ -29,6 +29,26 @@ String clientsecret;
 String clientId;
 String grantType = 'password';
 
+// config Request
+  String _errorMessage;
+  String _successMessage;
+  bool _logResponse;
+  bool _exception = false;
+  dynamic _timeoutRedirect;
+  dynamic _socketRedirect;
+  int _timeout;
+  String _timeoutMessage;
+  String _socketMessage;
+  Function _onTimeout;
+  Function _onSocket;
+  Function _onComplete;
+  Function _beforeSend;
+  Function _onException;
+  Function _onSuccess;
+  Function _onError;
+
+
+
 // server selected
 
 class Env{
@@ -48,7 +68,76 @@ class Env{
   /// Laravel Grant Type default 'password'
   String confgrantType = 'password';
 
-  Env({this.confurl , this.confnoapiurl , this.confkey , this.confclientsecret , this.confclientId , this.confgrantType});
+  String errorMessage;
+  /// show success message , use = 'default' to get 'message' : 'your message' response
+  String successMessage;
+  /// show log print response , use = 'default' to get 'message' : 'your message' response
+  bool logResponse;
+  /// show Exception
+  bool exception = false;
+  /// use timeoutRedirect=true for default routing timeout view
+  ///
+  ///use timeoutRedirect=your_route
+  dynamic timeoutRedirect;
+
+  /// use socketRedirect=true for default routing no internet access view
+  ///
+  ///use socketRedirect=your_route
+  dynamic socketRedirect;
+  /// default 10000 ms
+  int timeout;
+  /// show timeout message
+  String timeoutMessage;
+
+  /// show Socket Exception message
+  String socketMessage;
+  
+  /// do a function with if timeout;
+  Function onTimeout;
+
+  /// do a function with if no internet;
+  Function onSocket;
+
+  ///  show raw response from server
+  Function onComplete;
+
+  /// function before send
+  Function beforeSend;
+
+  // function if Exception
+  Function onException;
+
+  // function after encoded json
+  Function onSuccess;
+
+  // function if code != 200
+  Function onError;
+
+  Env({this.confurl ,
+      this.confnoapiurl , 
+      this.confkey , 
+      this.confclientsecret , 
+      this.confclientId , 
+      this.confgrantType,
+      this.errorMessage,
+      this.logResponse, 
+      this.successMessage,
+      this.exception , 
+      this.timeout, 
+      this.onTimeout ,
+      this.onSocket, 
+      this.onComplete, 
+      this.beforeSend, 
+      this.onException,
+      this.socketMessage,
+      this.socketRedirect,
+      this.timeoutMessage,
+      this.timeoutRedirect,
+      this.onError,
+      this.onSuccess
+      });
+
+
   void save()
   {
     url = confurl;
@@ -58,9 +147,28 @@ class Env{
     clientId = confclientId;
     grantType = confgrantType;
   }
+
+  saveConfiguration(){
+    _errorMessage = errorMessage;
+    _successMessage = successMessage;
+    _logResponse = logResponse;
+    _exception = exception;
+    _timeoutRedirect = timeoutRedirect;
+    _socketRedirect = socketRedirect;
+    _timeout = timeout;
+    _timeoutMessage = timeoutMessage;
+    _socketMessage = socketMessage;
+    _onTimeout = onTimeout;
+    _onSocket = onSocket;
+    _onComplete = onComplete;
+    _beforeSend = beforeSend;
+    _onException = onException;
+    _onSuccess = onSuccess;
+    _onError = onError;
+  }
 }
+
 class Get{
-  Session session = new Session();
   /// location : 127.0.0.1/myapps/api/['this is name']
   /// 
   /// name = store_data;
@@ -111,17 +219,44 @@ class Get{
   // function if Exception
   Function onException;
 
-  Get({Key key , this.name , this.body , this.customUrl, this.errorMessage,this.logResponse, this.successMessage,@required this.exception , this.timeout, this.onTimeout ,this.onSocket, this.onComplete, this.beforeSend, this.onException,this.socketMessage,this.socketRedirect,this.timeoutMessage,this.timeoutRedirect});
+  // function after encoded json
+  Function onSuccess;
+
+  // function if code != 200
+  Function onError;
+
+  Get({Key key , 
+      this.name , 
+      this.body , 
+      this.customUrl, 
+      this.errorMessage,
+      this.logResponse, 
+      this.successMessage,
+      @required this.exception , 
+      this.timeout, 
+      this.onTimeout ,
+      this.onSocket, 
+      this.onComplete, 
+      this.beforeSend, 
+      this.onException,
+      this.socketMessage,
+      this.socketRedirect,
+      this.timeoutMessage,
+      this.timeoutRedirect,
+      this.onError,
+      this.onSuccess
+    });
 
   request([context]) async {
+    await loadConfiguration();
     dynamic data;
     dynamic header;
     try{
       if(beforeSend != null){
         await beforeSend();
       }
-      dynamic acc = await session.load('token_type');
-      dynamic auth = await session.load('access_token');
+      dynamic acc = await Session.load('token_type');
+      dynamic auth = await Session.load('access_token');
       String token = "$acc $auth" ;
 
       if(auth != null && auth != ''){
@@ -172,23 +307,31 @@ class Get{
         }
         
         if(data.statusCode == 200){
-          if(successMessage == 'default'){
-            Fluttertoast.showToast(msg:dataresponse['message']);
-          }else if(successMessage != null && successMessage != ''){
-            Fluttertoast.showToast(msg:successMessage);
+          if(onSuccess != null){
+            return onSuccess(dataresponse);
+          }else{
+            if(successMessage == 'default'){
+              Fluttertoast.showToast(msg:dataresponse['message']);
+            }else if(successMessage != null && successMessage != ''){
+              Fluttertoast.showToast(msg:successMessage);
+            }
+            return dataresponse;
           }
-          return dataresponse;
         }else{
-          if(errorMessage == 'default'){
-            Fluttertoast.showToast(msg:dataresponse['message']);
-          }else if(errorMessage != null && errorMessage != ''){
-            Fluttertoast.showToast(msg:errorMessage);
+          if(onError != null){
+            return onError(data.statusCode,dataresponse);
+          }else{
+            if(errorMessage == 'default'){
+              Fluttertoast.showToast(msg:dataresponse['message']);
+            }else if(errorMessage != null && errorMessage != ''){
+              Fluttertoast.showToast(msg:errorMessage);
+            }
+            if(exception){
+              Fluttertoast.showToast(msg:dataresponse);
+            }
+            print('Failed, Code ${data.statusCode}');
+            return {'statusCode' : data.statusCode};
           }
-          if(exception){
-            Fluttertoast.showToast(msg:dataresponse);
-          }
-          print('Failed, Code ${data.statusCode}');
-          return {'statusCode' : data.statusCode};
         }
       }
 
@@ -254,10 +397,74 @@ class Get{
         }
     }
   }
-}
 
+  loadConfiguration(){
+    if(errorMessage == null){
+      errorMessage = _errorMessage;
+    }
+
+    if(successMessage == null){
+      successMessage = _successMessage;
+    }
+    
+    if(logResponse == null){
+      logResponse = _logResponse;
+    }
+    
+    if(exception == null){
+      exception = _exception;
+    }
+    
+    if(timeoutRedirect == null){
+      timeoutRedirect = _timeoutRedirect;
+    }
+    
+    if(socketRedirect == null){
+      socketRedirect = _socketRedirect;
+    }
+
+    if(timeout == null){
+      timeout = _timeout;
+    }
+
+    if(timeoutMessage == null){  
+      timeoutMessage = _timeoutMessage;
+    }
+
+    if(socketMessage == null){  
+      socketMessage = _socketMessage;
+    }
+
+    if(onTimeout == null){
+      onTimeout = _onTimeout;
+    }
+
+    if(onSocket == null){
+      onSocket = _onSocket;
+    }
+
+    if(onComplete == null){
+      onComplete = _onComplete;
+    }
+
+    if(beforeSend == null){
+      beforeSend = _beforeSend;
+    }
+
+    if(onException == null){
+      onException = _onException;
+    }
+
+    if(onSuccess == null){
+    onSuccess = _onSuccess;
+    }
+
+    if(onError == null){  
+      onError = _onError;
+    }
+  }
+}
 class Post{
-  Session session = new Session();
   /// location : 127.0.0.1/myapps/api/['this is name']
   /// 
   /// name = store_data;
@@ -321,18 +528,48 @@ class Post{
   // function if Exception
   Function onException;
 
+  // function after encoded json
+  Function onSuccess;
+
+  // function if code != 200
+  Function onError;
 
 
-  Post({Key key , this.name,this.body , this.customUrl,this.errorMessage,this.logResponse, this.successMessage , this.customHeader ,@required this.exception, this.timeout, this.file , this.fileRequestName , this.onTimeout ,this.onSocket, this.onComplete, this.beforeSend, this.onException,this.socketMessage,this.socketRedirect,this.timeoutMessage,this.timeoutRedirect});
+
+  Post({Key key , 
+    this.name,
+    this.body , 
+    this.customUrl,
+    this.errorMessage,
+    this.logResponse, 
+    this.successMessage , 
+    this.customHeader ,@required 
+    this.exception, 
+    this.timeout, 
+    this.file , 
+    this.fileRequestName , 
+    this.onTimeout ,
+    this.onSocket, 
+    this.onComplete, 
+    this.beforeSend, 
+    this.onException,
+    this.socketMessage,
+    this.socketRedirect,
+    this.timeoutMessage,
+    this.timeoutRedirect,
+    this.onError,
+    this.onSuccess,
+  });
   request([context]) async {
+    await loadConfiguration();
     if(beforeSend != null){
       await beforeSend();
     }
     dynamic data;
     dynamic header;
     try{
-      dynamic acc = await session.load('token_type');
-      dynamic auth = await  session.load('access_token');
+      dynamic acc = await Session.load('token_type');
+      dynamic auth = await  Session.load('access_token');
       String token = "$acc $auth" ;
       if(auth != null && auth != ''){
         header = {
@@ -385,7 +622,6 @@ class Post{
             headers : customHeader,
           ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
         }else{
-          print(url+name);
           data = await http.post(url+name,
             body : body,
             headers : header,
@@ -402,23 +638,31 @@ class Post{
         }
 
         if(data.statusCode == 200){
-          if(successMessage == 'default'){
-            Fluttertoast.showToast(msg:dataresponse['message']);
-          }else if(successMessage != null && successMessage != ''){
-            Fluttertoast.showToast(msg:successMessage);
-          }
-          return dataresponse;
-        } else {
-          print('Error Code ${data.statusCode}');
-          if(errorMessage == 'default'){
+          if(onSuccess != null){
+            return onSuccess(dataresponse);
+          }else{
+            if(successMessage == 'default'){
               Fluttertoast.showToast(msg:dataresponse['message']);
-          }else if(errorMessage != null && errorMessage != ''){
-              Fluttertoast.showToast(msg:errorMessage);
+            }else if(successMessage != null && successMessage != ''){
+              Fluttertoast.showToast(msg:successMessage);
+            }
+            return dataresponse;
           }
-          if(exception){
-            Fluttertoast.showToast(msg:dataresponse);
+        } else {
+          if(onError != null){
+            return onError(data.statusCode,dataresponse);
+          }else{
+            print('Error Code ${data.statusCode}');
+            if(errorMessage == 'default'){
+                Fluttertoast.showToast(msg:dataresponse['message']);
+            }else if(errorMessage != null && errorMessage != ''){
+                Fluttertoast.showToast(msg:errorMessage);
+            }
+            if(exception){
+              Fluttertoast.showToast(msg:dataresponse);
+            }
+            return {'statusCode' : data.statusCode};
           }
-          return {'statusCode' : data.statusCode};
         }
       }
     } on SocketException catch (_) {
@@ -485,13 +729,79 @@ class Post{
       }
     }
   }
+
+  loadConfiguration(){
+    if(errorMessage == null){
+      errorMessage = _errorMessage;
+    }
+
+    if(successMessage == null){
+      successMessage = _successMessage;
+    }
+    
+    if(logResponse == null){
+      logResponse = _logResponse;
+    }
+    
+    if(exception == null){
+      exception = _exception;
+    }
+    
+    if(timeoutRedirect == null){
+      timeoutRedirect = _timeoutRedirect;
+    }
+    
+    if(socketRedirect == null){
+      socketRedirect = _socketRedirect;
+    }
+
+    if(timeout == null){
+      timeout = _timeout;
+    }
+
+    if(timeoutMessage == null){  
+      timeoutMessage = _timeoutMessage;
+    }
+
+    if(socketMessage == null){  
+      socketMessage = _socketMessage;
+    }
+
+    if(onTimeout == null){
+      onTimeout = _onTimeout;
+    }
+
+    if(onSocket == null){
+      onSocket = _onSocket;
+    }
+
+    if(onComplete == null){
+      onComplete = _onComplete;
+    }
+
+    if(beforeSend == null){
+      beforeSend = _beforeSend;
+    }
+
+    if(onException == null){
+      onException = _onException;
+    }
+
+    if(onSuccess == null){
+    onSuccess = _onSuccess;
+    }
+
+    if(onError == null){  
+      onError = _onError;
+    }
+  }
 }
 
 class Session {
   
   /// parameter 1 = header , parameter 2 = value
   /// note : the name must be different from other data types
-  Future<dynamic> save(String name,dynamic value) async{
+  static Future<dynamic> save(String name,dynamic value) async{
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     if(value is String){
       preferences.setString(name, value);
@@ -507,7 +817,7 @@ class Session {
     }
   }
 
-  Future<dynamic> load(String name) async{
+  static Future<dynamic> load(String name) async{
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     bool typeBool = false; 
     bool typeString = false; 

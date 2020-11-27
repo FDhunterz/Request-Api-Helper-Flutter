@@ -3,6 +3,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:request_checker/request_api_helper.dart';
 
 void main() {
+  Env(
+    timeout: 10,
+    errorMessage: 'Hubungi Pengembang',
+    successMessage: 'default',
+    exception: false,
+    beforeSend: ()=>print('hi this is me')
+  ).saveConfiguration();
   runApp(MyApp());
 }
 
@@ -37,8 +44,8 @@ class _MyHomePageState extends State<MyHomePage> {
       name: 'launcher/list',
       timeoutRedirect: true,
       socketRedirect: true,
+      timeout: 1000,
       onException: (v)=> print(v),
-      timeout: 60000,
     ).request(context);
 
     if(data != null){
