@@ -853,7 +853,7 @@ class Session {
     }
   }
   
-  Future<bool> clear() async {
+  static Future<bool> clear() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.clear();
     return true;
