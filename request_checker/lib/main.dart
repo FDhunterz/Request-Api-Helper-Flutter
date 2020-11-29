@@ -8,7 +8,6 @@ void main() {
     errorMessage: 'Hubungi Pengembang',
     successMessage: 'default',
     exception: false,
-    beforeSend: ()=>print('hi this is me')
   ).saveConfiguration();
   runApp(MyApp());
 }
@@ -41,11 +40,34 @@ class _MyHomePageState extends State<MyHomePage> {
   postWithName() async {
     dynamic data = await Post(
       exception: true,
+      name: 'score/data',
+      timeoutRedirect: true,
+      socketRedirect: true,
+      timeout: 10000,
+      onException: (v)=> print(v),
+      withLoading: true,
+      singleContext: true,
+      authErrorRedirect: MyHomePage(title: 'Error 401',),
+    ).request(context);
+
+    await Post(
+      exception: true,
       name: 'launcher/list',
       timeoutRedirect: true,
       socketRedirect: true,
-      timeout: 1000,
+      timeout: 100,
       onException: (v)=> print(v),
+      withLoading: true,
+    ).request(context);
+
+    await Post(
+      exception: true,
+      name: 'launcher/list',
+      timeoutRedirect: true,
+      socketRedirect: true,
+      timeout: 100,
+      onException: (v)=> print(v),
+      withLoading: true,
     ).request(context);
 
     if(data != null){
@@ -76,6 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
       timeoutRedirect: true,
       socketRedirect: true,
       onException: (v)=> print(v),
+      withLoading: true,
     ).request(context);
 
     if(data != null){
@@ -109,7 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             ServerSwitcher(
               servers: [
-                {'name': 'my Server' , 'id' : 'http://192.168.0.117/scool/'}
+                {'name': 'my Server' , 'id' : 'http://192.168.0.117/scool/'},
+                {'name': 'Home Server' , 'id' : 'http://192.168.100.37/scool/'}
               ],
             ),
 

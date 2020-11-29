@@ -1,3 +1,13 @@
+## 2.2.3 - Get Request
+* customHeader -> added (Get)
+* authErrorRedirect : Login() (statefull widget) -> added 
+* singleContext -> added (bool) escaping context rules (rules : remove multiple push context)
+* removing bug multiple push TimeoutRedirect / SocketRedirect  
+
+
+## 2.2.2 - Change Function
+* withLoading -> added
+
 ## 2.2.1 - Change Function
 * Session().save() to Session.save()
 * onError(code,response) -> added

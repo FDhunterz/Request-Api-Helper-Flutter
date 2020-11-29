@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:request_checker/background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -30,23 +31,24 @@ String clientId;
 String grantType = 'password';
 
 // config Request
-  String _errorMessage;
-  String _successMessage;
-  bool _logResponse;
-  bool _exception = false;
-  dynamic _timeoutRedirect;
-  dynamic _socketRedirect;
-  int _timeout;
-  String _timeoutMessage;
-  String _socketMessage;
-  Function _onTimeout;
-  Function _onSocket;
-  Function _onComplete;
-  Function _beforeSend;
-  Function _onException;
-  Function _onSuccess;
-  Function _onError;
-
+String _errorMessage;
+String _successMessage;
+bool _logResponse;
+bool _exception = false;
+dynamic _timeoutRedirect;
+dynamic _socketRedirect;
+int _timeout;
+String _timeoutMessage;
+String _socketMessage;
+Function _onTimeout;
+Function _onSocket;
+Function _onComplete;
+Function _beforeSend;
+Function _onException;
+Function _onSuccess;
+Function _onError;
+dynamic _authErrorRedirect;
+dynamic _currentContext;
 
 
 // server selected
@@ -104,14 +106,17 @@ class Env{
   /// function before send
   Function beforeSend;
 
-  // function if Exception
+  /// function if Exception
   Function onException;
 
-  // function after encoded json
+  /// function after encoded json
   Function onSuccess;
 
-  // function if code != 200
+  /// function if code != 200
   Function onError;
+  
+  // Redrect and remove Session if response [401] 
+  dynamic authErrorRedirect;
 
   Env({this.confurl ,
       this.confnoapiurl , 
@@ -134,7 +139,8 @@ class Env{
       this.timeoutMessage,
       this.timeoutRedirect,
       this.onError,
-      this.onSuccess
+      this.onSuccess,
+      this.authErrorRedirect
       });
 
 
@@ -165,6 +171,7 @@ class Env{
     _onException = onException;
     _onSuccess = onSuccess;
     _onError = onError;
+    _authErrorRedirect = authErrorRedirect;
   }
 }
 
@@ -179,6 +186,11 @@ class Get{
   /// custom request to get data from other website or server
   /// 
   String customUrl;
+  /// set custom header on request format 
+  /// {  properties : value , other
+  /// }
+  /// 
+  dynamic customHeader;
   /// show error message 
   String errorMessage;
   /// show success message , use = 'default' to get 'message' : 'your message' response
@@ -225,6 +237,16 @@ class Get{
   // function if code != 200
   Function onError;
 
+  // Redrect and remove Session if response [401] 
+  dynamic authErrorRedirect;
+
+  // fill type Widget or true value
+  dynamic withLoading;
+
+  // for escaping rules context
+  bool singleContext;
+  
+
   Get({Key key , 
       this.name , 
       this.body , 
@@ -232,7 +254,7 @@ class Get{
       this.errorMessage,
       this.logResponse, 
       this.successMessage,
-      @required this.exception , 
+      this.exception , 
       this.timeout, 
       this.onTimeout ,
       this.onSocket, 
@@ -244,13 +266,30 @@ class Get{
       this.timeoutMessage,
       this.timeoutRedirect,
       this.onError,
-      this.onSuccess
+      this.customHeader,
+      this.onSuccess,
+      this.withLoading,
+      this.singleContext,
+      this.authErrorRedirect
     });
 
   request([context]) async {
     await loadConfiguration();
     dynamic data;
     dynamic header;
+    if(withLoading != null){
+      if(context == null){
+        print('REQUIRED! context parameter in .request(context)');
+        print('REQUIRED! context parameter in .request(context)');
+        print('REQUIRED! context parameter in .request(context)');
+      }else{
+        isLoading = true;
+        BackDark(
+          view: withLoading
+        ).dialog(context); 
+      }
+    }
+
     try{
       if(beforeSend != null){
         await beforeSend();
@@ -290,7 +329,7 @@ class Get{
       
       if(customUrl != null && customUrl != ''){
         data = await http.get(customUrl,
-          headers : header
+          headers : customHeader
         ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
       }else{
         data = await http.get(url + name + _request,
@@ -315,9 +354,37 @@ class Get{
             }else if(successMessage != null && successMessage != ''){
               Fluttertoast.showToast(msg:successMessage);
             }
+            
+            if(withLoading != null){
+              if(context == null){
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+              }else{
+                isLoading = false;
+                Navigator.pop(context);  
+              }
+            }
             return dataresponse;
           }
         }else{
+          if(authErrorRedirect != null){
+            if(_currentContext != context || singleContext == true){
+              if(context != null){
+                Session.clear();
+                return Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => authErrorRedirect,  
+                  ),(Route<dynamic> route) => false
+                );
+              }else{
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+              }
+            }
+          }
           if(onError != null){
             return onError(data.statusCode,dataresponse);
           }else{
@@ -326,16 +393,33 @@ class Get{
             }else if(errorMessage != null && errorMessage != ''){
               Fluttertoast.showToast(msg:errorMessage);
             }
-            if(exception){
-              Fluttertoast.showToast(msg:dataresponse);
-            }
             print('Failed, Code ${data.statusCode}');
+            if(withLoading != null){
+              if(context == null){
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+              }else{
+                isLoading = false;
+                Navigator.pop(context);  
+              }
+            }
             return {'statusCode' : data.statusCode};
           }
         }
       }
 
     } on SocketException catch (_) {
+      if(withLoading != null){
+        if(context == null){
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+        }else{
+          isLoading = false;
+          Navigator.pop(context);  
+        }
+      }
       if(socketMessage != null){
         Fluttertoast.showToast(msg:socketMessage,);
       }else if(socketRedirect != null){
@@ -362,6 +446,16 @@ class Get{
         await onSocket();
       }
     } on TimeoutException catch (_){
+      if(withLoading != null){
+        if(context == null){
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+        }else{
+          isLoading = false;
+          Navigator.pop(context);  
+        }
+      }
       if(timeoutMessage != null){
         Fluttertoast.showToast(msg:timeoutMessage,);
       }else if(timeoutRedirect != null){
@@ -388,13 +482,23 @@ class Get{
         onTimeout();
       }
     } catch (e) {
-      if(onException != null){
-          await onException(e.toString());
+      if(withLoading != null){
+        if(context == null){
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
         }else{
-          Fluttertoast.showToast(msg:'Error Exception');
-          Fluttertoast.showToast(msg:e.toString());
-          print(e.toString());
+          isLoading = false;
+          Navigator.pop(context);  
         }
+      }
+      if(onException != null){
+        await onException(e.toString());
+      }else{
+        Fluttertoast.showToast(msg:'Error Exception');
+        Fluttertoast.showToast(msg:e.toString());
+        print(e.toString());
+      }
     }
   }
 
@@ -461,6 +565,10 @@ class Get{
 
     if(onError == null){  
       onError = _onError;
+    }
+
+    if(authErrorRedirect == null){
+      authErrorRedirect = _authErrorRedirect;
     }
   }
 }
@@ -534,6 +642,15 @@ class Post{
   // function if code != 200
   Function onError;
 
+  // fill type Widget or true value
+  dynamic withLoading;
+
+ // for escaping rules context
+  bool singleContext;
+
+  // Redrect and remove Session if response [401] 
+  dynamic authErrorRedirect;
+
 
 
   Post({Key key , 
@@ -543,7 +660,7 @@ class Post{
     this.errorMessage,
     this.logResponse, 
     this.successMessage , 
-    this.customHeader ,@required 
+    this.customHeader , 
     this.exception, 
     this.timeout, 
     this.file , 
@@ -559,9 +676,28 @@ class Post{
     this.timeoutRedirect,
     this.onError,
     this.onSuccess,
+    this.withLoading,
+    this.singleContext,
+    this.authErrorRedirect
   });
   request([context]) async {
+    if(_currentContext != context || singleContext == true){
+      _currentContext = context;
+    }
     await loadConfiguration();
+    if(withLoading != null){
+      if(context == null){
+        print('REQUIRED! context parameter in .request(context)');
+        print('REQUIRED! context parameter in .request(context)');
+        print('REQUIRED! context parameter in .request(context)');
+      }else{
+        isLoading = true;
+        BackDark(
+          view: withLoading
+        ).dialog(context); 
+      }
+    }
+    
     if(beforeSend != null){
       await beforeSend();
     }
@@ -639,6 +775,10 @@ class Post{
 
         if(data.statusCode == 200){
           if(onSuccess != null){
+            if(withLoading != null){
+              isLoading = false;
+              Navigator.pop(context);  
+            }
             return onSuccess(dataresponse);
           }else{
             if(successMessage == 'default'){
@@ -646,10 +786,41 @@ class Post{
             }else if(successMessage != null && successMessage != ''){
               Fluttertoast.showToast(msg:successMessage);
             }
+            if(withLoading != null){
+              isLoading = false;
+              Navigator.pop(context);  
+            }
             return dataresponse;
           }
         } else {
+          if(authErrorRedirect != null){
+            if(_currentContext != context || singleContext == true){
+              if(context != null){
+                return Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => authErrorRedirect,  
+                  ),(Route<dynamic> route) => false
+                );
+              }else{
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+              }
+            }
+          }
+
           if(onError != null){
+            if(withLoading != null){
+              if(context == null){
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+              }else{
+                isLoading = false;
+                Navigator.pop(context);  
+              }
+            }
             return onError(data.statusCode,dataresponse);
           }else{
             print('Error Code ${data.statusCode}');
@@ -658,30 +829,49 @@ class Post{
             }else if(errorMessage != null && errorMessage != ''){
                 Fluttertoast.showToast(msg:errorMessage);
             }
-            if(exception){
-              Fluttertoast.showToast(msg:dataresponse);
+            if(withLoading != null){
+              if(context == null){
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+                print('REQUIRED! context parameter in .request(context)');
+              }else{
+                isLoading = false;
+                Navigator.pop(context);  
+              }
             }
             return {'statusCode' : data.statusCode};
           }
         }
       }
     } on SocketException catch (_) {
+      if(withLoading != null){
+        if(context == null){
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+        }else{
+          isLoading = false;
+          Navigator.pop(context);  
+        }
+      }
       if(socketMessage != null){
         Fluttertoast.showToast(msg:socketMessage,);
       }else if(socketRedirect != null){
         if(context != null){
-          if(socketRedirect is bool){
-            Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => Connection(), 
-              )
-            );
-          }else{
-            Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => socketRedirect, 
-              )
-            );
+          if(_currentContext != context || singleContext == true){
+            if(socketRedirect is bool){
+              Navigator.push(context,
+                MaterialPageRoute(
+                  builder: (context) => Connection(), 
+                )
+              );  
+            }else{
+              Navigator.push(context,
+                MaterialPageRoute(
+                  builder: (context) => socketRedirect, 
+                )
+              );
+            }
           }
         }else{
           print('REQUIRED! context parameter in .request(context)');
@@ -692,22 +882,34 @@ class Post{
         await onSocket();
       }
     } on TimeoutException catch (_){
+      if(withLoading != null){
+        if(context == null){
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+        }else{
+          isLoading = false;
+          Navigator.pop(context);  
+        }
+      }
       if(timeoutMessage != null){
         Fluttertoast.showToast(msg:timeoutMessage,);
       }else if(timeoutRedirect != null){
         if(context != null){
-          if(timeoutRedirect is bool){
-            Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => Timeout(), 
-              )
-            );
-          }else{
-            Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => timeoutRedirect, 
-              )
-            );
+          if(_currentContext != context || singleContext == true){
+            if(timeoutRedirect is bool){
+              Navigator.push(context,
+                MaterialPageRoute(
+                  builder: (context) => Timeout(), 
+                )
+              );
+            }else{
+              Navigator.push(context,
+                MaterialPageRoute(
+                  builder: (context) => timeoutRedirect, 
+                )
+              );
+            }
           }
         }else{
           print('REQUIRED! context parameter in .request(context)');
@@ -718,6 +920,16 @@ class Post{
         await onTimeout();
       }
     } catch (e) {
+      if(withLoading != null){
+        if(context == null){
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+          print('REQUIRED! context parameter in .request(context)');
+        }else{
+          isLoading = false;
+          Navigator.pop(context);  
+        }
+      }
       if(exception){
         if(onException != null){
           await onException(e.toString());
@@ -794,6 +1006,10 @@ class Post{
     if(onError == null){  
       onError = _onError;
     }
+
+    if(authErrorRedirect == null){
+      authErrorRedirect = _authErrorRedirect;
+    }
   }
 }
 
@@ -852,7 +1068,7 @@ class Session {
     }
   }
   
-  Future<bool> clear() async {
+  static Future<bool> clear() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.clear();
     return true;

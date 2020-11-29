@@ -9,7 +9,8 @@ Post, Get, Save, Helper for Flutter;
     errorMessage: 'Call Programmer',
     successMessage: 'default',
     exception: true,
-    beforeSend: ()=>print('hi this is me')
+    beforeSend: ()=>print('hi this is me'),
+    authErrorRedirect : Login() // clear Session and redirect if error [401]
   ).saveConfiguration();
   
   await Post / Get {
@@ -24,6 +25,8 @@ Post, Get, Save, Helper for Flutter;
     timeoutMessage : 'Error Connection', // return toast
     socketRedirect : true , // redirect to ...
     timeoutRedirect : true , // redirect to ...
+    withLoading:true, // fill with true or Widget 
+    singleContext: true, // escaping context rules (rules : remove multiple push context) 
   }.request(context)
 
   await Session.save('myname','hunter');
@@ -113,12 +116,12 @@ if(response != null){
   if(response['statusCode'] == null){
 
     // important
-    await Session().save('access_token', response['token']);
-    await Session().save('token_type', 'Bearer');
+    await Session.save('access_token', response['token']);
+    await Session.save('token_type', 'Bearer');
 
     // auto save different type data
-    await Session().save('user_name',response['user']['name']);
-    await Session().save('user_id',response['user']['id']);
+    await Session.save('user_name',response['user']['name']);
+    await Session.save('user_id',response['user']['id']);
   }
 }
 
@@ -213,16 +216,16 @@ session is Shared preferences plugin, implement :
 
 save to Shared Preferences
 ```dart
-await Session().save('myname','MIAUW'); // String
-await Session().save('myint',100); // int
-await Session().save('mybool',false); // bool
+await Session.save('myname','MIAUW'); // String
+await Session.save('myint',100); // int
+await Session.save('mybool',false); // bool
 
 ```
 
 load from Shared Preferences
 ```dart
-String mystring = await Session().load('myname'); // String
-int myint = await Session().load('myint'); // int
-bool mybool = await Session().load('mybool'); // bool
+String mystring = await Session.load('myname'); // String
+int myint = await Session.load('myint'); // int
+bool mybool = await Session.load('mybool'); // bool
 
 ```
