@@ -2,12 +2,23 @@ import 'package:flutter/material.dart';
 
 class Connection extends StatefulWidget
 {
+  final onSubmit;
+  final onDissmiss;
+
+  Connection({this.onSubmit,this.onDissmiss});
   @override
   _Connection createState()=> _Connection();
 }
 
 class _Connection extends State<Connection>
 {
+  @override
+  void dispose() { 
+    if(widget.onDissmiss != null){
+      widget.onDissmiss();
+    }
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,8 +68,11 @@ class _Connection extends State<Connection>
             height:80,
           ),
 
-          RaisedButton(onPressed: (){
+          RaisedButton(onPressed: () async {
             Navigator.pop(context);
+            if(widget.onSubmit != null){
+              await widget.onSubmit();
+            }
           },
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
@@ -81,12 +95,23 @@ class _Connection extends State<Connection>
 
 class Timeout extends StatefulWidget
 {
+  final onSubmit;
+  final onDissmiss;
+
+  Timeout({this.onSubmit,this.onDissmiss});
   @override
   _Timeout createState()=> _Timeout();
 }
 
 class _Timeout extends State<Timeout>
 {
+  @override
+  void dispose() { 
+    if(widget.onDissmiss != null){
+      widget.onDissmiss();
+    }
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,8 +161,11 @@ class _Timeout extends State<Timeout>
             height:80,
           ),
 
-          RaisedButton(onPressed: (){
+          RaisedButton(onPressed: () async {
             Navigator.pop(context);
+            if(widget.onSubmit != null){
+              await widget.onSubmit();
+            }
           },
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),

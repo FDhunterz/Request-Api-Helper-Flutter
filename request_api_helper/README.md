@@ -2,36 +2,6 @@
 
 Post, Get, Save, Helper for Flutter;
 
-## New Updates
-```dart
-  Env(
-    timeout: 10,
-    errorMessage: 'Call Programmer',
-    successMessage: 'default',
-    exception: true,
-    beforeSend: ()=>print('hi this is me'),
-    authErrorRedirect : Login() // clear Session and redirect if error [401]
-  ).saveConfiguration();
-  
-  await Post / Get {
-    ...
-    beforeSend: ()=> print('loading...'), // before send
-    onTimeout: ()=> print('this is timeout'), // if timeout Exception
-    onSocket: ()=> print('internet not connected'), // if socket Exception
-    onException: (val)=> print(val), // if Exception with Code
-    timeout: 20000, // default 10000 ms
-    onComplete : (v) => print(v), // return Raw HTTP
-    socketMessage : 'Error Connection', // return toast
-    timeoutMessage : 'Error Connection', // return toast
-    socketRedirect : true , // redirect to ...
-    timeoutRedirect : true , // redirect to ...
-    withLoading:true, // fill with true or Widget 
-    singleContext: true, // escaping context rules (rules : remove multiple push context) 
-  }.request(context)
-
-  await Session.save('myname','hunter');
-  String name = await Session.load('myname');
-```
 
 ## Installation
 
@@ -47,6 +17,22 @@ dependencies:
 ```dart
 import 'package:request_api_helper/request_api_helper.dart';
 ```
+
+## New Update
+
+```dart
+  Post/Get {
+    ...
+    onReloadSubmited : (){
+      // do something if reload Clicked
+    }
+    onReloadDissmiss: (){
+      // do something if view dissmiss, (note: cant use async)
+    }
+  }
+```
+
+And Change 'access_token' to 'token'
 
 ## 1 . Setting Env
 use static Env in main like this (Release):
@@ -76,6 +62,18 @@ ServerSwitcher(
  ]
 )
 
+```
+
+## Env Global Configuration
+```dart
+  Env(
+    timeout: 10,
+    errorMessage: 'Call Programmer',
+    successMessage: 'default',
+    exception: true,
+    beforeSend: ()=>print('hi this is me'),
+    authErrorRedirect : Login() // clear Session and redirect if error [401]
+  ).saveConfiguration();
 ```
 
 ## 2 . Make Login And Saving Token
@@ -116,8 +114,7 @@ if(response != null){
   if(response['statusCode'] == null){
 
     // important
-    await Session.save('access_token', response['token']);
-    await Session.save('token_type', 'Bearer');
+    await Session.save('token', 'Bearer ' + response['token']);
 
     // auto save different type data
     await Session.save('user_name',response['user']['name']);
@@ -177,6 +174,26 @@ if(mydata != null){
  // no response
 }
 
+```
+
+## Post/Get Attributes
+```dart
+await Post / Get {
+    ...
+    beforeSend: ()=> print('loading...'), // before send
+    onTimeout: ()=> print('this is timeout'), // if timeout Exception
+    onSocket: ()=> print('internet not connected'), // if socket Exception
+    onException: (val)=> print(val), // if Exception with Code
+    timeout: 20000, // default 10000 ms
+    onComplete : (v) => print(v), // return Raw HTTP
+    socketMessage : 'Error Connection', // return toast
+    timeoutMessage : 'Error Connection', // return toast
+    socketRedirect : true , // redirect to ...
+    timeoutRedirect : true , // redirect to ...
+    withLoading:true, // fill with true or Widget 
+    singleContext: true, // escaping context rules (rules : remove multiple push context) 
+  }.request(context)
+}
 ```
 
 ## 4 . Use Post / Get other Url?

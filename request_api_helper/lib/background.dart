@@ -5,13 +5,15 @@ bool isLoading = false ;
 
 class BackDark{
   dynamic view;
+  bool barrierDismissible;
   BackDark({
-    this.view
+    this.view,
+    this.barrierDismissible
   });
   dialog(context) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: barrierDismissible ?? false, // user must tap button!
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: () async {

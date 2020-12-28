@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:request_api_helper/request_api_helper.dart';
 
-void main() {
+void main(context) {
   Env(
     confurl: 'https://scool.alamraya.site/api/',
     confnoapiurl:  'https://scool.alamraya.site/',
   ).save();
   test('adds one to input values', () async {
-    dynamic response = await Get(
+    dynamic response = await Post(
       name: 'launcher/list',
       exception: true,
       beforeSend: ()=> print('a'),
@@ -23,7 +23,7 @@ void main() {
         'anjit' : 'anjim'
       }
       // timeout: 3000,
-    ).request();
+    ).request(context);
 
     print(response);
   });

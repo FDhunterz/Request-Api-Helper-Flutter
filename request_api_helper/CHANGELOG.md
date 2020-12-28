@@ -1,3 +1,23 @@
+## 2.2.5+8 - Fixing Bug
+* fixed bug authredirect , succes exception pop 2x
+## 2.2.5+1 - adding Atributes
+* fixed bug in file upload batch
+
+## 2.2.5 - adding Atributes
+* adding onReloadSubmited, onReloadDissmiss (Post/Get)
+* change 'access_token' to 'token' saving login token
+
+## 2.2.4+1 - authErrorRedirect always triggered
+* now authErrorRedirect only trigger at 401(Post/Get)
+
+## 2.2.4 - File Add to List
+* file now can send in List (Post)
+
+## 2.2.3+1 - Bug Fixed
+* withLoading Never closed (Get)
+* Header Not Added with file (Post)
+* withLoading added in global configuration (Env)
+
 ## 2.2.3 - Get Request
 * customHeader -> added (Get)
 * authErrorRedirect : Login() (statefull widget) -> added 

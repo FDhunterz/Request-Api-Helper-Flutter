@@ -40,10 +40,19 @@ class _MyHomePageState extends State<MyHomePage> {
   postWithName() async {
     dynamic data = await Post(
       exception: true,
-      name: 'score/data',
+      customUrl: 'http://192.168.100.2/score/data',
+      customHeader: {
+          'Accept' : 'application/json',
+      },
       timeoutRedirect: true,
       socketRedirect: true,
-      timeout: 10000,
+      timeout: 100,
+      onReloadSubmited: () async {
+        await postWithName();
+      },
+      onReloadDissmiss: (){
+        print('lol');
+      },
       onException: (v)=> print(v),
       withLoading: true,
       singleContext: true,
