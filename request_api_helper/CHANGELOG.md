@@ -1,3 +1,12 @@
+## 2.2.6+2 - Version Request
+* Update Http Version
+
+## 2.2.6 - Version Request
+* add version config
+
+## 2.2.5+11 - Fixing Bug
+* fixed bug LogResponse
+
 ## 2.2.5+8 - Fixing Bug
 * fixed bug authredirect , succes exception pop 2x
 ## 2.2.5+1 - adding Atributes

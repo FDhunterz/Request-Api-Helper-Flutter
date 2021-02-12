@@ -13,6 +13,7 @@ import 'timeout.dart';
 import 'package:http_parser/http_parser.dart';
 import 'response.dart';
 
+export 'package:fluttertoast/fluttertoast.dart';
 export 'response.dart';
 export 'serverSwitcher.dart';
 
@@ -42,6 +43,7 @@ Function _onError;
 dynamic _authErrorRedirect;
 dynamic _currentContext;
 dynamic _withLoading;
+String _version;
 
 bool _responseCatch = false;
 
@@ -111,11 +113,14 @@ class Env{
   Function onError;
 
   
-  // Redrect and remove Session if response [401] 
+  /// Redrect and remove Session if response [401] 
   dynamic authErrorRedirect;
 
-  // fill type Widget or true value
+  /// fill type Widget or true value
   dynamic withLoading;
+
+  /// add to body "version" : value
+  String version;
 
   Env({
     this.confurl ,
@@ -141,7 +146,8 @@ class Env{
     this.onError,
     this.onSuccess,
     this.authErrorRedirect,
-    this.withLoading
+    this.withLoading,
+    this.version
   });
 
 
@@ -170,6 +176,7 @@ class Env{
     _onError = onError;
     _authErrorRedirect = authErrorRedirect;
     _withLoading = withLoading;
+    _version = version;
   }
 }
 
@@ -323,7 +330,9 @@ class Get{
         };
       }
       String _request = '?';
-
+      if(_version != null){
+        _request += 'version=$_version';
+      }
       if(body != null){
         if(body is Map){
           int _counter = 0;
@@ -333,7 +342,7 @@ class Get{
               return Fluttertoast.showToast(msg:'$key No Have a Value');
             }
             if(!(_counter == body.length)){
-              _request += '$key=$value&';
+              _request += (_version != null ? '&' : '')+ '$key=$value&';
             }else{
               _request += '$key=$value';
             }
@@ -357,7 +366,7 @@ class Get{
       }else{
         dynamic dataresponse = json.decode(data.body);
         if(logResponse == true){
-          await Response().start(dataresponse,1,false);
+          await Response().start(dataresponse);
         }
         _responseCatch = true;
         if(data.statusCode == 200){
@@ -804,6 +813,9 @@ class Post{
           request = http.MultipartRequest('POST', Uri.parse(url+name));
           request.headers.addAll(header);
         }
+        if(_version != null){
+          request.fields['version'] = _version;
+        }
 
         if(body != null){
           if(body is Map){
@@ -832,11 +844,25 @@ class Post{
         data = await request.send().timeout(Duration(milliseconds: timeout != null ? timeout : 120000));
       }else{
         if(customUrl != null && customUrl != ''){
+          if(_version != null){
+            if(body != null){            
+              body.addAll({'version' : _version});
+            }else{
+              body = {'version' : _version};
+            }
+          }
           data = await http.post(customUrl,
             body : body,
             headers : customHeader,
           ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
         }else{
+          if(_version != null){
+            if(body != null){            
+              body.addAll({'version' : _version});
+            }else{
+              body = {'version' : _version};
+            }
+          }
           data = await http.post(url+name,
             body : body,
             headers : header,
@@ -849,7 +875,7 @@ class Post{
       }else{
         dynamic dataresponse = json.decode(file != null ? await data.stream.bytesToString() : data.body);
         if(logResponse == true){
-          await Response().start(dataresponse,1,false);
+          await Response().start(dataresponse);
         }
 
         if(data.statusCode == 200){
@@ -1172,46 +1198,4 @@ class Session {
     preferences.clear();
     return true;
   }
-}
-
-class States extends State{
-  /// this is function (){ any function };
-  VoidCallback setStates;
-
-  /// target to Set State<>
-  List<State> states;
-
-  /// example
-  /// 
-  ///       class BottomNavbars extends State<BottomNavbar>{
-  ///         setRefresh(){
-  ///           refresh = false;
-  ///         }
-  /// 
-  ///         getRefresh(){
-  ///           return refresh;
-  ///         }
-  ///       }
-  /// 
-  /// refresh : BottomNavbar()
-  dynamic refresh;
-  
-
-  States({ @required this.setStates , @required this.states, @required this.refresh});
-
-  rebuildWidgetss() async {
-    if (states != null) {
-      if(await refresh.getRefresh() == true){
-        states.forEach((s) {
-          if (s != null && s.mounted) s.setState(setStates ??(){});
-        });
-      }
-    }
-  }
-  @override
-  Widget build(BuildContext context) {
-    print(
-        "This build function will never be called. it has to be overriden here because State interface requires this");
-    return null;
-  }  
 }
