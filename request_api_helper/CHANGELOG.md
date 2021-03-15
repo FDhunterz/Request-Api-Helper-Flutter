@@ -1,3 +1,6 @@
+## 2.2.6+4 - Compatible FCM
+* fixed FCM build error
+
 ## 2.2.6+2 - Version Request
 * Update Http Version
 

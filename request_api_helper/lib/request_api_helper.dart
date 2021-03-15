@@ -47,10 +47,9 @@ String _version;
 
 bool _responseCatch = false;
 
-
 // server selected
 
-class Env{
+class Env {
   /// example https://this.com/api/
   String confurl = '';
 
@@ -62,18 +61,24 @@ class Env{
 
   /// Laravel Get Login Passport
   String confclientsecret = '';
+
   /// Laravel Client Id
   String confclientId = '';
+
   /// Laravel Grant Type default 'password'
   String confgrantType = 'password';
 
   String errorMessage;
+
   /// show success message , use = 'default' to get 'message' : 'your message' response
   String successMessage;
+
   /// show log print response , use = 'default' to get 'message' : 'your message' response
   bool logResponse;
+
   /// show Exception
   bool exception = false;
+
   /// use timeoutRedirect=true for default routing timeout view
   ///
   ///use timeoutRedirect=your_route
@@ -83,8 +88,10 @@ class Env{
   ///
   ///use socketRedirect=your_route
   dynamic socketRedirect;
+
   /// default 10000 ms
   int timeout;
+
   /// show timeout message
   String timeoutMessage;
 
@@ -112,8 +119,7 @@ class Env{
   /// function if code != 200
   Function onError;
 
-  
-  /// Redrect and remove Session if response [401] 
+  /// Redrect and remove Session if response [401]
   dynamic authErrorRedirect;
 
   /// fill type Widget or true value
@@ -122,42 +128,14 @@ class Env{
   /// add to body "version" : value
   String version;
 
-  Env({
-    this.confurl ,
-    this.confnoapiurl , 
-    this.confkey , 
-    this.confclientsecret , 
-    this.confclientId , 
-    this.confgrantType,
-    this.errorMessage,
-    this.logResponse, 
-    this.successMessage,
-    this.exception , 
-    this.timeout, 
-    this.onTimeout,
-    this.onSocket, 
-    this.onComplete, 
-    this.beforeSend, 
-    this.onException,
-    this.socketMessage,
-    this.socketRedirect,
-    this.timeoutMessage,
-    this.timeoutRedirect,
-    this.onError,
-    this.onSuccess,
-    this.authErrorRedirect,
-    this.withLoading,
-    this.version
-  });
+  Env({this.confurl, this.confnoapiurl, this.confkey, this.confclientsecret, this.confclientId, this.confgrantType, this.errorMessage, this.logResponse, this.successMessage, this.exception, this.timeout, this.onTimeout, this.onSocket, this.onComplete, this.beforeSend, this.onException, this.socketMessage, this.socketRedirect, this.timeoutMessage, this.timeoutRedirect, this.onError, this.onSuccess, this.authErrorRedirect, this.withLoading, this.version});
 
-
-  void save()
-  {
+  void save() {
     url = confurl;
     noapiurl = confnoapiurl;
   }
 
-  saveConfiguration(){
+  saveConfiguration() {
     _errorMessage = errorMessage;
     _successMessage = successMessage;
     _logResponse = logResponse;
@@ -180,30 +158,37 @@ class Env{
   }
 }
 
-class Get{
+class Get {
   /// location : 127.0.0.1/myapps/api/['this is name']
-  /// 
+  ///
   /// name = store_data;
   String name;
-  Map<String,dynamic> body = {};
+  Map<String, dynamic> body = {};
+
   /// ex full custom url : google.com/api/myapps/store_data
-  /// 
+  ///
   /// custom request to get data from other website or server
-  /// 
+  ///
   String customUrl;
-  /// set custom header on request format 
+
+  /// set custom header on request format
   /// {  properties : value , other
   /// }
-  /// 
+  ///
   dynamic customHeader;
-  /// show error message 
+
+  /// show error message
   String errorMessage;
+
   /// show success message , use = 'default' to get 'message' : 'your message' response
   String successMessage;
+
   /// show log print response , use = 'default' to get 'message' : 'your message' response
   bool logResponse;
+
   /// show Exception
   bool exception = false;
+
   /// use timeoutRedirect=true for default routing timeout view
   ///
   ///use timeoutRedirect=your_route
@@ -213,8 +198,10 @@ class Get{
   ///
   ///use socketRedirect=your_route
   dynamic socketRedirect;
+
   /// default 10000 ms
   int timeout;
+
   /// show timeout message
   String timeoutMessage;
 
@@ -226,14 +213,14 @@ class Get{
 
   /// do function if reload view popped;
   Function onReloadDissmiss;
-  
+
   /// do a function with if timeout;
   Function onTimeout;
 
   /// do a function with if no internet;
   Function onSocket;
 
-  ///  show raw response from server 
+  ///  show raw response from server
   /// ```(rawData){
   ///  do something
   /// }```
@@ -245,20 +232,20 @@ class Get{
   /// function if Exception
   Function onException;
 
-  /// function after encoded json 
+  /// function after encoded json
   /// ``` (data){
   ///   do something
   /// }
   /// ```
   Function onSuccess;
 
-  /// function if code != 200  
+  /// function if code != 200
   /// ``` (code,data){
   ///  do something
   /// }```
   Function onError;
 
-  /// Redrect and remove Session if response [401] 
+  /// Redrect and remove Session if response [401]
   dynamic authErrorRedirect;
 
   /// fill type Widget or true value
@@ -267,154 +254,123 @@ class Get{
   /// for escaping rules context
   bool singleContext;
 
-  Get({Key key , 
-      this.name , 
-      this.body , 
-      this.customUrl, 
-      this.errorMessage,
-      this.logResponse, 
-      this.successMessage,
-      this.exception , 
-      this.timeout, 
-      this.onTimeout ,
-      this.onSocket, 
-      this.onComplete, 
-      this.beforeSend, 
-      this.onException,
-      this.socketMessage,
-      this.socketRedirect,
-      this.timeoutMessage,
-      this.timeoutRedirect,
-      this.onReloadSubmited,
-      this.onError,
-      this.customHeader,
-      this.onSuccess,
-      this.withLoading,
-      this.singleContext,
-      this.authErrorRedirect
-    });
+  Get({Key key, this.name, this.body, this.customUrl, this.errorMessage, this.logResponse, this.successMessage, this.exception, this.timeout, this.onTimeout, this.onSocket, this.onComplete, this.beforeSend, this.onException, this.socketMessage, this.socketRedirect, this.timeoutMessage, this.timeoutRedirect, this.onReloadSubmited, this.onError, this.customHeader, this.onSuccess, this.withLoading, this.singleContext, this.authErrorRedirect});
 
   request(context) async {
     _responseCatch = false;
     await loadConfiguration();
     dynamic data;
     dynamic header;
-    if(withLoading != null && withLoading == true){
-      if(context == null){
+    if (withLoading != null && withLoading == true) {
+      if (context == null) {
         print('REQUIRED! context parameter in .request(context)');
         print('REQUIRED! context parameter in .request(context)');
         print('REQUIRED! context parameter in .request(context)');
-      }else{
+      } else {
         isLoading = true;
-        BackDark(
-          view: withLoading
-        ).dialog(context); 
+        BackDark(view: withLoading).dialog(context);
       }
     }
 
-    try{
-      if(beforeSend != null){
+    try {
+      if (beforeSend != null) {
         await beforeSend();
       }
       dynamic auth = await Session.load('token');
-      String token = "$auth" ;
+      String token = "$auth";
 
-      if(auth != null && auth != ''){
+      if (auth != null && auth != '') {
         header = {
-          'Accept' : 'application/json',
-          'Authorization' : token,
+          'Accept': 'application/json',
+          'Authorization': token,
         };
-      }else{
+      } else {
         header = {
-          'Accept' : 'application/json',
+          'Accept': 'application/json',
         };
       }
       String _request = '?';
-      if(_version != null){
+      if (_version != null) {
         _request += 'version=$_version';
       }
-      if(body != null){
-        if(body is Map){
+      if (body != null) {
+        if (body is Map) {
           int _counter = 0;
           body.forEach((key, value) {
             ++_counter;
-            if(value == null){
-              return Fluttertoast.showToast(msg:'$key No Have a Value');
+            if (value == null) {
+              return Fluttertoast.showToast(msg: '$key No Have a Value');
             }
-            if(!(_counter == body.length)){
-              _request += (_version != null ? '&' : '')+ '$key=$value&';
-            }else{
+            if (!(_counter == body.length)) {
+              _request += (_version != null ? '&' : '') + '$key=$value&';
+            } else {
               _request += '$key=$value';
             }
           });
         }
       }
-      
-      if(customUrl != null && customUrl != ''){
-        data = await http.get(customUrl,
-          headers : customHeader
-        ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
-      }else{
-        data = await http.get(url + name + _request,
-          headers : header
-        ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
+
+      if (customUrl != null && customUrl != '') {
+        data = await http.get(Uri.parse(customUrl), headers: customHeader).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
+      } else {
+        data = await http.get(Uri.parse(url + name + _request), headers: header).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
       }
 
-      if(onComplete != null){
+      if (onComplete != null) {
         _responseCatch = true;
         await onComplete(data);
-      }else{
+      } else {
         dynamic dataresponse = json.decode(data.body);
-        if(logResponse == true){
+        if (logResponse == true) {
           await Response().start(dataresponse);
         }
         _responseCatch = true;
-        if(data.statusCode == 200){
-          if(onSuccess != null){
-            if(withLoading != null && withLoading == true){
-              if(context == null){
+        if (data.statusCode == 200) {
+          if (onSuccess != null) {
+            if (withLoading != null && withLoading == true) {
+              if (context == null) {
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
-              }else{
+              } else {
                 isLoading = false;
-                Navigator.pop(context);  
+                Navigator.pop(context);
               }
             }
             return onSuccess(dataresponse);
-          }else{
-            if(successMessage == 'default'){
-              Fluttertoast.showToast(msg:dataresponse['message']);
-            }else if(successMessage != null && successMessage != ''){
-              Fluttertoast.showToast(msg:successMessage);
+          } else {
+            if (successMessage == 'default') {
+              Fluttertoast.showToast(msg: dataresponse['message']);
+            } else if (successMessage != null && successMessage != '') {
+              Fluttertoast.showToast(msg: successMessage);
             }
-            
-            if(withLoading != null && withLoading == true){
-              if(context == null){
+
+            if (withLoading != null && withLoading == true) {
+              if (context == null) {
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
-              }else{
+              } else {
                 isLoading = false;
-                Navigator.pop(context);  
+                Navigator.pop(context);
               }
             }
             return dataresponse;
           }
-        }else{
-        _responseCatch = true;
-          if(data.statusCode == 401){
-            if(authErrorRedirect != null){
-              if(_currentContext != context || singleContext == true){
-                if(context != null){
+        } else {
+          _responseCatch = true;
+          if (data.statusCode == 401) {
+            if (authErrorRedirect != null) {
+              if (_currentContext != context || singleContext == true) {
+                if (context != null) {
                   Session.clear();
                   return Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => authErrorRedirect,  
-                    ),(Route<dynamic> route) => false
-                  );
-                }else{
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => authErrorRedirect,
+                      ),
+                      (Route<dynamic> route) => false);
+                } else {
                   print('REQUIRED! context parameter in .request(context)');
                   print('REQUIRED! context parameter in .request(context)');
                   print('REQUIRED! context parameter in .request(context)');
@@ -422,235 +378,247 @@ class Get{
               }
             }
           }
-          if(onError != null){
-            return onError(data.statusCode,dataresponse);
-          }else{
-            if(errorMessage == 'default'){
-              Fluttertoast.showToast(msg:dataresponse['message']);
-            }else if(errorMessage != null && errorMessage != ''){
-              Fluttertoast.showToast(msg:errorMessage);
+          if (onError != null) {
+            return onError(data.statusCode, dataresponse);
+          } else {
+            if (errorMessage == 'default') {
+              Fluttertoast.showToast(msg: dataresponse['message']);
+            } else if (errorMessage != null && errorMessage != '') {
+              Fluttertoast.showToast(msg: errorMessage);
             }
             print('Failed, Code ${data.statusCode}');
-            if(withLoading != null && withLoading == true){
-              if(context == null){
+            if (withLoading != null && withLoading == true) {
+              if (context == null) {
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
-              }else{
+              } else {
                 isLoading = false;
-                Navigator.pop(context);  
+                Navigator.pop(context);
               }
             }
-            return {'statusCode' : data.statusCode};
+            return {'statusCode': data.statusCode};
           }
         }
       }
-
     } on SocketException catch (_) {
       _responseCatch = true;
-      if(withLoading != null && withLoading == true){
-        if(context == null){
+      if (withLoading != null && withLoading == true) {
+        if (context == null) {
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
-        }else{
+        } else {
           isLoading = false;
-          Navigator.pop(context);  
+          Navigator.pop(context);
         }
       }
-      if(socketMessage != null){
-        Fluttertoast.showToast(msg:socketMessage,);
-      }else if(socketRedirect != null){
-        if(context != null){
-          if(socketRedirect is bool){
-            Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => Connection(
-                  onSubmit: onReloadSubmited,
-                  onDissmiss: onReloadDissmiss,
-                ), 
-              )
-            );
-          }else{
-            Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => socketRedirect, 
-              )
-            );
+      if (socketMessage != null) {
+        Fluttertoast.showToast(
+          msg: socketMessage,
+        );
+      } else if (socketRedirect != null) {
+        if (context != null) {
+          if (socketRedirect is bool) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Connection(
+                    onSubmit: onReloadSubmited,
+                    onDissmiss: onReloadDissmiss,
+                  ),
+                ));
+          } else {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => socketRedirect,
+                ));
           }
-        }else{
+        } else {
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
         }
-      }else if(onSocket != null){
+      } else if (onSocket != null) {
         await onSocket();
       }
-    } on TimeoutException catch (_){
+    } on TimeoutException catch (_) {
       _responseCatch = true;
-      if(withLoading != null && withLoading == true){
-        if(context == null){
+      if (withLoading != null && withLoading == true) {
+        if (context == null) {
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
-        }else{
+        } else {
           isLoading = false;
-          Navigator.pop(context);  
+          Navigator.pop(context);
         }
       }
-      if(timeoutMessage != null){
-        Fluttertoast.showToast(msg:timeoutMessage,);
-      }else if(timeoutRedirect != null){
-        if(context != null){
-          if(timeoutRedirect is bool){
-            Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => Timeout(
-                  onSubmit: onReloadSubmited,
-                  onDissmiss: onReloadDissmiss,
-                ), 
-              )
-            );
-          }else{
-            Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => timeoutRedirect, 
-              )
-            );
+      if (timeoutMessage != null) {
+        Fluttertoast.showToast(
+          msg: timeoutMessage,
+        );
+      } else if (timeoutRedirect != null) {
+        if (context != null) {
+          if (timeoutRedirect is bool) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Timeout(
+                    onSubmit: onReloadSubmited,
+                    onDissmiss: onReloadDissmiss,
+                  ),
+                ));
+          } else {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => timeoutRedirect,
+                ));
           }
-        }else{
+        } else {
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
         }
-      }else if(onTimeout != null){
+      } else if (onTimeout != null) {
         onTimeout();
       }
     } catch (e) {
-      if(!_responseCatch){
-        if(withLoading != null && withLoading == true){
-          if(context == null){
+      if (!_responseCatch) {
+        if (withLoading != null && withLoading == true) {
+          if (context == null) {
             print('REQUIRED! context parameter in .request(context)');
             print('REQUIRED! context parameter in .request(context)');
             print('REQUIRED! context parameter in .request(context)');
-          }else{
+          } else {
             isLoading = false;
-            Navigator.pop(context);  
+            Navigator.pop(context);
           }
         }
       }
-      if(onException != null){
+      if (onException != null) {
         await onException(e.toString());
-      }else{
-        Fluttertoast.showToast(msg:'Error Exception');
-        Fluttertoast.showToast(msg:e.toString());
+      } else {
+        Fluttertoast.showToast(msg: 'Error Exception');
+        Fluttertoast.showToast(msg: e.toString());
         print(e.toString());
       }
     }
   }
 
-  loadConfiguration(){
-    if(errorMessage == null){
+  loadConfiguration() {
+    if (errorMessage == null) {
       errorMessage = _errorMessage;
     }
 
-    if(successMessage == null){
+    if (successMessage == null) {
       successMessage = _successMessage;
     }
-    
-    if(logResponse == null){
+
+    if (logResponse == null) {
       logResponse = _logResponse;
     }
-    
-    if(exception == null){
+
+    if (exception == null) {
       exception = _exception;
     }
-    
-    if(timeoutRedirect == null){
+
+    if (timeoutRedirect == null) {
       timeoutRedirect = _timeoutRedirect;
     }
-    
-    if(socketRedirect == null){
+
+    if (socketRedirect == null) {
       socketRedirect = _socketRedirect;
     }
 
-    if(timeout == null){
+    if (timeout == null) {
       timeout = _timeout;
     }
 
-    if(timeoutMessage == null){  
+    if (timeoutMessage == null) {
       timeoutMessage = _timeoutMessage;
     }
 
-    if(socketMessage == null){  
+    if (socketMessage == null) {
       socketMessage = _socketMessage;
     }
 
-    if(onTimeout == null){
+    if (onTimeout == null) {
       onTimeout = _onTimeout;
     }
 
-    if(onSocket == null){
+    if (onSocket == null) {
       onSocket = _onSocket;
     }
 
-    if(onComplete == null){
+    if (onComplete == null) {
       onComplete = _onComplete;
     }
 
-    if(beforeSend == null){
+    if (beforeSend == null) {
       beforeSend = _beforeSend;
     }
 
-    if(onException == null){
+    if (onException == null) {
       onException = _onException;
     }
 
-    if(onSuccess == null){
-    onSuccess = _onSuccess;
+    if (onSuccess == null) {
+      onSuccess = _onSuccess;
     }
 
-    if(onError == null){  
+    if (onError == null) {
       onError = _onError;
     }
 
-    if(authErrorRedirect == null){
+    if (authErrorRedirect == null) {
       authErrorRedirect = _authErrorRedirect;
     }
 
-    if(withLoading == null){
+    if (withLoading == null) {
       withLoading = _withLoading;
     }
   }
 }
-class Post{
+
+class Post {
   /// location : 127.0.0.1/myapps/api/['this is name']
-  /// 
+  ///
   /// name = store_data;
   String name;
-  /// 'dynamic' type 
-  /// 
+
+  /// 'dynamic' type
+  ///
   /// body = { 'id' : this.id , 'type' : 'owner'  }
-  /// 
+  ///
   dynamic body;
-  /// show error message 
+
+  /// show error message
   String errorMessage;
+
   /// show success message , use = 'default' to get 'message' : 'your message' response
   String successMessage;
+
   /// show log print response , use = 'default' to get 'message' : 'your message' response
   bool logResponse;
+
   /// ex full custom url : google.com/api/myapps/store_data
-  /// 
+  ///
   /// custom request to get data from other website or server
-  /// 
+  ///
   String customUrl;
-  /// set custom header on request format 
+
+  /// set custom header on request format
   /// {  properties : value , other
   /// }
-  /// 
+  ///
   dynamic customHeader;
+
   /// show Exception
   bool exception = false;
+
   /// use timeoutRedirect=true for default routing timeout view
   ///
   ///use timeoutRedirect=your_route
@@ -660,25 +628,27 @@ class Post{
   ///
   ///use socketRedirect=your_route
   dynamic socketRedirect;
+
   /// default 10000 ms
   int timeout;
+
   /// request body for file
-  /// 
+  ///
   /// array and String support
   ///
   /// fileRequestName: 'image'
-  /// 
+  ///
   /// or
-  /// 
+  ///
   /// fileRequestName: ['image_receipt','image_transfer']
   dynamic fileRequestName;
 
   /// array and String support
-  /// 
+  ///
   /// file: path of file
-  /// 
+  ///
   /// or
-  /// 
+  ///
   /// file: [path_of_file,path_of_file]
   dynamic file;
 
@@ -693,7 +663,7 @@ class Post{
 
   /// show Socket Exception message
   String socketMessage;
-  
+
   /// do a function with if timeout;
   Function onTimeout;
 
@@ -718,200 +688,166 @@ class Post{
   // fill type Widget or true value
   dynamic withLoading;
 
- // for escaping rules context
+  // for escaping rules context
   bool singleContext;
 
-  // Redrect and remove Session if response [401] 
+  // Redrect and remove Session if response [401]
   dynamic authErrorRedirect;
 
-
-
-  Post({Key key , 
-    this.name,
-    this.body , 
-    this.customUrl,
-    this.errorMessage,
-    this.logResponse, 
-    this.successMessage , 
-    this.customHeader , 
-    this.exception, 
-    this.timeout, 
-    this.file , 
-    this.fileRequestName , 
-    this.onTimeout ,
-    this.onSocket, 
-    this.onComplete, 
-    this.beforeSend, 
-    this.onException,
-    this.socketMessage,
-    this.socketRedirect,
-    this.timeoutMessage,
-    this.timeoutRedirect,
-    this.onError,
-    this.onSuccess,
-    this.withLoading,
-    this.singleContext,
-    this.onReloadSubmited,
-    this.onReloadDissmiss,
-    this.authErrorRedirect
-  });
+  Post({Key key, this.name, this.body, this.customUrl, this.errorMessage, this.logResponse, this.successMessage, this.customHeader, this.exception, this.timeout, this.file, this.fileRequestName, this.onTimeout, this.onSocket, this.onComplete, this.beforeSend, this.onException, this.socketMessage, this.socketRedirect, this.timeoutMessage, this.timeoutRedirect, this.onError, this.onSuccess, this.withLoading, this.singleContext, this.onReloadSubmited, this.onReloadDissmiss, this.authErrorRedirect});
   request(context) async {
     _responseCatch = false;
 
-    if(_currentContext != context || singleContext == true){
+    if (_currentContext != context || singleContext == true) {
       _currentContext = context;
     }
     await loadConfiguration();
-    if(withLoading != null && withLoading == true){
-      if(context == null){
+    if (withLoading != null && withLoading == true) {
+      if (context == null) {
         print('REQUIRED! context parameter in .request(context)');
         print('REQUIRED! context parameter in .request(context)');
         print('REQUIRED! context parameter in .request(context)');
-      }else{
+      } else {
         isLoading = true;
-        BackDark(
-          view: withLoading
-        ).dialog(context); 
+        BackDark(view: withLoading).dialog(context);
       }
     }
-    
-    if(beforeSend != null){
+
+    if (beforeSend != null) {
       await beforeSend();
     }
     dynamic data;
     dynamic header;
-    try{
-      dynamic auth = await  Session.load('token');
-      String token = "$auth" ;
-      if(auth != null && auth != ''){
+    try {
+      dynamic auth = await Session.load('token');
+      String token = "$auth";
+      if (auth != null && auth != '') {
         header = {
-          'Accept' : 'application/json',
-          'Authorization' : token,
+          'Accept': 'application/json',
+          'Authorization': token,
         };
-      }else{
+      } else {
         header = {
-          'Accept' : 'application/json',
+          'Accept': 'application/json',
         };
       }
 
-      if(body != null){
-        if(body is Map){
-          body.forEach((k,v){
-            if(v == null){
-              return Fluttertoast.showToast(msg:'$k No Have Value');
+      if (body != null) {
+        if (body is Map) {
+          body.forEach((k, v) {
+            if (v == null) {
+              return Fluttertoast.showToast(msg: '$k No Have Value');
             }
           });
         }
       }
 
-      if(file != null){
+      if (file != null) {
         var request;
-        if(customUrl != null && customUrl != ''){
+        if (customUrl != null && customUrl != '') {
           request = http.MultipartRequest('POST', Uri.parse(customUrl));
           request.headers.addAll(customHeader);
-        }else{
-          request = http.MultipartRequest('POST', Uri.parse(url+name));
+        } else {
+          request = http.MultipartRequest('POST', Uri.parse(url + name));
           request.headers.addAll(header);
         }
-        if(_version != null){
+        if (_version != null) {
           request.fields['version'] = _version;
         }
 
-        if(body != null){
-          if(body is Map){
-              body.forEach((k,v){
+        if (body != null) {
+          if (body is Map) {
+            body.forEach((k, v) {
               request.fields[k] = v;
             });
           }
         }
 
-        if(file is String && fileRequestName is String ){
-          request.files.add(await http.MultipartFile.fromPath(
-            fileRequestName ?? 'file', file,
-            contentType: MediaType('application', file.split('.').last)
-            )
-          );
-        }else if(file is List && fileRequestName is List){
-          for(int counterfile = 0; counterfile < file.length;counterfile++){
-            request.files.add(await http.MultipartFile.fromPath(
-              fileRequestName[counterfile] ?? 'file', file[counterfile],
-              contentType: MediaType('application', file[counterfile].split('.').last)
-              )
-            );
+        if (file is String && fileRequestName is String) {
+          request.files.add(await http.MultipartFile.fromPath(fileRequestName ?? 'file', file, contentType: MediaType('application', file.split('.').last)));
+        } else if (file is List && fileRequestName is List) {
+          for (int counterfile = 0; counterfile < file.length; counterfile++) {
+            request.files.add(await http.MultipartFile.fromPath(fileRequestName[counterfile] ?? 'file', file[counterfile], contentType: MediaType('application', file[counterfile].split('.').last)));
           }
         }
 
         data = await request.send().timeout(Duration(milliseconds: timeout != null ? timeout : 120000));
-      }else{
-        if(customUrl != null && customUrl != ''){
-          if(_version != null){
-            if(body != null){            
-              body.addAll({'version' : _version});
-            }else{
-              body = {'version' : _version};
+      } else {
+        if (customUrl != null && customUrl != '') {
+          if (_version != null) {
+            if (body != null) {
+              body.addAll({'version': _version});
+            } else {
+              body = {'version': _version};
             }
           }
-          data = await http.post(customUrl,
-            body : body,
-            headers : customHeader,
-          ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
-        }else{
-          if(_version != null){
-            if(body != null){            
-              body.addAll({'version' : _version});
-            }else{
-              body = {'version' : _version};
+          data = await http
+              .post(
+                Uri.parse(customUrl),
+                body: body,
+                headers: customHeader,
+              )
+              .timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
+        } else {
+          if (_version != null) {
+            if (body != null) {
+              body.addAll({'version': _version});
+            } else {
+              body = {'version': _version};
             }
           }
-          data = await http.post(url+name,
-            body : body,
-            headers : header,
-          ).timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
+          data = await http
+              .post(
+                Uri.parse(url + name),
+                body: body,
+                headers: header,
+              )
+              .timeout(Duration(milliseconds: timeout != null ? timeout : 10000));
         }
       }
-      
-      if(onComplete != null){
+
+      if (onComplete != null) {
         await onComplete(data);
-      }else{
+      } else {
         dynamic dataresponse = json.decode(file != null ? await data.stream.bytesToString() : data.body);
-        if(logResponse == true){
+        if (logResponse == true) {
           await Response().start(dataresponse);
         }
 
-        if(data.statusCode == 200){
+        if (data.statusCode == 200) {
           _responseCatch = true;
-          if(onSuccess != null){
-            if(withLoading != null && withLoading == true){
+          if (onSuccess != null) {
+            if (withLoading != null && withLoading == true) {
               isLoading = false;
-              Navigator.pop(context);  
+              Navigator.pop(context);
             }
             return onSuccess(dataresponse);
-          }else{
-            if(successMessage == 'default'){
-              Fluttertoast.showToast(msg:dataresponse['message']);
-            }else if(successMessage != null && successMessage != ''){
-              Fluttertoast.showToast(msg:successMessage);
+          } else {
+            if (successMessage == 'default') {
+              Fluttertoast.showToast(msg: dataresponse['message']);
+            } else if (successMessage != null && successMessage != '') {
+              Fluttertoast.showToast(msg: successMessage);
             }
-            if(withLoading != null && withLoading == true){
+            if (withLoading != null && withLoading == true) {
               isLoading = false;
-              Navigator.pop(context);  
+              Navigator.pop(context);
             }
             return dataresponse;
           }
         } else {
           _responseCatch = true;
-          if(data.statusCode == 401){
-            if(authErrorRedirect != null){
-              if(_currentContext != context || singleContext == true){
-                if(context != null){
+          if (data.statusCode == 401) {
+            if (authErrorRedirect != null) {
+              if (_currentContext != context || singleContext == true) {
+                if (context != null) {
                   Session.clear();
                   return Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => authErrorRedirect,  
-                    ),(Route<dynamic> route) => false
-                  );
-                }else{
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => authErrorRedirect,
+                      ),
+                      (Route<dynamic> route) => false);
+                } else {
                   print('REQUIRED! context parameter in .request(context)');
                   print('REQUIRED! context parameter in .request(context)');
                   print('REQUIRED! context parameter in .request(context)');
@@ -920,279 +856,280 @@ class Post{
             }
           }
 
-          if(onError != null){
-            if(withLoading != null && withLoading == true){
-              if(context == null){
+          if (onError != null) {
+            if (withLoading != null && withLoading == true) {
+              if (context == null) {
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
-              }else{
+              } else {
                 isLoading = false;
-                Navigator.pop(context);  
+                Navigator.pop(context);
               }
             }
-            return onError(data.statusCode,dataresponse);
-          }else{
+            return onError(data.statusCode, dataresponse);
+          } else {
             print('Error Code ${data.statusCode}');
-            if(errorMessage == 'default'){
-                Fluttertoast.showToast(msg:dataresponse['message']);
-            }else if(errorMessage != null && errorMessage != ''){
-                Fluttertoast.showToast(msg:errorMessage);
+            if (errorMessage == 'default') {
+              Fluttertoast.showToast(msg: dataresponse['message']);
+            } else if (errorMessage != null && errorMessage != '') {
+              Fluttertoast.showToast(msg: errorMessage);
             }
-            if(withLoading != null && withLoading == true){
-              if(context == null){
+            if (withLoading != null && withLoading == true) {
+              if (context == null) {
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
                 print('REQUIRED! context parameter in .request(context)');
-              }else{
+              } else {
                 isLoading = false;
-                Navigator.pop(context);  
+                Navigator.pop(context);
               }
             }
-            return {'statusCode' : data.statusCode};
+            return {'statusCode': data.statusCode};
           }
         }
       }
     } on SocketException catch (_) {
-        _responseCatch = true;
-      if(withLoading != null && withLoading == true){
-        if(context == null){
+      _responseCatch = true;
+      if (withLoading != null && withLoading == true) {
+        if (context == null) {
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
-        }else{
+        } else {
           isLoading = false;
-          Navigator.pop(context);  
+          Navigator.pop(context);
         }
       }
-      if(socketMessage != null){
-        Fluttertoast.showToast(msg:socketMessage,);
-      }else if(socketRedirect != null){
-        if(context != null){
-          if(_currentContext != context || singleContext == true){
-            if(socketRedirect is bool){
-              Navigator.push(context,
-                MaterialPageRoute(
-                  builder: (context) => Connection(
-                    onSubmit: onReloadSubmited,
-                    onDissmiss: onReloadDissmiss,
-                  ), 
-                )
-              );  
-            }else{
-              Navigator.push(context,
-                MaterialPageRoute(
-                  builder: (context) => socketRedirect, 
-                )
-              );
+      if (socketMessage != null) {
+        Fluttertoast.showToast(
+          msg: socketMessage,
+        );
+      } else if (socketRedirect != null) {
+        if (context != null) {
+          if (_currentContext != context || singleContext == true) {
+            if (socketRedirect is bool) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Connection(
+                      onSubmit: onReloadSubmited,
+                      onDissmiss: onReloadDissmiss,
+                    ),
+                  ));
+            } else {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => socketRedirect,
+                  ));
             }
           }
-        }else{
+        } else {
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
         }
-      }else if(onSocket != null){
+      } else if (onSocket != null) {
         await onSocket();
       }
-    } on TimeoutException catch (_){
+    } on TimeoutException catch (_) {
       _responseCatch = true;
-      if(withLoading != null && withLoading == true){
-        if(context == null){
+      if (withLoading != null && withLoading == true) {
+        if (context == null) {
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
-        }else{
+        } else {
           isLoading = false;
-          Navigator.pop(context);  
+          Navigator.pop(context);
         }
       }
-      if(timeoutMessage != null){
-        Fluttertoast.showToast(msg:timeoutMessage,);
-      }else if(timeoutRedirect != null){
-        if(context != null){
-          if(_currentContext != context || singleContext == true){
-            if(timeoutRedirect is bool){
-              Navigator.push(context,
-                MaterialPageRoute(
-                  builder: (context) => Timeout(
-                    onSubmit: onReloadSubmited,
-                    onDissmiss: onReloadDissmiss,
-                  ), 
-                )
-              );
-            }else{
-              Navigator.push(context,
-                MaterialPageRoute(
-                  builder: (context) => timeoutRedirect, 
-                )
-              );
+      if (timeoutMessage != null) {
+        Fluttertoast.showToast(
+          msg: timeoutMessage,
+        );
+      } else if (timeoutRedirect != null) {
+        if (context != null) {
+          if (_currentContext != context || singleContext == true) {
+            if (timeoutRedirect is bool) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Timeout(
+                      onSubmit: onReloadSubmited,
+                      onDissmiss: onReloadDissmiss,
+                    ),
+                  ));
+            } else {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => timeoutRedirect,
+                  ));
             }
           }
-        }else{
+        } else {
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
           print('REQUIRED! context parameter in .request(context)');
         }
-      }else if(onTimeout != null){
+      } else if (onTimeout != null) {
         await onTimeout();
       }
     } catch (e) {
-      if(!_responseCatch){
-        if(withLoading != null && withLoading == true){
-          if(context == null){
+      if (!_responseCatch) {
+        if (withLoading != null && withLoading == true) {
+          if (context == null) {
             print('REQUIRED! context parameter in .request(context)');
             print('REQUIRED! context parameter in .request(context)');
             print('REQUIRED! context parameter in .request(context)');
-          }else{
+          } else {
             isLoading = false;
-            Navigator.pop(context);  
+            Navigator.pop(context);
           }
         }
       }
 
-      if(exception){
-        if(onException != null){
+      if (exception) {
+        if (onException != null) {
           await onException(e.toString());
-        }else{
-          Fluttertoast.showToast(msg:'Error Exception');
-          Fluttertoast.showToast(msg:e.toString());
+        } else {
+          Fluttertoast.showToast(msg: 'Error Exception');
+          Fluttertoast.showToast(msg: e.toString());
           print(e.toString());
         }
       }
     }
   }
 
-  loadConfiguration(){
-    if(errorMessage == null){
+  loadConfiguration() {
+    if (errorMessage == null) {
       errorMessage = _errorMessage;
     }
 
-    if(successMessage == null){
+    if (successMessage == null) {
       successMessage = _successMessage;
     }
-    
-    if(logResponse == null){
+
+    if (logResponse == null) {
       logResponse = _logResponse;
     }
-    
-    if(exception == null){
+
+    if (exception == null) {
       exception = _exception;
     }
-    
-    if(timeoutRedirect == null){
+
+    if (timeoutRedirect == null) {
       timeoutRedirect = _timeoutRedirect;
     }
-    
-    if(socketRedirect == null){
+
+    if (socketRedirect == null) {
       socketRedirect = _socketRedirect;
     }
 
-    if(timeout == null){
+    if (timeout == null) {
       timeout = _timeout;
     }
 
-    if(timeoutMessage == null){  
+    if (timeoutMessage == null) {
       timeoutMessage = _timeoutMessage;
     }
 
-    if(socketMessage == null){  
+    if (socketMessage == null) {
       socketMessage = _socketMessage;
     }
 
-    if(onTimeout == null){
+    if (onTimeout == null) {
       onTimeout = _onTimeout;
     }
 
-    if(onSocket == null){
+    if (onSocket == null) {
       onSocket = _onSocket;
     }
 
-    if(onComplete == null){
+    if (onComplete == null) {
       onComplete = _onComplete;
     }
 
-    if(beforeSend == null){
+    if (beforeSend == null) {
       beforeSend = _beforeSend;
     }
 
-    if(onException == null){
+    if (onException == null) {
       onException = _onException;
     }
 
-    if(onSuccess == null){
-    onSuccess = _onSuccess;
+    if (onSuccess == null) {
+      onSuccess = _onSuccess;
     }
 
-    if(onError == null){  
+    if (onError == null) {
       onError = _onError;
     }
 
-    if(authErrorRedirect == null){
+    if (authErrorRedirect == null) {
       authErrorRedirect = _authErrorRedirect;
     }
 
-    if(withLoading == null){
+    if (withLoading == null) {
       withLoading = _withLoading;
     }
   }
 }
 
 class Session {
-  
   /// parameter 1 = header , parameter 2 = value
   /// note : the name must be different from other data types
-  static Future<dynamic> save(String name,dynamic value) async{
+  static Future<dynamic> save(String name, dynamic value) async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
-    if(value is String){
+    if (value is String) {
       preferences.setString(name, value);
       return true;
-    }else if(value is int){
+    } else if (value is int) {
       preferences.setInt(name, value);
       return true;
-    }else if(value is bool){
+    } else if (value is bool) {
       preferences.setBool(name, value);
       return true;
-    }else{
+    } else {
       return 'Type Data Tidak Diketahui';
     }
   }
 
-  static Future<dynamic> load(String name) async{
+  static Future<dynamic> load(String name) async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool typeBool = false; 
-    bool typeString = false; 
-    bool typeInt = false; 
+    bool typeBool = false;
+    bool typeString = false;
+    bool typeInt = false;
 
-    try{
+    try {
       preferences.getBool(name);
       typeBool = true;
-    }catch(e){
-      try{
+    } catch (e) {
+      try {
         preferences.getInt(name);
         typeInt = true;
-      }catch(e){
-        try{
+      } catch (e) {
+        try {
           preferences.getString(name);
           typeString = true;
-        }catch(e){
-
-        }
+        } catch (e) {}
       }
     }
-    
-    if(typeString != false ){
+
+    if (typeString != false) {
       return preferences.getString(name);
-    }else if(typeInt != false){
+    } else if (typeInt != false) {
       return preferences.getInt(name);
-    }else if(typeBool != false){
+    } else if (typeBool != false) {
       return preferences.getBool(name);
-    }else{
+    } else {
       print('Tidak Ditemukan');
       return false;
     }
   }
-  
+
   static Future<bool> clear() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.clear();
