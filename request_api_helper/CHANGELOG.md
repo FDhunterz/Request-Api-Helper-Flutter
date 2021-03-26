@@ -1,3 +1,6 @@
+## 2.2.6+6 - Response Issue
+* logResponse bug fixed
+
 ## 2.2.6+4 - Compatible FCM
 * fixed FCM build error
 

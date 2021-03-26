@@ -1,11 +1,11 @@
 name: request_api_helper
 description: http, shared_preferences helper for Lavarel and other.
-version: 2.2.6+4
+version: 2.2.6+6
 homepage: https://github.com/FDhunterz/Request-Api-Helper-Flutter-V-2.0.2
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
-  flutter: ">=1.17.0 <2.0.0"
+  flutter: ">=1.17.0 <2.0.1"
 
 dependencies:
   flutter:
