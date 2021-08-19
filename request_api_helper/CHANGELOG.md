@@ -1,4 +1,14 @@
-## 2.2.6+6 - Response Issue
+## 3.0.0+1 - Bug Loading
+* Fixed Loading Bug
+
+## 3.0.0 - Upgrade And Optimizing
+* changed all Function
+
+## 2.2.6+10 - Update Plugin
+* shared_preferences: ^2.0.6
+* fluttertoast: ^8.0.8
+
+## 2.2.6+9 - Response Issue
 * logResponse bug fixed
 
 ## 2.2.6+4 - Compatible FCM

@@ -1,6 +1,6 @@
 class Response {
-  String toTab = ' ';
-  start(data) {
+  static String _toTab = ' ';
+  static start(data) {
     if (data is Map) {
       print('{');
       ifObject(data, 0);
@@ -23,11 +23,11 @@ class Response {
   }
 
   // [value] int
-  ifArray(data, tab, {string}) {
+  static ifArray(data, tab, {string}) {
     String thisTab = '';
     int tabs = tab + 1;
     for (int t = 0; t < tabs; t++) {
-      thisTab += toTab;
+      thisTab += _toTab;
     }
     if (data[0] is List) {
       print('$thisTab ' + (string ?? '') + ' [');
@@ -65,12 +65,12 @@ class Response {
   }
 
   // { 'object' : value }
-  ifObject(data, tab, {string}) {
+  static ifObject(data, tab, {string}) {
     String thisTab = '';
     int counter = 0;
     int tabs = tab + 1;
     for (int t = 0; t < tabs; t++) {
-      thisTab += toTab;
+      thisTab += _toTab;
     }
 
     data.forEach((k, v) {
@@ -116,11 +116,11 @@ class Response {
     });
   }
 
-  ifOther(data, type, tab) {
+  static ifOther(data, type, tab) {
     String thisTab = '';
     int tabs = tab + 1;
     for (int t = 0; t < tabs; t++) {
-      thisTab += toTab;
+      thisTab += _toTab;
     }
     print('$thisTab $data // $type');
   }

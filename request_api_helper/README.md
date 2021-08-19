@@ -15,65 +15,27 @@ dependencies:
 ## Usage
 
 ```dart
-import 'package:request_api_helper/request_api_helper.dart';
+import 'package:request_api_helper/request.dart' as req;
 ```
 
-## New Update
-
-```dart
-  Post/Get {
-    ...
-    onReloadSubmited : (){
-      // do something if reload Clicked
-    }
-    onReloadDissmiss: (){
-      // do something if view dissmiss, (note: cant use async)
-    }
-  }
-```
-
-And Change 'access_token' to 'token'
-
-## 1 . Setting Env
+## 1 . Setting Config
 use static Env in main like this (Release):
 
 ```dart
-// == 200 response dynamic
-// != 200 response {'statusCode' : other int code}
+import 'package:request_api_helper/model/config_model.dart';
 
 void main(
-  Env(
-    confurl: 'http://rootUrl/api/',
-    confnoapiurl: 'http://rootUrl/'
-  ).save();
+  RequestApiHelperConfig.save(
+    RequestApiHelperConfigModel(
+      url: 'https://official-joke-api.appspot.com/',
+      noapiurl: 'https://official-joke-api.appspot.com/',
+      logResponse: true,
+      withLoading: Redirects(toogle: false),
+    ),
+  );
   runApp(MyApp());
 }
 
-```
-
-or use Server Switcher (Team Developing)
-
-```dart
-
-ServerSwitcher(
- servers: [
-   {'name' : 'Server 1' , 'id' : 'http://rootUrl/'},
-   {'name' : 'Server 2' , 'id' : 'http://rootUrl2/'},
- ]
-)
-
-```
-
-## Env Global Configuration
-```dart
-  Env(
-    timeout: 10,
-    errorMessage: 'Call Programmer',
-    successMessage: 'default',
-    exception: true,
-    beforeSend: ()=>print('hi this is me'),
-    authErrorRedirect : Login() // clear Session and redirect if error [401]
-  ).saveConfiguration();
 ```
 
 ## 2 . Make Login And Saving Token
@@ -82,152 +44,29 @@ First you must make login request.
 ```dart
 login() async {
 ======================= GET DATA FROM SERVER
+  await req.send(
+    name: 'login',
+    type: RESTAPI.POST,
+    data: RequestData(
+      body: {
+        'username' : username,
+        'password' : password,
+      }
+    ),
+    RequestApiHelperConfigModel(
+      onSuccess: (response) async {
+        // important
+        await Session.save('token', 'Bearer ' + response['token']);
 
-// == 200 response dynamic
-// != 200 response {'statusCode' : other int code}
-dynamic response = await Post( 
- name: 'login', // full url http://rootUrl/api/login
- exception : true, // error exception, false to hide
- successMessage : 'default',
- errorMessage : 'Try Again!',
- logResponse : false, // showing server response
- timeout : 20000, 
- timeoutRedirect : true // if true .request(context)
- socketRedirect : true // if true .request(context)
-).request(context); 
-
-// note : 
-
-// successMessage : 'default' auto show message from server [200]
-// { 'message' : 'Thanks For Buy' }
-
-// errorMessage : 'default' auto show message from server [!=200]
-// { 'message' : 'Error You Must Login' }
-
-// timeout : CustomTimeout() // for routing to your custom view
-
-======================= Process Data
-// ex : response is 
-// {'token' : 'mytoken' , 'user' : {'name' : 'MIAUW' , 'id' : 1}}
-
-if(response != null){
-  if(response['statusCode'] == null){
-
-    // important
-    await Session.save('token', 'Bearer ' + response['token']);
-
-    // auto save different type data
-    await Session.save('user_name',response['user']['name']);
-    await Session.save('user_id',response['user']['id']);
-  }
-}
-
+        // auto save different type data
+        await Session.save('user_name', response['user']['name']);
+        await Session.save('user_id', response['user']['id']);
+      },
+    ),
+  );
 }
 ```
-
-## 3 . Use Post / Get After Saving Token
-
-Post
-
-```dart
-Map<String,dynamic> mydata = await Post( 
- name: 'data/employee', // full url http://rootUrl/api/data/employee
- exception : true,
- logResponse : true,
- timeout : 20000, 
- timeoutRedirect : true,
- socketRedirect : true 
-).request(context); 
-
-if(mydata != null){
- if(mydata['statusCode'] == null){
-  // success return
- }{
-  // error return
- }
- // no response
-}
-
-```
-
-Get
-
-```dart
-Map<String,dynamic> mydata = await Get( 
- name: 'data/employee', // full url http://rootUrl/api/data/employee
- exception : true,
- logResponse : true,
- timeout : 20000, 
- timeoutRedirect : true,
- socketRedirect : true 
- body : {
-  'mydata' : 'yourdata'
- },
-).request(context); 
-
-if(mydata != null){
- if(mydata['statusCode'] == null){
-  // success return
- }{
-  // error return
- }
- // no response
-}
-
-```
-
-## Post/Get Attributes
-```dart
-await Post / Get {
-    ...
-    beforeSend: ()=> print('loading...'), // before send
-    onTimeout: ()=> print('this is timeout'), // if timeout Exception
-    onSocket: ()=> print('internet not connected'), // if socket Exception
-    onException: (val)=> print(val), // if Exception with Code
-    timeout: 20000, // default 10000 ms
-    onComplete : (v) => print(v), // return Raw HTTP
-    socketMessage : 'Error Connection', // return toast
-    timeoutMessage : 'Error Connection', // return toast
-    socketRedirect : true , // redirect to ...
-    timeoutRedirect : true , // redirect to ...
-    withLoading:true, // fill with true or Widget 
-    singleContext: true, // escaping context rules (rules : remove multiple push context) 
-  }.request(context)
-}
-```
-
-## 4 . Use Post / Get other Url?
-
-
-```dart
-Map<String,dynamic> mydata = await Post( 
- name: 'image/myimage', // full url http://google.com/api/image/myimage
- customUrl : 'http://google.com/api/',
- customHeader : {
-   'your header' : 'this header',
- },
- body : {
-   'mybody' : 'myvalue',
- }
- exception : true,
- logResponse : true,
- timeout : true, 
-).request(context); 
-```
-
-## File Upload
-```dart
-  Post {
-    ...
-    ...
-    ...
-    file : file, // String path of file
-    fileRequestName : 'images' // request name of file
-  }.request()
-```
-
-
-## 5 . What is Session?
+## 3 . What is Session?
 
 session is Shared preferences plugin, implement :
 
