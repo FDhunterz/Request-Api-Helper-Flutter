@@ -12,9 +12,6 @@ import 'package:flutter/material.dart' show MaterialPageRoute;
 import 'background.dart';
 import 'model/error_list.dart';
 
-BuildContext? _currentContext;
-
-dynamic _response;
 String _request = '?';
 Map<String, dynamic>? _body;
 bool _isFile = false;
@@ -22,6 +19,7 @@ bool _isFile = false;
 abstract class RestApi {
   BuildContext? context;
   bool? singleContext;
+  dynamic _response;
 
   resetVariable() {
     _response = null;
@@ -32,9 +30,6 @@ abstract class RestApi {
 
   process({RequestData? data, CustomRequestData? customData, Map<String, String>? header, RequestApiHelperConfigModel? config, String? name, required RESTAPI type}) async {
     await resetVariable();
-    if (_currentContext != context || singleContext == true) {
-      _currentContext = context;
-    }
     if (config!.version != null) {
       _request += 'version=${config.version}';
     }
@@ -129,8 +124,8 @@ abstract class RestApi {
   }
 
   responseApi(RequestApiHelperConfigModel config, RESTAPI type) async {
-    if (config.onComplete != null) {
-      await config.onComplete;
+    if (config.onCompleteRawRespose != null) {
+      return config.onCompleteRawRespose!(_response);
     } else {
       dynamic dataresponse;
       dynamic _responses = _isFile ? await _response.stream.bytesToString() : _response.body;
@@ -178,7 +173,7 @@ abstract class RestApi {
       } else {
         if (_response.statusCode == 401) {
           if (config.authErrorRedirect != null) {
-            if (_currentContext != context || singleContext == true) {
+            if (currentContext != context || singleContext == true) {
               if (context != null) {
                 Session.clear();
                 return Navigator.pushAndRemoveUntil(

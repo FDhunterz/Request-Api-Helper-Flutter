@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/material.dart' show BuildContext;
 import 'package:request_api_helper/model/redirect_helper.dart';
 
 enum RESTAPI { POST, GET, PUT, DELETE, PATCH }
+BuildContext? currentContext;
 
 // example https://this.com/api/
 String? _url;
@@ -18,13 +23,13 @@ Redirects? _socketRedirect;
 Duration? _timeout;
 String? _timeoutMessage;
 String? _socketMessage;
-Future? _onTimeout;
-Future? _onSocket;
-Future? _onComplete;
+Function(TimeoutException)? _onTimeout;
+Function(SocketException)? _onSocket;
+Function(dynamic data)? _onCompleteRawRespose;
 Future? _beforeSend;
-Function? _onException;
-Function? _onSuccess;
-Function? _onError;
+Function(Object e)? _onException;
+Function(dynamic response)? _onSuccess;
+Function(int code, dynamic data)? _onError;
 Redirects? _authErrorRedirect;
 Redirects? _withLoading;
 String? _version;
@@ -38,7 +43,7 @@ class RequestApiHelperConfig {
       exception: config != null ? config.exception ?? _exception : _exception,
       logResponse: config != null ? config.logResponse ?? _logResponse : _logResponse,
       noapiurl: config != null ? config.noapiurl ?? _noapiurl : _noapiurl,
-      onComplete: config != null ? config.onComplete ?? _onComplete : _onComplete,
+      onCompleteRawRespose: config != null ? config.onCompleteRawRespose ?? _onCompleteRawRespose : _onCompleteRawRespose,
       onError: config != null ? config.onError ?? _onError : _onError,
       onException: config != null ? config.onException ?? _onException : _onException,
       onSocket: config != null ? config.onSocket ?? _onSocket : _onSocket,
@@ -75,7 +80,7 @@ class RequestApiHelperConfig {
     _socketMessage = config.socketMessage;
     _onTimeout = config.onTimeout;
     _onSocket = config.onSocket;
-    _onComplete = config.onComplete;
+    _onCompleteRawRespose = config.onCompleteRawRespose;
     _beforeSend = config.beforeSend;
     _onException = config.onException;
     _onSuccess = config.onSuccess;
@@ -98,18 +103,18 @@ class RequestApiHelperConfigModel {
   String? successMessage;
   bool? logResponse;
   bool? exception;
-  dynamic timeoutRedirect;
-  dynamic socketRedirect;
+  Redirects? timeoutRedirect;
+  Redirects? socketRedirect;
   Duration? timeout;
   String? timeoutMessage;
   String? socketMessage;
-  Future? onTimeout;
-  Future? onSocket;
-  Future? onComplete;
+  Function(TimeoutException)? onTimeout;
+  Function(SocketException)? onSocket;
+  Function(dynamic data)? onCompleteRawRespose;
   Future? beforeSend;
-  Function? onException;
-  Function? onSuccess;
-  Function? onError;
+  Function(Object e)? onException;
+  Function(dynamic response)? onSuccess;
+  Function(int code, dynamic data)? onError;
   Redirects? authErrorRedirect;
   Redirects? withLoading;
   String? version;
@@ -121,7 +126,7 @@ class RequestApiHelperConfigModel {
     this.exception,
     this.logResponse,
     this.noapiurl,
-    this.onComplete,
+    this.onCompleteRawRespose,
     this.onError,
     this.onException,
     this.onSocket,

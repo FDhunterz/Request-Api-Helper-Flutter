@@ -40,7 +40,7 @@ class _Connection extends State<Connection> {
           Center(
             child: Text(
               'CONNECTION LOST',
-              style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w700),
+              style: Theme.of(context).textTheme.headline1 ?? TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w700),
             ),
           ),
           SizedBox(
@@ -49,10 +49,11 @@ class _Connection extends State<Connection> {
           Center(
             child: Text(
               'Check Your Internet Connection',
-              style: TextStyle(
-                color: Colors.black38,
-                fontSize: 14,
-              ),
+              style: Theme.of(context).textTheme.caption ??
+                  TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
             ),
           ),
           SizedBox(
@@ -70,10 +71,11 @@ class _Connection extends State<Connection> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18.0),
               ),
-              primary: Colors.blueAccent,
-              textStyle: TextStyle(
-                color: Colors.white,
-              ),
+              primary: Theme.of(context).buttonColor,
+              textStyle: Theme.of(context).textTheme.button ??
+                  TextStyle(
+                    color: Colors.white,
+                  ),
             ),
             child: Text(
               '             Reconnect            ',
@@ -126,7 +128,7 @@ class _Timeout extends State<Timeout> {
           Center(
             child: Text(
               'REQUEST TIMEOUT',
-              style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w700),
+              style: Theme.of(context).textTheme.headline1 ?? TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w700),
             ),
           ),
           SizedBox(
@@ -135,10 +137,11 @@ class _Timeout extends State<Timeout> {
           Center(
             child: Text(
               'Maybe Server Is Down',
-              style: TextStyle(
-                color: Colors.black38,
-                fontSize: 14,
-              ),
+              style: Theme.of(context).textTheme.caption ??
+                  TextStyle(
+                    color: Colors.black38,
+                    fontSize: 14,
+                  ),
             ),
           ),
           SizedBox(
@@ -156,10 +159,11 @@ class _Timeout extends State<Timeout> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18.0),
               ),
-              primary: Colors.blueAccent,
-              textStyle: TextStyle(
-                color: Colors.white,
-              ),
+              primary: Theme.of(context).buttonColor,
+              textStyle: Theme.of(context).textTheme.button ??
+                  TextStyle(
+                    color: Colors.white,
+                  ),
             ),
             child: Text(
               '             Back            ',

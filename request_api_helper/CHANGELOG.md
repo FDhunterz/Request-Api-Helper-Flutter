@@ -1,3 +1,6 @@
+## 3.0.0+3 - Bug Loading
+* adding socket , timeout exception function
+
 ## 3.0.0+1 - Bug Loading
 * Fixed Loading Bug
 
