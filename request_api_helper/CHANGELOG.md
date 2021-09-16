@@ -1,3 +1,28 @@
+## 3.0.1+3 - Bug Auth
+* fixed
+
+## 3.0.1+2 - Bug StatusCode
+* fixed
+
+## 3.0.1+1 - adding Upload Callback (uploaded,total)
+* callback upload file size added
+
+## 3.0.0+14 - adding single context
+* single context for triggering redirect in multiple request
+
+## 3.0.0+10 - Bug error return null data
+* Bug Fixed
+
+## 3.0.0+9 - Bug RequestApiHelperConfigData
+* Bug Fixed
+* adding Session delete function;
+
+## 3.0.0+5 - change RequestApiHelperConfigData
+* Change RequestApiHelperConfigData to RequestApiHelperConfigData
+
+## 3.0.0+4 - Bug Server Switcher
+* fixing error saved server
+
 ## 3.0.0+3 - Bug Loading
 * adding socket , timeout exception function
 

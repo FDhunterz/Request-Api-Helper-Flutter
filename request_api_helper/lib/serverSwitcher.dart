@@ -43,16 +43,18 @@ class _ServerSwitcher extends State<ServerSwitcher> {
   loadSelected() async {
     if (widget.saved != null) {
       if (widget.saved!) {
-        final String _load = await Session.load('url_saved');
-        final List _parse = json.decode(_load);
-        _selected = _parse[0];
-        RequestApiHelperConfig.save(
-          RequestApiHelperConfigModel(
-            url: _parse[1],
-            noapiurl: _parse[0],
-          ),
-        );
-        setState(() {});
+        final String? _load = await Session.load('url_saved');
+        if (_load != null) {
+          final List _parse = json.decode(_load);
+          _selected = _parse[0];
+          RequestApiHelperConfig.save(
+            RequestApiHelperConfigData(
+              url: _parse[1],
+              noapiurl: _parse[0],
+            ),
+          );
+          setState(() {});
+        }
       }
     }
   }
@@ -60,7 +62,7 @@ class _ServerSwitcher extends State<ServerSwitcher> {
   selected(id, context) {
     _selected = id;
     RequestApiHelperConfig.save(
-      RequestApiHelperConfigModel(
+      RequestApiHelperConfigData(
         url: id + 'api/',
         noapiurl: id,
       ),

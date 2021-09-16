@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:request_checker/request_api_helper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:request_checker/request.dart' as req;
+import 'package:request_checker/session.dart';
+
+import 'model/config_model.dart';
+import 'model/redirect_helper.dart';
 
 void main() {
-  Env(
-    timeout: 10,
-    errorMessage: 'Hubungi Pengembang',
-    successMessage: 'default',
-    exception: false,
-  ).saveConfiguration();
+  RequestApiHelperConfig.save(RequestApiHelperConfigData(
+    url: 'https://public.scool.my.id/api/',
+    noapiurl: 'https://public.scool.my.id/',
+    // url: 'http://192.168.100.200/scool_remake_2/public/api/',
+    // noapiurl: 'http://192.168.100.200/scool_remake_2/public/',
+    logResponse: true,
+    exception: true,
+    onException: (e) {
+      print(e);
+    },
+    timeout: Duration(seconds: 30),
+    version: '1.0.0',
+    withLoading: Redirects(toogle: true),
+    timeoutMessage: 'Timeout, Check Your Connection',
+    // successMessage: 'default',
+  ));
   runApp(MyApp());
 }
 
@@ -17,157 +31,66 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Silver VTR',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.orange,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
+      // home: Topup(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+  MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  postWithName() async {
-    dynamic data = await Post(
-      exception: true,
-      customUrl: 'http://192.168.100.2/score/data',
-      customHeader: {
-          'Accept' : 'application/json',
-      },
-      timeoutRedirect: true,
-      socketRedirect: true,
-      timeout: 100,
-      onReloadSubmited: () async {
-        await postWithName();
-      },
-      onReloadDissmiss: (){
-        print('lol');
-      },
-      onException: (v)=> print(v),
-      withLoading: true,
-      singleContext: true,
-      authErrorRedirect: MyHomePage(title: 'Error 401',),
-    ).request(context);
-
-    await Post(
-      exception: true,
-      name: 'launcher/list',
-      timeoutRedirect: true,
-      socketRedirect: true,
-      timeout: 100,
-      onException: (v)=> print(v),
-      withLoading: true,
-    ).request(context);
-
-    await Post(
-      exception: true,
-      name: 'launcher/list',
-      timeoutRedirect: true,
-      socketRedirect: true,
-      timeout: 100,
-      onException: (v)=> print(v),
-      withLoading: true,
-    ).request(context);
-
-    if(data != null){
-      if(data['statusCode'] == null){
-        print(data);
-        // no error [200]
-      }else{
-        // error code != [200]
-      }
-      // no response / exception
+  getData() async {
+    await Session.save('token', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiOGJjMTMxZTYyMWQwOGNlODBkZTcyNGMxZjc3ZDNhNDdkZmVkOGM1YmZhZTc1ZjJiNTk0YTAxMzg1ZmI2YWZkY2I3NzhlMjkyMTUwMjk3YWYiLCJpYXQiOjE2MzE4MDMzMjUuMDY3NTIzMDAyNjI0NTExNzE4NzUsIm5iZiI6MTYzMTgwMzMyNS4wNjc1Mjk5MTY3NjMzMDU2NjQwNjI1LCJleHAiOjE2NjMzMzkzMjUuMDU3MDU5MDQ5NjA2MzIzMjQyMTg3NSwic3ViIjoiMiIsInNjb3BlcyI6W119.Fb_qt8seHTeRTC64k2tIwKpqB42wyQTb0JT5RzNG2DnuDOlGAUzs0W3X1rogyRbkTE6FdBD1VSAqgKOQElJXTcUpkkzS3EsEKEQJXTQJJwflcPrt7wH_rm1653Dm2hMJL4eLXBsH5Sk3FHZGcesaAGlKx1TVs2b_kAe8rSa3ugU_x_GOV4qryq52ZMxpINz9iev1ylFyWJ_e4ttvkpGfA7AkuUT3RtgJWMn2GbI00rjwzldyrAz21SoImH94HPZHtudjE0dJ3T2E0kVQ5InbKv7_fCP7-qmKeMkSrfL2arkKhgjOVFgdRAu4w_iJV4lvyfrNeDqLX52vgcFnLAM6MtX9d_oSpvQFS5GxABjLwEeFThrtMbcgDhduD8q8xdf1hLKdrb4n4_GKXhoFsfzDmy2zH5p-aZCgEw7Lq96h5YxAwphC5SWItnSeZP1T7EqxAGfMhfP_x_E4Fd85KTgXYwZgBVmSLlEBJpgxQxUEVyLgJht1ashszyPz93fi-m1n8Yv4bdIp5Q2r7grHBVBDDY9r-EH_NFePBm-ixcpw4nW1gjJ2qX0pV-xPa5tjE5s059J041WSD1gdz3PLH_edts6QazuuQSpJNIWUaRb5BRN1vepkKHO2tP_fkRaR4GkCW1W-rPayOmCICGCWdmsvSy3i2mLqN16gmFdGwRh8o64');
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      req.send(
+        type: RESTAPI.POST,
+        name: 'tugas/upload',
+        data: RequestData(
+          file: RequestFileData(filePath: [image.path], fileRequestName: ['file[0]']),
+          body: {
+            'id_scool': 'eyJpdiI6IkFjaFBBTXNKYittZnB1ZVBaa29ZY3c9PSIsInZhbHVlIjoidEtVK2FyTlBQVHdvMFEvY0M4M0ZLZz09IiwibWFjIjoiZjQ3NzUyZjcyZTZlMzM0MzQxODNhYzA5ZDIxOGUxZjM0NWQwNTFmODU4M2U2ZTlkNjI0ODUxMTg2MDUyM2I1NyIsInRhZyI6IiJ9',
+            'id_tugas': 'eyJpdiI6IjNwN21OaU5zcE1CeUoxdWVrazNJWnc9PSIsInZhbHVlIjoidmpMdC9yOFFUZ1pMVmw2NVZnOUxCdz09IiwibWFjIjoiYjkyNDhhYzhjZGVlNjZmYTI5MDM2NDFjMjI3MzUyMjljNGQ5MDYxMTNjYmM5NWUzY2NlZTM0NzU0NTc2YmQ1NSIsInRhZyI6IiJ9',
+          },
+        ),
+        context: context,
+        changeConfig: RequestApiHelperConfigData(
+          onSuccess: (data) {},
+          onError: (code, data) {},
+        ),
+        onUploadProgress: (sended, total) {
+          print(sended / total * 100);
+        },
+      );
     }
-
-    // this is raw 
-    // await Post(
-    //   exception: false,
-    //   name: 'launcher/list',
-    //   timeoutRedirect: true,
-    //   socketRedirect: true,
-    //   onException: (v)=> print(v),
-    //   onComplete: (val)=> print(val),
-    // ).request(context);
   }
 
-  getWithName() async {
-    dynamic data = await Get(
-      exception: false,
-      name: 'launcher/list',
-      timeoutRedirect: true,
-      socketRedirect: true,
-      onException: (v)=> print(v),
-      withLoading: true,
-    ).request(context);
-
-    if(data != null){
-      if(data['statusCode'] == null){
-        // no error [200]
-      }else{
-        // error code != [200]
-      }
-      // no response / exception
-    }
-
-    // this is raw 
-    // await Post(
-    //   exception: false,
-    //   name: 'launcher/list',
-    //   timeoutRedirect: true,
-    //   socketRedirect: true,
-    //   onException: (v)=> print(v),
-    //   onComplete: (val)=> print(val),
-    // ).request(context);
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          getData();
+        },
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ServerSwitcher(
-              servers: [
-                {'name': 'my Server' , 'id' : 'http://192.168.0.117/scool/'},
-                {'name': 'Home Server' , 'id' : 'http://192.168.100.37/scool/'}
-              ],
-            ),
-
-            SizedBox(height:10),
-
-            RaisedButton(
-              child: Text('Post With Name'),
-              onPressed: () async {
-                Fluttertoast.showToast(msg:'Loading...');
-                await postWithName();
-              },
-            ),
-
-            SizedBox(height:10),
-
-            RaisedButton(
-              child: Text('Get With Name'),
-              onPressed: () async {
-                Fluttertoast.showToast(msg:'Loading...');
-                await getWithName();
-              },
-            )
-          ],
-        ),
-      )
     );
   }
 }

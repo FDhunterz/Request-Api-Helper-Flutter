@@ -6,9 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:request_api_helper/model/config_model.dart';
-import 'package:request_api_helper/response.dart';
-import 'package:request_api_helper/session.dart';
+import 'package:request_checker/model/config_model.dart';
+import 'package:request_checker/response.dart';
+import 'package:request_checker/session.dart';
 import 'package:flutter/material.dart' show MaterialPageRoute;
 
 import 'background.dart';
@@ -67,9 +67,9 @@ abstract class RestApi {
     // else if (type == RESTAPI.POST) {}
   }
 
-  static HttpClient getHttpClient({Duration? duration}) {
+  static HttpClient getHttpClient() {
     HttpClient httpClient = new HttpClient()
-      ..connectionTimeout = duration ?? const Duration(seconds: 120)
+      ..connectionTimeout = const Duration(seconds: 120)
       ..badCertificateCallback = ((X509Certificate cert, String host, int port) => trustSelfSigned);
 
     return httpClient;
@@ -122,9 +122,7 @@ abstract class RestApi {
       _response = await http.get(_http, headers: _header).timeout(config.timeout ?? Duration(milliseconds: 10000));
     } else if (type == RESTAPI.POST) {
       if (_file.length > 0) {
-        final httpClients = getHttpClient(
-          duration: config.timeout,
-        );
+        final httpClients = getHttpClient();
         final requests = await httpClients.postUrl(_http);
         int byteCount = 0;
 

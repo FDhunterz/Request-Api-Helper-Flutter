@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart' show BuildContext, Navigator, MaterialPageRoute;
 import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
-import 'package:request_api_helper/model/config_model.dart';
-import 'package:request_api_helper/rest_api.dart';
-import 'package:request_api_helper/session.dart';
-import 'package:request_api_helper/timeout.dart';
+import 'package:request_checker/model/config_model.dart';
+import 'package:request_checker/rest_api.dart';
+import 'package:request_checker/session.dart';
+import 'package:request_checker/timeout.dart';
 
 import 'background.dart';
 
