@@ -1,7 +1,25 @@
+/// this class is core of the Request [timeout], [exception], [socket] error handler
+/// you can use Directly :
+///
+///     import 'package:request_api_helper/request.dart' as req;
+///     import 'package:request_api_helper/request_api_helper.dart' show RESTAPI, RequestApiHelperConfigData, RequestData;
+///
+///     BaseRequests(
+///       changeConfig: changeConfig, // [RequestApiHelperConfigData] for catch success or other
+///       context: context, // [BuildContext] for Redirect
+///       customData: customData, // [CustomRequestData] for custom [header] , [file] , [url], [file]
+///       data: data, // [RequestData]
+///       name: name, // used after [url] example url = https://192.168.0.1/api/ + name
+///       type: type, // [RESTAPI] fullrest api enum
+///       singleContext: singleContext, [true] / [false] forced redirect if 401 error / socket - timeout redirect true
+///       onUploadProgress: onUploadProgress // track upload progress (sended,total)
+///     );
+///
+
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart' show BuildContext, Navigator, MaterialPageRoute;
+import 'package:flutter/material.dart' show BuildContext, Colors, MaterialPageRoute, Navigator;
 import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:request_api_helper/model/config_model.dart';
@@ -96,7 +114,9 @@ class BaseRequests extends RestApi {
                 Navigator.push(
                   context!,
                   MaterialPageRoute(
-                    builder: (context) => Timeout(),
+                    builder: (context) => Timeout(
+                      buttonColor: Colors.blue,
+                    ),
                   ),
                 );
               }
@@ -137,7 +157,9 @@ class BaseRequests extends RestApi {
                 Navigator.push(
                   context!,
                   MaterialPageRoute(
-                    builder: (context) => Timeout(),
+                    builder: (context) => Timeout(
+                      buttonColor: Colors.blue,
+                    ),
                   ),
                 );
               }

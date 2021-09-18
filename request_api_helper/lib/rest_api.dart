@@ -1,3 +1,5 @@
+/// core of process request
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -16,8 +18,13 @@ import 'model/error_list.dart';
 
 typedef void OnUploadProgressCallback(int sentBytes, int totalBytes);
 
+/// get request parser
 String _request = '?';
+
+/// body
 Map<String, dynamic>? _body;
+
+/// is file included
 bool _isFile = false;
 
 abstract class RestApi {
@@ -82,6 +89,20 @@ abstract class RestApi {
       contents.write(data);
     }, onDone: () => completer.complete(contents.toString()));
     return completer.future;
+  }
+
+  void _checkingLoadingSession(config) {
+    if (config.withLoading != null) {
+      if (config.withLoading!.widget != null || config.withLoading!.toogle == true) {
+        if (context == null) {
+          print('REQUIRED! context parameter in .request(context)');
+        } else {
+          isLoading = false;
+          Navigator.pop(context!);
+          ifResponseError = true;
+        }
+      }
+    }
   }
 
   requestApi(RequestData? data, CustomRequestData? customData, header, RequestApiHelperConfigData config, name, RESTAPI type, OnUploadProgressCallback? onUploadProgress) async {
@@ -248,16 +269,7 @@ abstract class RestApi {
           }
 
           if (config.onSuccess != null) {
-            if (config.withLoading != null) {
-              if (config.withLoading!.widget != null || config.withLoading!.toogle == true) {
-                if (context == null) {
-                  print('REQUIRED! context parameter in .request(context)');
-                } else {
-                  isLoading = false;
-                  Navigator.pop(context!);
-                }
-              }
-            }
+            _checkingLoadingSession(config);
             return config.onSuccess!(dataresponse);
           } else {
             if (config.withLoading != null) {
@@ -265,12 +277,12 @@ abstract class RestApi {
                 if (context == null) {
                   print('REQUIRED! context parameter in .request(context)');
                 } else {
-                  ifResponseError = true;
                   isLoading = false;
                   Navigator.pop(context!);
                 }
               }
             }
+            _checkingLoadingSession(config);
             return dataresponse;
           }
         } else {
@@ -301,31 +313,11 @@ abstract class RestApi {
           }
 
           if (config.onError != null) {
-            if (config.withLoading != null) {
-              if (config.withLoading!.widget != null || config.withLoading!.toogle == true) {
-                if (context == null) {
-                  print('REQUIRED! context parameter in .request(context)');
-                } else {
-                  ifResponseError = true;
-                  isLoading = false;
-                  Navigator.pop(context!);
-                }
-              }
-            }
+            _checkingLoadingSession(config);
             return config.onError!(statusCode, dataresponse);
           } else {
-            print('Failed, Code ${statusCode}');
-            if (config.withLoading != null) {
-              if (config.withLoading!.widget != null || config.withLoading!.toogle == true) {
-                if (context == null) {
-                  print('REQUIRED! context parameter in .request(context)');
-                } else {
-                  ifResponseError = true;
-                  isLoading = false;
-                  Navigator.pop(context!);
-                }
-              }
-            }
+            print('Failed, Code $statusCode');
+            _checkingLoadingSession(config);
             return {'statusCode': statusCode};
           }
         }

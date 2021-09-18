@@ -1,3 +1,19 @@
+/// this is a [Widget] for change server
+/// default Widget used : Icon(Icons.setting)
+///
+///     import 'package:request_api_helper/request.dart' as req;
+///     import 'package:request_api_helper/request_api_helper.dart' show RESTAPI, RequestApiHelperConfigData, RequestData;
+///
+///     ServerSwitcher(
+///       servers: [
+///         {
+///           'name' : 'Server 1',
+///           'id' : 'http://192.168.0.101/myproject' //root folder project
+///         }
+///       ],
+///       saved: true,
+///     )
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,7 +23,14 @@ import 'package:request_api_helper/session.dart';
 // import 'request_api_helper.dart';
 
 class ServerSwitcher extends StatefulWidget {
-  /// List > Map Data [{'name' : 'Server 1','id' : 'http://192.168.0.101/myproject' //root folder project}]
+  /// List > Map Data
+  ///
+  ///       [
+  ///         {
+  ///           'name' : 'Server 1',
+  ///           'id' : 'http://192.168.0.101/myproject' //root folder project
+  ///         }
+  ///       ]
   final List<ServerSwitcherData>? servers;
   // save your Selected Server
   final bool? saved;

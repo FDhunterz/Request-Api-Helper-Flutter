@@ -1,3 +1,18 @@
+/// this class used For show Dialog or Loading,
+/// [Redirects] class have 2 attributes
+/// toogle is [true] or [false]
+/// widget for custom Widget you want
+/// you can implement like :
+///
+///     import 'package:request_api_helper/request_api_helper.dart';
+///
+///     BackDark(
+///       view : Redirects(
+///         widget: [your_Widget_Here]
+///       )
+///     );
+///
+///
 import 'package:flutter/material.dart';
 import 'model/redirect_helper.dart';
 

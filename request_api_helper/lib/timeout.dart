@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class Connection extends StatefulWidget {
   final onSubmit;
   final onDissmiss;
+  final Color buttonColor;
 
-  Connection({this.onSubmit, this.onDissmiss});
+  Connection({this.onSubmit, this.onDissmiss, required this.buttonColor});
   @override
   _Connection createState() => _Connection();
 }
@@ -71,7 +72,7 @@ class _Connection extends State<Connection> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18.0),
               ),
-              primary: Theme.of(context).buttonColor,
+              primary: widget.buttonColor,
               textStyle: Theme.of(context).textTheme.button ??
                   TextStyle(
                     color: Colors.white,
@@ -91,8 +92,9 @@ class _Connection extends State<Connection> {
 class Timeout extends StatefulWidget {
   final onSubmit;
   final onDissmiss;
+  final Color buttonColor;
 
-  Timeout({this.onSubmit, this.onDissmiss});
+  Timeout({this.onSubmit, this.onDissmiss, required this.buttonColor});
   @override
   _Timeout createState() => _Timeout();
 }
@@ -159,7 +161,7 @@ class _Timeout extends State<Timeout> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18.0),
               ),
-              primary: Theme.of(context).buttonColor,
+              primary: widget.buttonColor,
               textStyle: Theme.of(context).textTheme.button ??
                   TextStyle(
                     color: Colors.white,

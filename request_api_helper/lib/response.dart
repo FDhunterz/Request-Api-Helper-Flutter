@@ -1,3 +1,7 @@
+/// used for Beauty response
+/// Response.start(data)
+/// [data] cant null
+
 class Response {
   static String _toTab = ' ';
   static start(data) {

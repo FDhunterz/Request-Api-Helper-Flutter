@@ -1,3 +1,24 @@
+///
+/// used for main request function
+///
+///     import 'package:request_api_helper/request.dart' as req;
+///     import 'package:request_api_helper/request_api_helper.dart' show RESTAPI, RequestApiHelperConfigData, RequestData;
+///
+///     other() async {
+///       await req.send(
+///         name: 'get/data',
+///         type: RESTAPI.POST,
+///         data: RequestData(),
+///         changeConfig: RequestApiHelperConfigData(
+///           logResponse: true,
+///           onSucces: (data){
+///
+///           }
+///         ),
+///       )
+///     }
+///
+
 import 'package:request_api_helper/model/config_model.dart';
 import 'package:flutter/material.dart' show BuildContext;
 import 'package:request_api_helper/rest_api.dart' show OnUploadProgressCallback;

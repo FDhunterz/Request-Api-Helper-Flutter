@@ -23,7 +23,7 @@ onUploadProgress :
 
 ```dart
 import 'package:request_api_helper/request.dart' as req;
-import 'package:request_api_helper/request_api_helper.dart';
+import 'package:request_api_helper/request_api_helper.dart' show RESTAPI; // use show [class] for selection 
 
 upload() async {
   await req.send(
@@ -40,10 +40,6 @@ upload() async {
       onSuccess: (response) async {
         // important
         await Session.save('token', 'Bearer ' + response['token']);
-
-        // auto save different type data
-        await Session.save('user_name', response['user']['name']);
-        await Session.save('user_id', response['user']['id']);
       },
     ),
     onUploadProgress: (sended, total) {
@@ -70,12 +66,15 @@ void main(
       noapiurl: 'https://official-joke-api.appspot.com/',
       logResponse: true,
       withLoading: Redirects(toogle: false),
+      
     ),
   );
   runApp(MyApp());
 }
 
 ```
+
+[See More Setting]: https://pub.dev/documentation/request_api_helper/latest/model_config_model/model_config_model-library.html
 
 ## 2 . Make Login And Saving Token
 First you must make login request.
@@ -117,13 +116,7 @@ login() async {
     data: RequestData(),
     changeConfig: RequestApiHelperConfigData(
       onSuccess: (response) async {
-        // important
-        await Session.save('token', 'Bearer ' + response['token']);
-
-        // auto save different type data
-        await Session.save('user_name', response['user']['name']);
-        await Session.save('user_id', response['user']['id']);
-      },
+        // other function after success 
     ),
   );
 }

@@ -1,4 +1,4 @@
-## 3.0.1+3 - Bug Auth
+## 3.0.1+4 - Bug Auth
 * fixed
 
 ## 3.0.1+2 - Bug StatusCode

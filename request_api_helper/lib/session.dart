@@ -1,3 +1,13 @@
+/// Session is SharedPreferences
+/// you can call directly or use this stucture class
+///
+///       await Session.save('name',value);
+///       await Session.load('name');
+///       await Session.delete(name: 'name');
+///       await Session.delete(nameList: ['name','token']);
+///       await Session.clear();
+///
+
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
