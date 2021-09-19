@@ -7,68 +7,47 @@ import 'package:request_api_helper/model/redirect_helper.dart';
 enum RESTAPI { POST, GET, PUT, DELETE, PATCH }
 BuildContext? currentContext;
 
-/// example https://this.com/api/
 String? _url;
 
-/// example https://this.com/
 String? _noapiurl;
 
 // config Request
-/// error message use 'default' auto response key message, or disable response ''
 String? _errorMessage;
 
-/// success message use 'default' auto response key message, or disable response ''
 String? _successMessage;
 
-/// beauty response
 bool? _logResponse;
 
-/// exception error from code flutter
 bool? _exception;
 
-/// time out from server redirect
 Redirects? _timeoutRedirect;
 
-/// no connection redirect
 Redirects? _socketRedirect;
 
-/// set timeout request process
 Duration? _timeout;
 
-/// showing timeout message use 'default' auto response key message, or disable response ''
 String? _timeoutMessage;
 
-/// showing no connection message use 'default' auto response key message, or disable response ''
 String? _socketMessage;
 
-/// on timeout function
 Function(TimeoutException)? _onTimeout;
 
-/// on no connection function
 Function(SocketException)? _onSocket;
 
-/// raw response from server without json parse
 Function(dynamic data)? _onCompleteRawRespose;
 
-/// before request send to server
 Future<void>? _beforeSend;
 
-/// on Exception function
 Function(Object e)? _onException;
 
-/// on success from server with json parse
 Function(dynamic response)? _onSuccess;
 
-/// on error from server with json parse
 Function(int code, dynamic data)? _onError;
 
-/// auto redirect if [401] Navigator to another Widget , use Redirect(widget: Login())
 Redirects? _authErrorRedirect;
 
-/// auto loading if request triggered
 Redirects? _withLoading;
 
-/// auto send {'version' : value}
 String? _version;
 
 class RequestApiHelperConfig {
@@ -99,13 +78,8 @@ class RequestApiHelperConfig {
   }
 
   static save(RequestApiHelperConfigData config) {
-    // example https://this.com/api/
     _url = config.url;
-
-    // example https://this.com/
     _noapiurl = config.noapiurl;
-
-    // config Request
     _errorMessage = config.errorMessage;
     _successMessage = config.successMessage;
     _logResponse = config.logResponse;
@@ -129,31 +103,67 @@ class RequestApiHelperConfig {
 }
 
 class RequestApiHelperConfigData {
-  // example https://this.com/api/
+  /// example https://this.com/api/
   String? url;
 
-// example https://this.com/
+  /// example https://this.com/
   String? noapiurl;
 
-// config Request
+  /// error message use 'default' auto response key message, or disable response ''
   String? errorMessage;
+
+  /// success message use 'default' auto response key message, or disable response ''
   String? successMessage;
+
+  /// beauty response
   bool? logResponse;
+
+  /// exception error from code flutter
   bool? exception;
+
+  /// time out from server redirect
   Redirects? timeoutRedirect;
+
+  /// no connection redirect
   Redirects? socketRedirect;
+
+  /// set timeout request process
   Duration? timeout;
+
+  /// showing timeout message use 'default' auto response key message, or disable response ''
   String? timeoutMessage;
+
+  /// showing no connection message use 'default' auto response key message, or disable response ''
   String? socketMessage;
+
+  /// on timeout function
   Function(TimeoutException)? onTimeout;
+
+  /// on no connection function
   Function(SocketException)? onSocket;
+
+  /// raw response from server without json parse
   Function(dynamic data)? onCompleteRawRespose;
+
+  /// before request send to server
   Future? beforeSend;
+
+  /// on Exception function
   Function(Object e)? onException;
+
+  /// on success from server with json parse
   Function(dynamic response)? onSuccess;
+
+  /// on error from server with json parse
   Function(int code, dynamic data)? onError;
+
+  /// auto redirect if [401] Navigator to another Widget , use Redirect(widget: Login())
   Redirects? authErrorRedirect;
+
+  /// auto loading if request triggered
   Redirects? withLoading;
+
+  /// auto send {'version' : value}
   String? version;
 
   RequestApiHelperConfigData({
