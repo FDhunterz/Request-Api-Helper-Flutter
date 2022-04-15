@@ -1,33 +1,30 @@
-///
-/// used for main request function
-///
-///     import 'package:request_api_helper/request.dart' as req;
-///     import 'package:request_api_helper/request_api_helper.dart' show RESTAPI, RequestApiHelperConfigData, RequestData;
-///
-///     other() async {
-///       await req.send(
-///         name: 'get/data',
-///         type: RESTAPI.POST,
-///         data: RequestData(),
-///         changeConfig: RequestApiHelperConfigData(
-///           logResponse: true,
-///           onSucces: (data){
-///
-///           }
-///         ),
-///       )
-///     }
-///
+import 'package:flutter/cupertino.dart';
 
-import 'package:request_api_helper/model/config_model.dart';
-import 'package:flutter/material.dart' show BuildContext;
-import 'package:request_api_helper/rest_api.dart' show OnUploadProgressCallback;
-import 'base_request.dart';
+class FileData {
+  List<String> path;
+  List<String> requestName;
 
-Future send({CustomRequestData? customData, RequestData? data, String? name, RequestApiHelperConfigData? changeConfig, BuildContext? context, required RESTAPI type, bool? singleContext, OnUploadProgressCallback? onUploadProgress}) => _withClient(customData, data, name, changeConfig, context, type, singleContext, onUploadProgress);
+  FileData({required this.path, required this.requestName});
+}
 
-Future<T> _withClient<T>(CustomRequestData? customData, RequestData? data, String? name, RequestApiHelperConfigData? changeConfig, BuildContext? context, type, singleContext, OnUploadProgressCallback? onUploadProgress) async {
-  var client = BaseRequests(changeConfig: changeConfig, context: context, customData: customData, data: data, name: name, type: type, singleContext: singleContext, onUploadProgress: onUploadProgress);
+class RequestApiHelperData {
+  String? baseUrl;
+  Map<String, dynamic>? body;
+  Map<String, String>? header;
+  bool bodyIsJson = false;
+  Function(dynamic)? onSuccess;
+  GlobalKey<NavigatorState>? navigatorKey;
+  bool debug;
+  FileData? file;
 
-  return await client.api();
+  RequestApiHelperData({
+    this.baseUrl,
+    this.body,
+    this.bodyIsJson = false,
+    this.header,
+    this.onSuccess,
+    this.debug = false,
+    this.navigatorKey,
+    this.file,
+  });
 }

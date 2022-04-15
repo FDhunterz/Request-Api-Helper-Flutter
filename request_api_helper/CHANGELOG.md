@@ -1,3 +1,7 @@
+## 4.0.0 - Major Upgrade, removing loading
+* request stack management
+* when push navigator, request is cancel
+
 ## 3.0.1+4 - Bug Auth
 * fixed
 

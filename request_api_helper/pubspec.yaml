@@ -1,6 +1,6 @@
 name: request_api_helper
-description: http, shared_preferences helper for Lavarel and other.
-version: 3.0.1+4
+description: send request with stack request management and cancel request.
+version: 4.0.0
 homepage: https://github.com/FDhunterz/Request-Api-Helper-Flutter-V-2.0.2
 
 environment:
@@ -11,9 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
   
-  shared_preferences: ^2.0.6
-  fluttertoast: ^8.0.8
-  http: ^0.13.3
+  shared_preferences: ^2.0.13
+  fluttertoast: ^8.0.9
+  http: ^0.13.4
   http_parser: ^4.0.0
 
 dev_dependencies:
@@ -28,10 +28,10 @@ dev_dependencies:
 flutter:
 
   # To add assets to your package, add an assets section, like this:
-  assets:
-    - assets/
-    - assets/image/plug/
-    - assets/image/worldwide/
+  # assets:
+  #   - assets/
+  #   - assets/image/plug/
+  #   - assets/image/worldwide/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   #

@@ -1,92 +1,64 @@
-/// Session is SharedPreferences
-/// you can call directly or use this stucture class
-///
-///       await Session.save('name',value);
-///       await Session.load('name');
-///       await Session.delete(name: 'name');
-///       await Session.delete(nameList: ['name','token']);
-///       await Session.clear();
-///
-
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 class Session {
-  /// parameter 1 = header , parameter 2 = value
-  /// note : the name must be different from other data types
-  static Future<dynamic> save(String name, dynamic value) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
+  static List data = [];
+  static SharedPreferences? preferences;
+
+  static Future<void> init() async {
+    preferences = await SharedPreferences.getInstance();
+
+    var list = await compute(preferences!.getString, 'saved_list');
+    if (list != null) {
+      final encoded = await json.decode(list);
+      data = encoded;
+    }
+  }
+
+  static Future<bool> save({required String header, String? stringData, bool? boolData, double? doubleData, int? integerData}) async {
+    bool feedback = false;
     String typeData = '';
-    final getList = await loadList();
-    List savedList = getList == null ? [] : json.decode(getList);
-    if (value is String) {
+    assert(preferences != null);
+    if (stringData != null) {
+      feedback = true;
       typeData = 'string';
-      preferences.setString(name, value);
-    } else if (value is int) {
-      typeData = 'int';
-      preferences.setInt(name, value);
-    } else if (value is bool) {
+      await preferences!.setString(header, stringData);
+    } else if (boolData != null) {
+      feedback = true;
       typeData = 'bool';
-      preferences.setBool(name, value);
-    } else {
-      return 'Type Data Tidak Diketahui';
+      await preferences!.setBool(header, boolData);
+    } else if (doubleData != null) {
+      feedback = true;
+      typeData = 'double';
+      await preferences!.setDouble(header, doubleData);
+    } else if (integerData != null) {
+      feedback = true;
+      typeData = 'integer';
+      await preferences!.setInt(header, integerData);
     }
-    savedList.add({'type': '$typeData', 'name': '$name'});
-    final encode = json.encode(savedList);
-    preferences.setString('saved_list', encode);
-    return true;
-  }
 
-  static Future<dynamic> loadList() async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    return preferences.getString('saved_list');
-  }
-
-  static Future<dynamic> load(String name) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    final getList = await loadList();
-    List savedList = getList == null ? [] : json.decode(getList);
-    bool typeString = false, typeInt = false, typeBool = false;
-    savedList.where((val) => val['name'] == name).map((val) {
-      if (val['type'] == 'string')
-        typeString = true;
-      else if (val['type'] == 'int')
-        typeInt = true;
-      else if (val['type'] == 'bool') typeBool = true;
-    }).toString();
-
-    if (typeString != false) {
-      return preferences.getString(name);
-    } else if (typeInt != false) {
-      return preferences.getInt(name);
-    } else if (typeBool != false) {
-      return preferences.getBool(name);
-    } else {
-      print('Tidak Ditemukan');
-      return null;
+    final datas = data.where((e) => e['name'] == header);
+    if (datas.isEmpty) {
+      data.add({'type': typeData, 'name': header});
+      final encode = await compute(json.encode, data);
+      preferences!.setString('saved_list', encode);
     }
+
+    return feedback;
   }
 
-  static Future<bool> delete({String? name, List? nameList}) async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    final getList = await loadList();
-    List savedList = getList == null ? [] : json.decode(getList);
-    if (name != null) {
-      savedList.removeWhere((val) => val['name'] == name);
-      preferences.remove(name);
-    } else if (nameList != null) {
-      nameList.forEach((names) {
-        savedList.removeWhere((val) => val['name'] == names);
-        preferences.remove(names);
-      });
+  static Future<dynamic> load(header) async {
+    final datas = data.where((e) => e['name'] == header);
+    if (datas.isEmpty) return null;
+    if (datas.first['type'] == 'string') {
+      return preferences!.getString(header);
+    } else if (datas.first['type'] == 'double') {
+      return preferences!.getDouble(header);
+    } else if (datas.first['type'] == 'integer') {
+      return preferences!.getInt(header);
+    } else if (datas.first['type'] == 'bool') {
+      return preferences!.getBool(header);
     }
-    return true;
-  }
-
-  static Future<bool> clear() async {
-    final SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.clear();
-    return true;
   }
 }
