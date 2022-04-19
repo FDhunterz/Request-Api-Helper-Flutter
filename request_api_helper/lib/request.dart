@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
 
 class FileData {
   List<String> path;
@@ -13,6 +14,8 @@ class RequestApiHelperData {
   Map<String, String>? header;
   bool bodyIsJson = false;
   Function(dynamic)? onSuccess;
+  Function(Response)? onError;
+  Function(BuildContext)? onAuthError;
   GlobalKey<NavigatorState>? navigatorKey;
   bool debug;
   FileData? file;
@@ -26,5 +29,7 @@ class RequestApiHelperData {
     this.debug = false,
     this.navigatorKey,
     this.file,
+    this.onAuthError,
+    this.onError,
   });
 }

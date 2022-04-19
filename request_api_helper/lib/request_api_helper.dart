@@ -36,6 +36,8 @@ class RequestApiHelper {
     baseData!.debug = notNullFill(baseData!.debug, data.debug);
     baseData!.navigatorKey = notNullFill(baseData!.navigatorKey, data.navigatorKey);
     baseData!.file = notNullFill(baseData!.file, data.file);
+    baseData!.onError = notNullFill(baseData!.onError, data.onError);
+    baseData!.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
   }
 
   static Future<RequestApiHelperData> _getCustomConfig(RequestApiHelperData data) async {
@@ -48,6 +50,8 @@ class RequestApiHelper {
     _data.debug = notNullFill(baseData!.debug, data.debug);
     _data.navigatorKey = notNullFill(baseData!.navigatorKey, data.navigatorKey);
     _data.file = notNullFill(baseData!.file, data.file);
+    _data.onError = notNullFill(baseData!.onError, data.onError);
+    _data.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
     return _data;
   }
 
@@ -72,11 +76,11 @@ class RequestApiHelper {
     UniqueKey keys = UniqueKey();
     final RequestApiHelperData getConfig = config == null ? baseData! : (await _getCustomConfig(config));
     if (replacementId != null) {
-        final getStack = requestStack.where((element) => element.replacementId == replacementId);
-        if (getStack.isNotEmpty) {
-          getStack.first.stream.cancel();
-          requestStack.removeWhere((element) => element.replacementId == replacementId);
-        }
+      final getStack = requestStack.where((element) => element.replacementId == replacementId);
+      if (getStack.isNotEmpty) {
+        getStack.first.stream.cancel();
+        requestStack.removeWhere((element) => element.replacementId == replacementId);
+      }
     }
     final send = RequestStack(
       id: keys,
@@ -91,14 +95,25 @@ class RequestApiHelper {
       ).asStream().listen(
         (response) async {
           final res = response as Response;
-          if (getConfig.onSuccess != null) {
-            dynamic decode;
+          dynamic decode;
+
+          if (res.statusCode == 401) {
+            if (getConfig.onAuthError != null) {
+              getConfig.onAuthError!(getConfig.navigatorKey!.currentContext!);
+            }
+          } else {
             try {
-              decode = await compute(json.decode, res.body);
+              if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 202) {
+                if (getConfig.onSuccess != null) {
+                  decode = await compute(json.decode, res.body);
+                  getConfig.onSuccess!(decode);
+                }
+              } else {
+                getConfig.onError!(res);
+              }
             } catch (_) {
               handlingData(res.body, debug: getConfig.debug);
             }
-            getConfig.onSuccess!(decode);
           }
           requestStack.removeWhere((element) => element.id == keys);
         },
@@ -121,18 +136,22 @@ class RequestApiHelper {
         'content-type': 'application/json',
       });
       body = utf8.encode(await compute(json.encode, config.body));
+    } else if (type != Api.get) {
+      body = config.body;
     } else {
       body = '';
 
       if (config.body is Map) {
-        body = '?';
         int _counter = 0;
+        body = '?';
         config.body!.forEach((key, value) {
           ++_counter;
-          if (!(_counter == config.body!.length)) {
-            body += '$key=$value&';
-          } else {
-            body += '$key=$value';
+          if (value != '' && value != null) {
+            if (!(_counter == config.body!.length)) {
+              body += '$key=$value&';
+            } else {
+              body += '$key=$value';
+            }
           }
         });
       }
@@ -146,7 +165,7 @@ class RequestApiHelper {
         return await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
       }
     } else if (type == Api.get) {
-      return await get(Uri.parse(config.baseUrl! + url), headers: config.header!);
+      return await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
     } else if (type == Api.put) {
       return await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
     } else if (type == Api.delete) {

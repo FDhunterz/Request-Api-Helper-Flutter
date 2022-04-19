@@ -61,4 +61,22 @@ class Session {
       return preferences!.getBool(header);
     }
   }
+
+  static Future<bool> delete({String? name, List? nameList}) async {
+    if (name != null) {
+      data.removeWhere((val) => val['name'] == name);
+      preferences!.remove(name);
+    } else if (nameList != null) {
+      for (var names in nameList) {
+        data.removeWhere((val) => val['name'] == names);
+        preferences!.remove(names);
+      }
+    }
+    return true;
+  }
+
+  static Future<bool> clear() async {
+    preferences!.clear();
+    return true;
+  }
 }

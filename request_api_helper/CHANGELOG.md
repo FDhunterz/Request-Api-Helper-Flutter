@@ -1,3 +1,11 @@
+## 4.0.0+2
+* post body not include (fixed)
+* add Session clear and delete
+
+## 4.0.0+1 - add Error, auth error
+* auth error function
+* error function
+
 ## 4.0.0 - Major Upgrade, removing loading
 * request stack management
 * when push navigator, request is cancel
