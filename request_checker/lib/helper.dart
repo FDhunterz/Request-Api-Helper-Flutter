@@ -1,4 +1,5 @@
-import 'package:request_api_helper/request.dart';
+import 'package:request_checker/request.dart';
+import 'package:request_checker/request_api_helper.dart';
 
 Future<dynamic> timeTracker(name, Function function, {RequestApiHelperData? config}) async {
   DateTime? now;

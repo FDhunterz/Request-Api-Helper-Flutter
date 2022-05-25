@@ -1,12 +1,35 @@
-import 'package:request_checker/model/config_model.dart';
-import 'package:flutter/material.dart' show BuildContext;
-import 'package:request_checker/rest_api.dart' show OnUploadProgressCallback;
-import 'base_request.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
 
-Future send({CustomRequestData? customData, RequestData? data, String? name, RequestApiHelperConfigData? changeConfig, BuildContext? context, required RESTAPI type, bool? singleContext, OnUploadProgressCallback? onUploadProgress}) => _withClient(customData, data, name, changeConfig, context, type, singleContext, onUploadProgress);
+class FileData {
+  List<String> path;
+  List<String> requestName;
 
-Future<T> _withClient<T>(CustomRequestData? customData, RequestData? data, String? name, RequestApiHelperConfigData? changeConfig, BuildContext? context, type, singleContext, OnUploadProgressCallback? onUploadProgress) async {
-  var client = BaseRequests(changeConfig: changeConfig, context: context, customData: customData, data: data, name: name, type: type, singleContext: singleContext, onUploadProgress: onUploadProgress);
+  FileData({required this.path, required this.requestName});
+}
 
-  return await client.api();
+class RequestApiHelperData {
+  String? baseUrl;
+  Map<String, dynamic>? body;
+  Map<String, String>? header;
+  bool bodyIsJson = false;
+  Function(dynamic)? onSuccess;
+  Function(Response)? onError;
+  Function(BuildContext)? onAuthError;
+  GlobalKey<NavigatorState>? navigatorKey;
+  bool debug;
+  FileData? file;
+
+  RequestApiHelperData({
+    this.baseUrl,
+    this.body,
+    this.bodyIsJson = false,
+    this.header,
+    this.onSuccess,
+    this.debug = false,
+    this.navigatorKey,
+    this.file,
+    this.onAuthError,
+    this.onError,
+  });
 }

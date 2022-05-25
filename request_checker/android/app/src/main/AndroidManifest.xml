@@ -8,7 +8,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:name="io.flutter.app.FlutterApplication"
+        android:name="${applicationName}"
         android:label="request_checker"
         android:icon="@mipmap/ic_launcher">
         <activity

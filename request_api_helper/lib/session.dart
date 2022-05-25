@@ -1,48 +1,113 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+
+import 'helper/database.dart';
 
 class Session {
   static List data = [];
-  static SharedPreferences? preferences;
 
   static Future<void> init() async {
-    preferences = await SharedPreferences.getInstance();
-
-    var list = await compute(preferences!.getString, 'saved_list');
+    var list = await StorageBase.getString(DatabaseCompute(
+      name: 'saved_list',
+    ));
     if (list != null) {
       final encoded = await json.decode(list);
       data = encoded;
+    } else {
+      await StorageBase.insert(name: 'saved_list', text: json.encode([]), type: 'string');
     }
   }
 
   static Future<bool> save({required String header, String? stringData, bool? boolData, double? doubleData, int? integerData}) async {
     bool feedback = false;
     String typeData = '';
-    assert(preferences != null);
     if (stringData != null) {
       feedback = true;
       typeData = 'string';
-      await preferences!.setString(header, stringData);
+      String? getData = await StorageBase.getString(DatabaseCompute(
+        name: header,
+      ));
+      if (getData != null) {
+        await StorageBase.update(
+          name: header,
+          text: stringData,
+          type: 'string',
+        );
+      } else {
+        await StorageBase.insert(
+          name: header,
+          text: stringData,
+          type: 'string',
+        );
+      }
     } else if (boolData != null) {
       feedback = true;
       typeData = 'bool';
-      await preferences!.setBool(header, boolData);
+      bool? getData = await StorageBase.getBool(DatabaseCompute(
+        name: header,
+      ));
+      if (getData != null) {
+        await StorageBase.update(
+          name: header,
+          text: boolData ? '1' : '0',
+          type: 'bool',
+        );
+      } else {
+        await StorageBase.insert(
+          name: header,
+          text: boolData ? '1' : '0',
+          type: 'bool',
+        );
+      }
     } else if (doubleData != null) {
       feedback = true;
       typeData = 'double';
-      await preferences!.setDouble(header, doubleData);
+      double? getData = await StorageBase.getDouble(DatabaseCompute(
+        name: header,
+      ));
+      if (getData != null) {
+        await StorageBase.update(
+          name: header,
+          text: doubleData.toString(),
+          type: 'bool',
+        );
+      } else {
+        await StorageBase.insert(
+          name: header,
+          text: doubleData.toString(),
+          type: 'bool',
+        );
+      }
     } else if (integerData != null) {
       feedback = true;
       typeData = 'integer';
-      await preferences!.setInt(header, integerData);
+      int? getData = await StorageBase.getInt(DatabaseCompute(
+        name: header,
+      ));
+      if (getData != null) {
+        await StorageBase.update(
+          name: header,
+          text: integerData.toString(),
+          type: 'integer',
+        );
+      } else {
+        await StorageBase.insert(
+          name: header,
+          text: integerData.toString(),
+          type: 'integer',
+        );
+      }
     }
 
     final datas = data.where((e) => e['name'] == header);
     if (datas.isEmpty) {
       data.add({'type': typeData, 'name': header});
       final encode = await compute(json.encode, data);
-      preferences!.setString('saved_list', encode);
+      await StorageBase.update(
+        name: 'saved_list',
+        text: encode,
+        type: 'string',
+      );
     }
 
     return feedback;
@@ -52,31 +117,47 @@ class Session {
     final datas = data.where((e) => e['name'] == header);
     if (datas.isEmpty) return null;
     if (datas.first['type'] == 'string') {
-      return preferences!.getString(header);
+      return await StorageBase.getString(DatabaseCompute(
+        name: header,
+      ));
     } else if (datas.first['type'] == 'double') {
-      return preferences!.getDouble(header);
+      return await StorageBase.getDouble(DatabaseCompute(
+        name: header,
+      ));
     } else if (datas.first['type'] == 'integer') {
-      return preferences!.getInt(header);
+      return await StorageBase.getInt(DatabaseCompute(
+        name: header,
+      ));
     } else if (datas.first['type'] == 'bool') {
-      return preferences!.getBool(header);
+      return await StorageBase.getBool(DatabaseCompute(
+        name: header,
+      ));
     }
   }
 
   static Future<bool> delete({String? name, List? nameList}) async {
     if (name != null) {
       data.removeWhere((val) => val['name'] == name);
-      preferences!.remove(name);
+      await compute(
+          StorageBase.delete,
+          DatabaseCompute(
+            name: name,
+          ));
     } else if (nameList != null) {
       for (var names in nameList) {
         data.removeWhere((val) => val['name'] == names);
-        preferences!.remove(names);
+        await compute(
+            StorageBase.delete,
+            DatabaseCompute(
+              name: names,
+            ));
       }
     }
     return true;
   }
 
   static Future<bool> clear() async {
-    preferences!.clear();
+    await StorageBase.deleteAll(DatabaseCompute());
     return true;
   }
 }

@@ -1,4 +1,10 @@
-## 4.0.0+2
+## 4.0.0+6 - 
+* Change Session base code to database that grand access to background process
+
+## 4.0.0+5 - 
+* withloading
+
+## 4.0.0+2 - 
 * post body not include (fixed)
 * add Session clear and delete
 

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
+import 'package:request_api_helper/loading.dart';
 import 'package:request_api_helper/model/request_file.dart';
 
 import '../helper.dart';
@@ -12,6 +13,20 @@ import '../session.dart';
 
 enum Api { post, get, put, delete }
 
+// class RequestApiHelperObserver extends NavigatorObserver {
+//   @override
+//   void didPop(Route route, Route? previousRoute) {
+//     print(route);
+//     super.didPop(route, previousRoute);
+//   }
+
+//   @override
+//   void didPush(Route route, Route? previousRoute) {
+//     print(route);
+//     super.didPush(route, previousRoute);
+//   }
+// }
+
 List<RequestStack> requestStack = [];
 
 class RequestStack {
@@ -19,9 +34,10 @@ class RequestStack {
   int? replacementId;
   StreamSubscription stream;
   bool runInBackground;
+  bool withLoading;
   BuildContext currentContext;
 
-  RequestStack({required this.stream, this.replacementId, required this.id, required this.currentContext, this.runInBackground = false});
+  RequestStack({required this.stream, this.replacementId, required this.id, required this.currentContext, this.runInBackground = false, this.withLoading = false});
 }
 
 class RequestApiHelper {
@@ -72,9 +88,14 @@ class RequestApiHelper {
     int? replacementId,
     bool runInBackground = false,
     Function(int uploaded, int total)? onUploadProgress,
+    bool withLoading = false,
   }) async {
     UniqueKey keys = UniqueKey();
     final RequestApiHelperData getConfig = config == null ? baseData! : (await _getCustomConfig(config));
+    int getLength = requestStack.where((element) => element.withLoading == true).length;
+    if (getLength == 0 && withLoading) {
+      Loading.start();
+    }
     if (replacementId != null) {
       final getStack = requestStack.where((element) => element.replacementId == replacementId);
       if (getStack.isNotEmpty) {
@@ -87,6 +108,7 @@ class RequestApiHelper {
       replacementId: replacementId,
       currentContext: getConfig.navigatorKey!.currentContext!,
       runInBackground: runInBackground,
+      withLoading: withLoading,
       stream: request(
         type: type,
         url: url,
@@ -96,6 +118,11 @@ class RequestApiHelper {
         (response) async {
           final res = response as Response;
           dynamic decode;
+          requestStack.removeWhere((element) => element.id == keys);
+          int getLength = requestStack.where((element) => element.withLoading == true).length;
+          if (getLength == 0 && withLoading) {
+            Loading.end();
+          }
 
           if (res.statusCode == 401) {
             if (getConfig.onAuthError != null) {
@@ -106,16 +133,19 @@ class RequestApiHelper {
               if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 202) {
                 if (getConfig.onSuccess != null) {
                   decode = await compute(json.decode, res.body);
-                  getConfig.onSuccess!(decode);
+                  timeTracker('onSuccess Clear', () async {
+                    await getConfig.onSuccess!(decode);
+                  }, config: config);
                 }
-              } else {
-                getConfig.onError!(res);
+              } else if (getConfig.onError != null) {
+                timeTracker('onError Clear', () async {
+                  await getConfig.onError!(res);
+                }, config: config);
               }
             } catch (_) {
               handlingData(res.body, debug: getConfig.debug);
             }
           }
-          requestStack.removeWhere((element) => element.id == keys);
         },
       ),
     );
@@ -124,13 +154,16 @@ class RequestApiHelper {
   }
 
   static Future<dynamic> request({url, required Api type, required RequestApiHelperData config, Function(int uploaded, int total)? onUploadProgress}) async {
-    String? token = await Session.load('token');
+    String? token;
+    await timeTracker('Load Token ($url)', () async {
+      token = await Session.load('token');
+    }, config: config);
     dynamic body;
     config.header ??= {
       'Accept': 'application/json',
     };
 
-    if (token != null) config.header!.addAll({'Authorization': token});
+    if (token != null) config.header!.addAll({'Authorization': token!});
     if (config.bodyIsJson && type != Api.get) {
       config.header!.addAll({
         'content-type': 'application/json',
@@ -160,16 +193,27 @@ class RequestApiHelper {
       if (config.file != null) {
         final newConfig = config;
         newConfig.baseUrl = config.baseUrl! + url;
-        return await requestfile(newConfig, onUploadProgress: onUploadProgress);
+
+        return await timeTracker('Request Post File ($url)', () async {
+          return await requestfile(newConfig, onUploadProgress: onUploadProgress);
+        }, config: config) as Response;
       } else {
-        return await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        return await timeTracker('Request Post  ($url)', () async {
+          return await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        }, config: config) as Response;
       }
     } else if (type == Api.get) {
-      return await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
+      return await timeTracker('Request Get  ($url)', () async {
+        return await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
+      }, config: config) as Response;
     } else if (type == Api.put) {
-      return await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+      return await timeTracker('Request Put  ($url)', () async {
+        return await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+      }, config: config) as Response;
     } else if (type == Api.delete) {
-      return await delete(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+      return await timeTracker('Request Delete  ($url)', () async {
+        return await delete(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+      }, config: config) as Response;
     }
     return null;
   }
