@@ -100,9 +100,10 @@ class Session {
     }
 
     final datas = data.where((e) => e['name'] == header);
+
     if (datas.isEmpty) {
       data.add({'type': typeData, 'name': header});
-      final encode = await compute(json.encode, data);
+      final encode = json.encode(data);
       await StorageBase.update(
         name: 'saved_list',
         text: encode,
@@ -138,19 +139,17 @@ class Session {
   static Future<bool> delete({String? name, List? nameList}) async {
     if (name != null) {
       data.removeWhere((val) => val['name'] == name);
-      await compute(
-          StorageBase.delete,
-          DatabaseCompute(
-            name: name,
-          ));
+      await StorageBase.delete(DatabaseCompute(
+        name: name,
+      ));
     } else if (nameList != null) {
       for (var names in nameList) {
         data.removeWhere((val) => val['name'] == names);
-        await compute(
-            StorageBase.delete,
-            DatabaseCompute(
-              name: names,
-            ));
+        await StorageBase.delete(
+          DatabaseCompute(
+            name: names,
+          ),
+        );
       }
     }
     return true;

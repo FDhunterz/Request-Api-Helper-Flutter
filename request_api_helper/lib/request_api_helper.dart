@@ -63,7 +63,7 @@ class RequestApiHelper {
     _data.header = notNullFill(baseData!.header, data.header);
     _data.bodyIsJson = notNullFill(baseData!.bodyIsJson, data.bodyIsJson);
     _data.onSuccess = notNullFill(baseData!.onSuccess, data.onSuccess);
-    _data.debug = notNullFill(baseData!.debug, data.debug);
+    _data.debug = baseData!.debug;
     _data.navigatorKey = notNullFill(baseData!.navigatorKey, data.navigatorKey);
     _data.file = notNullFill(baseData!.file, data.file);
     _data.onError = notNullFill(baseData!.onError, data.onError);
@@ -138,6 +138,8 @@ class RequestApiHelper {
                   }, config: config);
                 }
               } else if (getConfig.onError != null) {
+                decode = await compute(json.decode, res.body);
+                handlingData(decode, debug: getConfig.debug);
                 timeTracker('onError Clear', () async {
                   await getConfig.onError!(res);
                 }, config: config);
