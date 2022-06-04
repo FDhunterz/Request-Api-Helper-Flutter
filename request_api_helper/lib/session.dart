@@ -159,4 +159,8 @@ class Session {
     await StorageBase.deleteAll(DatabaseCompute());
     return true;
   }
+
+  static resetDataBase() async {
+    await StorageBase.reset();
+  }
 }

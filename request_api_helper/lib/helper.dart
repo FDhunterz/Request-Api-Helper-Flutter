@@ -36,28 +36,28 @@ handlingData(data, {bool debug = false}) {
     }
   } else if (data is String) {
     if (debug) {
-      if (data.contains('<script>') || data.contains('</script>')) {
-        if (RequestApiHelper.baseData?.navigatorKey != null) {
-          late WebViewController _controller;
-          showDialog(
-            context: RequestApiHelper.baseData!.navigatorKey!.currentContext!,
-            builder: (context) {
-              return Scaffold(
-                body: StatefulBuilder(builder: (context, state) {
-                  return WebView(
-                      initialUrl: 'about:blank',
-                      javascriptMode: JavascriptMode.unrestricted,
-                      onWebViewCreated: (WebViewController webViewController) {
-                        _controller = webViewController;
-                        _controller.loadUrl(Uri.dataFromString(data, mimeType: 'text/html', encoding: Encoding.getByName('utf-8')).toString());
-                        state(() {});
-                      });
-                }),
-              );
-            },
-          );
-        }
+      // if (data.contains('<script>') || data.contains('</script>')) {
+      if (RequestApiHelper.baseData?.navigatorKey != null) {
+        late WebViewController _controller;
+        showDialog(
+          context: RequestApiHelper.baseData!.navigatorKey!.currentContext!,
+          builder: (context) {
+            return Scaffold(
+              body: StatefulBuilder(builder: (context, state) {
+                return WebView(
+                    initialUrl: 'about:blank',
+                    javascriptMode: JavascriptMode.unrestricted,
+                    onWebViewCreated: (WebViewController webViewController) {
+                      _controller = webViewController;
+                      _controller.loadUrl(Uri.dataFromString(data, mimeType: 'text/html', encoding: Encoding.getByName('utf-8')).toString());
+                      state(() {});
+                    });
+              }),
+            );
+          },
+        );
       }
+      // }
     }
   } else if (data is int) {
     if (debug) {

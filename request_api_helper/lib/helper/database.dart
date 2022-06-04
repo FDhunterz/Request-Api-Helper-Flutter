@@ -87,4 +87,8 @@ class StorageBase {
             ? null
             : (list.first['text'] == '1' ? true : false);
   }
+
+  static reset() async {
+    await deleteDatabase(path);
+  }
 }

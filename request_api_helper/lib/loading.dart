@@ -7,6 +7,7 @@ import 'package:request_api_helper/request_api_helper.dart';
 class Loading {
   static bool loading = false;
   static BuildContext? currentContext;
+  static BuildContext? lastContext;
   static Timer? delay;
   static Function(BuildContext)? widget;
 
@@ -29,7 +30,9 @@ class Loading {
     }
     if (loading) {
       loading = false;
-      Navigator.pop(RequestApiHelper.baseData!.navigatorKey!.currentContext!);
+      if (Loading.currentContext == (lastContext ?? RequestApiHelper.baseData!.navigatorKey!.currentContext!)) {
+        Navigator.pop(RequestApiHelper.baseData!.navigatorKey!.currentContext!);
+      }
     }
   }
 }
