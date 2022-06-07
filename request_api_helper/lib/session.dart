@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-
 import 'helper/database.dart';
 
 class Session {

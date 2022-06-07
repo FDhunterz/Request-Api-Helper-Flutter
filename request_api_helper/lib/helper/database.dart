@@ -33,7 +33,6 @@ class StorageBase {
   static insert({String? name, String? text, String? type, databasesPath}) async {
     Database db = await connect();
     await db.transaction((txn) async {
-      print(name);
       await txn.rawInsert("INSERT INTO data(name,text,type) VALUES('$name','$text','$type')");
     });
   }
@@ -55,7 +54,6 @@ class StorageBase {
   static update({String? name, String? text, String? type, databasesPath}) async {
     Database db = await connect();
     await db.transaction((txn) async {
-      print(name);
       await txn.rawInsert("UPDATE data SET text='$text' WHERE name='$name' AND type='$type'");
     });
   }
