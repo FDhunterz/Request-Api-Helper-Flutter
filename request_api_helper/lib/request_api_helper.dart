@@ -54,6 +54,8 @@ class RequestApiHelper {
     baseData!.file = notNullFill(baseData!.file, data.file);
     baseData!.onError = notNullFill(baseData!.onError, data.onError);
     baseData!.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
+    baseData!.timeout = notNullFill(baseData!.timeout, data.timeout);
+    baseData!.onTimeout = notNullFill(baseData!.onTimeout, data.onTimeout);
   }
 
   static Future<RequestApiHelperData> _getCustomConfig(RequestApiHelperData data) async {
@@ -63,11 +65,14 @@ class RequestApiHelper {
     _data.header = notNullFill(baseData!.header, data.header);
     _data.bodyIsJson = notNullFill(baseData!.bodyIsJson, data.bodyIsJson);
     _data.onSuccess = notNullFill(baseData!.onSuccess, data.onSuccess);
-    _data.debug = baseData!.debug;
+    _data.debug = notNullFill(baseData!.debug, data.debug);
     _data.navigatorKey = notNullFill(baseData!.navigatorKey, data.navigatorKey);
     _data.file = notNullFill(baseData!.file, data.file);
     _data.onError = notNullFill(baseData!.onError, data.onError);
     _data.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
+    _data.onTimeout = notNullFill(baseData!.onTimeout, data.onTimeout);
+    _data.timeout = notNullFill(baseData!.timeout, data.timeout);
+    print(_data.timeout);
     return _data;
   }
 
@@ -103,6 +108,7 @@ class RequestApiHelper {
         requestStack.removeWhere((element) => element.replacementId == replacementId);
       }
     }
+    print(getConfig.timeout);
     final send = RequestStack(
       id: keys,
       replacementId: replacementId,
@@ -114,42 +120,59 @@ class RequestApiHelper {
         url: url,
         config: getConfig,
         onUploadProgress: onUploadProgress,
-      ).asStream().listen(
-        (response) async {
-          final res = response as Response;
-          dynamic decode;
-          requestStack.removeWhere((element) => element.id == keys);
-          int getLength = requestStack.where((element) => element.withLoading == true).length;
-          if (getLength == 0 && withLoading) {
-            Loading.end();
-          }
-
-          if (res.statusCode == 401) {
-            if (getConfig.onAuthError != null) {
-              getConfig.onAuthError!(getConfig.navigatorKey!.currentContext!);
-            }
-          } else {
-            try {
-              if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 202) {
-                if (getConfig.onSuccess != null) {
-                  decode = await compute(json.decode, res.body);
-                  timeTracker('onSuccess Clear', () async {
-                    await getConfig.onSuccess!(decode);
-                  }, config: config);
-                }
-              } else if (getConfig.onError != null) {
-                decode = await compute(json.decode, res.body);
-                handlingData(decode, debug: getConfig.debug);
-                timeTracker('onError Clear', () async {
-                  await getConfig.onError!(res);
+      )
+          .timeout(getConfig.timeout!)
+          .onError((error, stackTrace) async {
+            if (error.toString().contains('TimeoutException')) {
+              final getStack = requestStack.where((element) => element.id == keys);
+              getStack.first.stream.cancel();
+              requestStack.removeWhere((element) => element.id == keys);
+              if (getConfig.onTimeout != null) {
+                await timeTracker('Timeout Clear', () async {
+                  await getConfig.onTimeout!(Response(json.encode({'message': 'timeout'}), 408));
                 }, config: config);
               }
-            } catch (_) {
-              handlingData(res.body, debug: getConfig.debug);
             }
-          }
-        },
-      ),
+          })
+          .asStream()
+          .listen(
+            (response) async {
+              if (!(response == null)) {
+                final res = response as Response;
+                dynamic decode;
+                requestStack.removeWhere((element) => element.id == keys);
+                int getLength = requestStack.where((element) => element.withLoading == true).length;
+                if (getLength == 0 && withLoading) {
+                  Loading.end();
+                }
+
+                if (res.statusCode == 401) {
+                  if (getConfig.onAuthError != null) {
+                    getConfig.onAuthError!(getConfig.navigatorKey!.currentContext!);
+                  }
+                } else {
+                  try {
+                    if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 202) {
+                      if (getConfig.onSuccess != null) {
+                        decode = await compute(json.decode, res.body);
+                        timeTracker('onSuccess Clear', () async {
+                          await getConfig.onSuccess!(decode);
+                        }, config: config);
+                      }
+                    } else if (getConfig.onError != null) {
+                      decode = await compute(json.decode, res.body);
+                      handlingData(decode, debug: getConfig.debug!);
+                      timeTracker('onError Clear', () async {
+                        await getConfig.onError!(res);
+                      }, config: config);
+                    }
+                  } catch (_) {
+                    handlingData(res.body, debug: getConfig.debug!);
+                  }
+                }
+              }
+            },
+          ),
     );
     requestStack.add(send);
     return send;
@@ -198,24 +221,24 @@ class RequestApiHelper {
 
         return await timeTracker('Request Post File ($url)', () async {
           return await requestfile(newConfig, onUploadProgress: onUploadProgress);
-        }, config: config) as Response;
+        }, config: config) as Response?;
       } else {
         return await timeTracker('Request Post  ($url)', () async {
           return await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
-        }, config: config) as Response;
+        }, config: config) as Response?;
       }
     } else if (type == Api.get) {
       return await timeTracker('Request Get  ($url)', () async {
         return await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
-      }, config: config) as Response;
+      }, config: config) as Response?;
     } else if (type == Api.put) {
       return await timeTracker('Request Put  ($url)', () async {
         return await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
-      }, config: config) as Response;
+      }, config: config) as Response?;
     } else if (type == Api.delete) {
       return await timeTracker('Request Delete  ($url)', () async {
         return await delete(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
-      }, config: config) as Response;
+      }, config: config) as Response?;
     }
     return null;
   }

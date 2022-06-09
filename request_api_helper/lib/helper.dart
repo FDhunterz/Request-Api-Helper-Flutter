@@ -10,10 +10,13 @@ Future<dynamic> timeTracker(name, Function function, {RequestApiHelperData? conf
   if (config?.debug == true) {
     now = DateTime.now();
   }
-  final res = await function();
+  dynamic res;
+  try {
+    res = (await function()); //.timeout(config?.timeout);
+  } catch (_) {}
 
   if (config?.debug == true) {
-    print('$name ' + DateTime.now().difference(now!).inMilliseconds.toString() + ' Millisecond');
+    print('$name ' + DateTime.now().difference(now!).inMilliseconds.toString() + ' Millisecond' + (res == null ? '(Timeout)' : ''));
   }
   return res;
 }

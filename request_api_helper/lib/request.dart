@@ -16,9 +16,11 @@ class RequestApiHelperData {
   Function(dynamic)? onSuccess;
   Function(Response)? onError;
   Function(BuildContext)? onAuthError;
+  Function(Response)? onTimeout;
   GlobalKey<NavigatorState>? navigatorKey;
-  bool debug;
+  bool? debug;
   FileData? file;
+  Duration? timeout;
 
   RequestApiHelperData({
     this.baseUrl,
@@ -26,10 +28,12 @@ class RequestApiHelperData {
     this.bodyIsJson = false,
     this.header,
     this.onSuccess,
-    this.debug = false,
+    this.debug,
     this.navigatorKey,
     this.file,
     this.onAuthError,
     this.onError,
+    this.timeout,
+    this.onTimeout,
   });
 }

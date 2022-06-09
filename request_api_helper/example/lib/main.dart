@@ -17,9 +17,10 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       title: 'Request Api Helper',
       theme: ThemeData(
+        brightness: Brightness.dark,
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
-          bodyText2: GoogleFonts.karla(textStyle: textTheme.bodyText2),
+          bodyText2: GoogleFonts.karla(textStyle: textTheme.bodyText2).apply(color: Colors.white),
         ),
       ),
       home: const StartView(),

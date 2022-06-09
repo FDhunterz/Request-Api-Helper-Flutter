@@ -1,7 +1,7 @@
 import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
 
-import 'example/import.dart';
+import 'example/navigation.dart';
 
 class StartView extends StatefulWidget {
   const StartView({Key? key}) : super(key: key);
@@ -208,7 +208,7 @@ class _StartViewState extends State<StartView> {
                           child: InkWell(
                             splashColor: Colors.black12,
                             onTap: () {
-                              Navigator.push(context, fadeIn(page: const ImportView()));
+                              Navigator.push(context, fadeIn(page: const NavigationView()));
                             },
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
                             child: const Padding(
