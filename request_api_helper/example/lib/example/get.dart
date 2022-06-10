@@ -24,6 +24,19 @@ class _RequestViewState extends State<RequestView> {
   String param = '';
   String response = '';
   Map<String, dynamic> bodys = {};
+
+  @override
+  void initState() {
+    super.initState();
+    RequestApiHelper.save(
+      RequestApiHelperData(
+        baseUrl: controller.text,
+        navigatorKey: navigatorKey,
+        debug: false,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InitControl(
@@ -66,7 +79,6 @@ class _RequestViewState extends State<RequestView> {
                             RequestApiHelperData(
                               baseUrl: controller.text,
                               navigatorKey: navigatorKey,
-                              timeout: Duration(milliseconds: 100),
                               debug: false,
                             ),
                           );
@@ -191,9 +203,9 @@ class _RequestViewState extends State<RequestView> {
                           RequestApiHelper.sendRequest(
                             type: restApiParse(restApi.text),
                             url: name.text,
+                            withLoading: true,
                             config: RequestApiHelperData(
-                              debug: true,
-                              timeout: const Duration(seconds: 1),
+                              debug: false,
                               onTimeout: (data) {
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(json.decode(data.body)['message'])));
                               },

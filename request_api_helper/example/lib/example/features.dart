@@ -1,37 +1,50 @@
-import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
 
 import '../template/body.dart';
-import 'get.dart';
 
-class ImportView extends StatefulWidget {
-  const ImportView({Key? key}) : super(key: key);
+class FeaturesView extends StatefulWidget {
+  const FeaturesView({Key? key}) : super(key: key);
 
   @override
-  State<ImportView> createState() => _ImportViewState();
+  State<FeaturesView> createState() => _FeaturesViewState();
 }
 
-class _ImportViewState extends State<ImportView> {
-  String importText = """import 'package:request_api_helper/request_api_helper.dart';
-import 'package:request_api_helper/module/request.dart';
-import 'package:flutter/foundation.dart';
+class _FeaturesViewState extends State<FeaturesView> {
+  String savingToken = """onSuccess(data) async {
+    await Session.save(header:'token' ,stringData:data['your_token']);
+  }""";
 
-GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-""";
-
-  String mainDartText = """WidgetsFlutterBinding.ensureInitialized();
-RequestApiHelper.init(
-    RequestApiHelperData(
-            baseUrl: 'https://your-base-url.com/api/', 
-            debug: !kReleaseMode, 
-            navigatorKey: navigatorKey
-        ),
+  String loading = """// in main.dart after WidgetsFlutterBinding.ensureInitialized()
+Loading.widget = (context) async {
+    await showDialog(
+        barrierColor: Colors.black12,
+        context: context,
+        builder: (context) {
+            Loading.currentContext = context;
+            Loading.lastContext = context;
+            return const LoadingView();
+        },
     );
-);""";
-  String materialAppText = """navigatorKey: navigatorKey,
-navigatorObservers: [RequestApiHelperObserver()],
-""";
-  List<bool> statusCopy = [false, false, false];
+    Loading.currentContext = context;
+}""";
+
+  String upload = """file: FileData(
+    path: ['path_file_1','path_file_2','path_file_3'], 
+    requestName: ['images[0]','images[1]','images[3]'],
+)""";
+
+  String customUrl = """RequestApiHelper.sendRequest(
+    type: Api.get,
+    url: '',
+    config: RequestApiHelperData(
+        baseUrl: 'yourNextPage',
+        onSuccess: (data) {
+            // process new data
+            setState(() {});
+        },
+    ),
+)""";
+  List<bool> statusCopy = [false, false, false, false];
   @override
   Widget build(BuildContext context) {
     return body(
@@ -46,23 +59,7 @@ navigatorObservers: [RequestApiHelperObserver()],
               horizontal: 20,
             ),
             child: Text(
-              'Import and Setting Library',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
-            child: Text(
-              '🎯 main.dart',
+              'Saving Token',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -77,13 +74,13 @@ navigatorObservers: [RequestApiHelperObserver()],
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: card(
               status: statusCopy[0],
-              copyText: importText,
+              copyText: savingToken,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Column(
                   children: [
                     Text(
-                      importText,
+                      savingToken,
                       style: const TextStyle(color: Colors.white),
                     ),
                   ],
@@ -92,14 +89,14 @@ navigatorObservers: [RequestApiHelperObserver()],
             ),
           ),
           const SizedBox(
-            height: 20,
+            height: 12,
           ),
           const Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 20,
             ),
             child: Text(
-              '🎯 main.dart > inside void main()',
+              'showing Loading',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -114,13 +111,13 @@ navigatorObservers: [RequestApiHelperObserver()],
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: card(
               status: statusCopy[1],
-              copyText: mainDartText,
+              copyText: loading,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Column(
                   children: [
                     Text(
-                      mainDartText,
+                      loading,
                       style: const TextStyle(color: Colors.white),
                     ),
                   ],
@@ -129,14 +126,14 @@ navigatorObservers: [RequestApiHelperObserver()],
             ),
           ),
           const SizedBox(
-            height: 20,
+            height: 12,
           ),
           const Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 20,
             ),
             child: Text(
-              '🎯 main.dart > inside MaterialApp (Widget)\nadd attribute navigatorKey',
+              'Uploading',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -151,19 +148,59 @@ navigatorObservers: [RequestApiHelperObserver()],
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: card(
               status: statusCopy[2],
-              copyText: mainDartText,
+              copyText: upload,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Column(
                   children: [
                     Text(
-                      materialAppText,
+                      upload,
                       style: const TextStyle(color: Colors.white),
                     ),
                   ],
                 ),
               ),
             ),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 20,
+            ),
+            child: Text(
+              'Custom Server Url',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: card(
+              status: statusCopy[3],
+              copyText: customUrl,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Column(
+                  children: [
+                    Text(
+                      customUrl,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
           ),
           Row(
             children: [

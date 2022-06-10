@@ -30,7 +30,7 @@ class Loading {
     }
     if (loading) {
       loading = false;
-      if (Loading.currentContext == (lastContext ?? RequestApiHelper.baseData!.navigatorKey!.currentContext!)) {
+      if (currentContext == (lastContext ?? RequestApiHelper.baseData!.navigatorKey!.currentContext!)) {
         Navigator.pop(RequestApiHelper.baseData!.navigatorKey!.currentContext!);
       }
     }

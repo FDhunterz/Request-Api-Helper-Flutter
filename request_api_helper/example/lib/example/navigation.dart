@@ -1,8 +1,11 @@
+import 'package:example/example/attributes.dart';
 import 'package:example/example/import.dart';
+import 'package:example/example/request.dart';
 import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
 
 import '../template/body.dart';
+import 'features.dart';
 import 'get.dart';
 
 class NavigationView extends StatefulWidget {
@@ -91,7 +94,7 @@ class _NavigationViewState extends State<NavigationView> {
                     child: InkWell(
                       splashColor: Colors.black12,
                       onTap: () {
-                        Navigator.push(context, fadeIn(page: const ImportView()));
+                        Navigator.push(context, fadeIn(page: const RequestViewTutorial()));
                       },
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
                       child: const Padding(
@@ -134,7 +137,7 @@ class _NavigationViewState extends State<NavigationView> {
                     child: InkWell(
                       splashColor: Colors.black12,
                       onTap: () {
-                        Navigator.push(context, fadeIn(page: const ImportView()));
+                        Navigator.push(context, fadeIn(page: const RequestAttributesView()));
                       },
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
                       child: const Padding(
@@ -177,7 +180,7 @@ class _NavigationViewState extends State<NavigationView> {
                     child: InkWell(
                       splashColor: Colors.black12,
                       onTap: () {
-                        Navigator.push(context, fadeIn(page: const ImportView()));
+                        Navigator.push(context, fadeIn(page: const FeaturesView()));
                       },
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
                       child: const Padding(

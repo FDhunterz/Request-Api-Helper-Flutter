@@ -13,19 +13,30 @@ import '../session.dart';
 
 enum Api { post, get, put, delete }
 
-// class RequestApiHelperObserver extends NavigatorObserver {
-//   @override
-//   void didPop(Route route, Route? previousRoute) {
-//     print(route);
-//     super.didPop(route, previousRoute);
-//   }
+class RequestApiHelperObserver extends NavigatorObserver {
+  final Function(Route, Route?)? didPopFunction;
+  final Function(Route, Route?)? didPushFunction;
 
-//   @override
-//   void didPush(Route route, Route? previousRoute) {
-//     print(route);
-//     super.didPush(route, previousRoute);
-//   }
-// }
+  RequestApiHelperObserver({this.didPopFunction, this.didPushFunction});
+
+  @override
+  void didPop(Route route, Route? previousRoute) {
+    RequestApiHelper.initState(hasContext: previousRoute?.navigator?.context);
+    if (didPopFunction != null) {
+      didPopFunction!(route, previousRoute);
+    }
+    super.didPop(route, previousRoute);
+  }
+
+  @override
+  void didPush(Route route, Route? previousRoute) {
+    RequestApiHelper.initState(hasContext: previousRoute?.navigator?.context);
+    if (didPushFunction != null) {
+      didPushFunction!(route, previousRoute);
+    }
+    super.didPush(route, previousRoute);
+  }
+}
 
 List<RequestStack> requestStack = [];
 
@@ -42,6 +53,7 @@ class RequestStack {
 
 class RequestApiHelper {
   static RequestApiHelperData? baseData;
+  static Route? nowRoute;
 
   static Future<void> save(RequestApiHelperData data) async {
     baseData ??= RequestApiHelperData();
@@ -72,7 +84,6 @@ class RequestApiHelper {
     _data.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
     _data.onTimeout = notNullFill(baseData!.onTimeout, data.onTimeout);
     _data.timeout = notNullFill(baseData!.timeout, data.timeout);
-    print(_data.timeout);
     return _data;
   }
 
@@ -81,9 +92,9 @@ class RequestApiHelper {
     await save(data);
   }
 
-  static initState() async {
-    requestStack.where((element) => element.currentContext == baseData!.navigatorKey!.currentContext && element.runInBackground == false).map((e) => e.stream.cancel()).toList();
-    requestStack.removeWhere((element) => element.currentContext == baseData!.navigatorKey!.currentContext && element.runInBackground == false);
+  static initState({BuildContext? hasContext}) async {
+    requestStack.where((element) => element.currentContext != (hasContext ?? baseData!.navigatorKey!.currentContext) && element.runInBackground == false).map((e) => e.stream.cancel()).toList();
+    requestStack.removeWhere((element) => element.currentContext != (hasContext ?? baseData!.navigatorKey!.currentContext) && element.runInBackground == false);
   }
 
   static Future<RequestStack> sendRequest({
@@ -98,9 +109,7 @@ class RequestApiHelper {
     UniqueKey keys = UniqueKey();
     final RequestApiHelperData getConfig = config == null ? baseData! : (await _getCustomConfig(config));
     int getLength = requestStack.where((element) => element.withLoading == true).length;
-    if (getLength == 0 && withLoading) {
-      Loading.start();
-    }
+
     if (replacementId != null) {
       final getStack = requestStack.where((element) => element.replacementId == replacementId);
       if (getStack.isNotEmpty) {
@@ -108,7 +117,6 @@ class RequestApiHelper {
         requestStack.removeWhere((element) => element.replacementId == replacementId);
       }
     }
-    print(getConfig.timeout);
     final send = RequestStack(
       id: keys,
       replacementId: replacementId,
@@ -121,9 +129,10 @@ class RequestApiHelper {
         config: getConfig,
         onUploadProgress: onUploadProgress,
       )
-          .timeout(getConfig.timeout!)
+          .timeout(getConfig.timeout ?? Duration(seconds: 60))
           .onError((error, stackTrace) async {
             if (error.toString().contains('TimeoutException')) {
+              Loading.end();
               final getStack = requestStack.where((element) => element.id == keys);
               getStack.first.stream.cancel();
               requestStack.removeWhere((element) => element.id == keys);
@@ -175,6 +184,9 @@ class RequestApiHelper {
           ),
     );
     requestStack.add(send);
+    if (getLength == 0 && withLoading) {
+      Loading.start();
+    }
     return send;
   }
 

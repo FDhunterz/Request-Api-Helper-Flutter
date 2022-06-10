@@ -1,35 +1,59 @@
-import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
 
 import '../template/body.dart';
-import 'get.dart';
 
-class ImportView extends StatefulWidget {
-  const ImportView({Key? key}) : super(key: key);
+class RequestAttributesView extends StatefulWidget {
+  const RequestAttributesView({Key? key}) : super(key: key);
 
   @override
-  State<ImportView> createState() => _ImportViewState();
+  State<RequestAttributesView> createState() => _RequestAttributesViewState();
 }
 
-class _ImportViewState extends State<ImportView> {
-  String importText = """import 'package:request_api_helper/request_api_helper.dart';
-import 'package:request_api_helper/module/request.dart';
-import 'package:flutter/foundation.dart';
+class _RequestAttributesViewState extends State<RequestAttributesView> {
+  String sendRequestText = """String? url
+required Api type,
+RequestApiHelperData? config,
+int? replacementId,
+bool runInBackground = false,
+Function(int uploaded, int total)? onUploadProgress,
+bool withLoading = false""";
 
-GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  String copyAttributes = """url:null,
+type: Api.post || Api.get || Api.put || Api.delete,
+config: RequestApiHelperData(),
+replacementId: 1,
+runInBackground: false,
+withLoading: false,
+onUploadProgress: (upload,total){
+  print((upload/total) * 100);
+},
 """;
 
-  String mainDartText = """WidgetsFlutterBinding.ensureInitialized();
-RequestApiHelper.init(
-    RequestApiHelperData(
-            baseUrl: 'https://your-base-url.com/api/', 
-            debug: !kReleaseMode, 
-            navigatorKey: navigatorKey
-        ),
-    );
-);""";
-  String materialAppText = """navigatorKey: navigatorKey,
-navigatorObservers: [RequestApiHelperObserver()],
+  String mainDartText = """String? baseUrl;
+Map<String, dynamic>? body;
+Map<String, String>? header;
+bool bodyIsJson = false;
+Function(dynamic)? onSuccess;
+Function(Response)? onError;
+Function(BuildContext)? onAuthError;
+Function(Response)? onTimeout;
+GlobalKey<NavigatorState>? navigatorKey;
+bool? debug;
+FileData? file;
+Duration? timeout;""";
+
+  String copyAttributesData = """baseUrl:null,
+body: {},
+header: null,
+bodyIsJson: false,
+onSuccess: (data){},
+onError: (Response data){},
+onAuthError: (context){},
+onTimeout: (Response data){},
+navigatorKey: navigatorKey,
+debug: !kReleaseMode,
+file: null,
+timeout: Duration(seconds:60),
 """;
   List<bool> statusCopy = [false, false, false];
   @override
@@ -46,60 +70,7 @@ navigatorObservers: [RequestApiHelperObserver()],
               horizontal: 20,
             ),
             child: Text(
-              'Import and Setting Library',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
-            child: Text(
-              '🎯 main.dart',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: card(
-              status: statusCopy[0],
-              copyText: importText,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Column(
-                  children: [
-                    Text(
-                      importText,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
-            child: Text(
-              '🎯 main.dart > inside void main()',
+              'RequestApiHelper.sendRequest{attributes}',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -114,7 +85,44 @@ navigatorObservers: [RequestApiHelperObserver()],
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: card(
               status: statusCopy[1],
-              copyText: mainDartText,
+              copyText: copyAttributes,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Column(
+                  children: [
+                    Text(
+                      sendRequestText,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 20,
+            ),
+            child: Text(
+              'RequestApiHelperData',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: card(
+              status: statusCopy[2],
+              copyText: copyAttributesData,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Column(
@@ -130,40 +138,6 @@ navigatorObservers: [RequestApiHelperObserver()],
           ),
           const SizedBox(
             height: 20,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
-            child: Text(
-              '🎯 main.dart > inside MaterialApp (Widget)\nadd attribute navigatorKey',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: card(
-              status: statusCopy[2],
-              copyText: mainDartText,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Column(
-                  children: [
-                    Text(
-                      materialAppText,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
           Row(
             children: [

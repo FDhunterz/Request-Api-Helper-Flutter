@@ -1,3 +1,8 @@
+## 4.0.1 - Example In Preview
+* tutorial in example now
+* timeout
+* minor bug
+
 ## 4.0.0+6 - 
 * Change Session base code to database that grand access to background process
 
