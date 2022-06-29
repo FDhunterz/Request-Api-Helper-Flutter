@@ -21,6 +21,8 @@ class RequestApiHelperObserver extends NavigatorObserver {
 
   @override
   void didPop(Route route, Route? previousRoute) {
+    Loading.loading = false;
+    RequestApiHelper.nowRoute = route;
     RequestApiHelper.initState(hasContext: previousRoute?.navigator?.context);
     if (didPopFunction != null) {
       didPopFunction!(route, previousRoute);
@@ -30,6 +32,7 @@ class RequestApiHelperObserver extends NavigatorObserver {
 
   @override
   void didPush(Route route, Route? previousRoute) {
+    RequestApiHelper.nowRoute = previousRoute;
     RequestApiHelper.initState(hasContext: previousRoute?.navigator?.context);
     if (didPushFunction != null) {
       didPushFunction!(route, previousRoute);
@@ -47,13 +50,15 @@ class RequestStack {
   bool runInBackground;
   bool withLoading;
   BuildContext currentContext;
+  Route? route;
 
-  RequestStack({required this.stream, this.replacementId, required this.id, required this.currentContext, this.runInBackground = false, this.withLoading = false});
+  RequestStack({required this.stream, this.replacementId, required this.id, required this.currentContext, this.runInBackground = false, this.withLoading = false, this.route});
 }
 
 class RequestApiHelper {
   static RequestApiHelperData? baseData;
   static Route? nowRoute;
+  static Route? loadingRoute;
 
   static Future<void> save(RequestApiHelperData data) async {
     baseData ??= RequestApiHelperData();
@@ -93,8 +98,10 @@ class RequestApiHelper {
   }
 
   static initState({BuildContext? hasContext}) async {
-    requestStack.where((element) => element.currentContext != (hasContext ?? baseData!.navigatorKey!.currentContext) && element.runInBackground == false).map((e) => e.stream.cancel()).toList();
-    requestStack.removeWhere((element) => element.currentContext != (hasContext ?? baseData!.navigatorKey!.currentContext) && element.runInBackground == false);
+    requestStack.where((element) => (element.currentContext != (hasContext ?? baseData!.navigatorKey!.currentContext) || (element.route != nowRoute && !Loading.loading)) && element.runInBackground == false).map((e) {
+      e.stream.cancel();
+    }).toList();
+    requestStack.removeWhere((element) => (element.currentContext != (hasContext ?? baseData!.navigatorKey!.currentContext) || (element.route != nowRoute && !Loading.loading)) && element.runInBackground == false);
   }
 
   static Future<RequestStack> sendRequest({
@@ -123,6 +130,7 @@ class RequestApiHelper {
       currentContext: getConfig.navigatorKey!.currentContext!,
       runInBackground: runInBackground,
       withLoading: withLoading,
+      route: nowRoute,
       stream: request(
         type: type,
         url: url,

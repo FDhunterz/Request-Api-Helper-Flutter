@@ -5,6 +5,7 @@ import 'package:request_api_helper/loading.dart';
 import 'package:request_api_helper/request_api_helper.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
+
 void main() {
   // in main.dart after WidgetsFlutterBinding.ensureInitialized()
   Loading.widget = (context) async {
@@ -21,6 +22,7 @@ void main() {
         );
       },
     );
+    Loading.loading = false;
     Loading.currentContext = context;
   };
 

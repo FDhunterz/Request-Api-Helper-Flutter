@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:example/example/parse.dart';
 import 'package:example/main.dart';
+import 'package:example/navigator/animation.dart';
 import 'package:example/template/base_widget.dart';
 import 'package:example/template/body.dart';
 import 'package:flutter/material.dart';
 import 'package:request_api_helper/request.dart';
 import 'package:request_api_helper/request_api_helper.dart';
+
+import 'import.dart';
 
 class RequestView extends StatefulWidget {
   const RequestView({Key? key}) : super(key: key);
@@ -17,7 +20,7 @@ class RequestView extends StatefulWidget {
 
 class _RequestViewState extends State<RequestView> {
   final controller = TextEditingController(text: 'https://reqbin.com/');
-  final name = TextEditingController(text: 'sample/post/json');
+  final name = TextEditingController(text: 'sample/get/json');
   final parameter = TextEditingController(text: 'title:DNA\nbody:RNA');
   final header = TextEditingController(text: 'Accep:application/json');
   final restApi = TextEditingController(text: 'get');
@@ -197,10 +200,10 @@ class _RequestViewState extends State<RequestView> {
                       borderRadius: const BorderRadius.all(Radius.circular(6)),
                       child: InkWell(
                         splashColor: Colors.black12,
-                        onTap: () {
+                        onTap: () async {
                           response = '';
                           setState(() {});
-                          RequestApiHelper.sendRequest(
+                          await RequestApiHelper.sendRequest(
                             type: restApiParse(restApi.text),
                             url: name.text,
                             withLoading: true,

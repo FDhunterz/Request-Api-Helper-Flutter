@@ -1,3 +1,6 @@
+## 4.0.2 - Example In Preview
+* optimize loading
+
 ## 4.0.1 - Example In Preview
 * tutorial in example now
 * timeout

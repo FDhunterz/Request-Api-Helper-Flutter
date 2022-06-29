@@ -25,7 +25,7 @@ Loading.widget = (context) async {
             return const LoadingView();
         },
     );
-    Loading.currentContext = context;
+Loading.currentContext = context;
 }""";
 
   String upload = """file: FileData(
