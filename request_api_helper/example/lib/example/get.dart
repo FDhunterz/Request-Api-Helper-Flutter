@@ -6,6 +6,7 @@ import 'package:example/navigator/animation.dart';
 import 'package:example/template/base_widget.dart';
 import 'package:example/template/body.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:request_api_helper/request.dart';
 import 'package:request_api_helper/request_api_helper.dart';
 
@@ -27,6 +28,7 @@ class _RequestViewState extends State<RequestView> {
   String param = '';
   String response = '';
   Map<String, dynamic> bodys = {};
+  double progress = 0;
 
   @override
   void initState() {
@@ -190,6 +192,23 @@ class _RequestViewState extends State<RequestView> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Text('link generated : ' + (restApi.text == 'get' ? (controller.text + name.text + param) : ' Map data')),
             ),
+            const SizedBox(
+              height: 12,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text((progress * 100).toStringAsFixed(1) + '%'),
+            ),
+            const SizedBox(
+              height: 12,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: LinearProgressIndicator(
+                color: Colors.greenAccent,
+                value: progress,
+              ),
+            ),
             Row(
               children: [
                 Expanded(
@@ -202,20 +221,50 @@ class _RequestViewState extends State<RequestView> {
                         splashColor: Colors.black12,
                         onTap: () async {
                           response = '';
+                          bodys = {};
+                          param = '';
+                          if (parameter.text.isNotEmpty && restApi.text == 'get') {
+                            final split = parameter.text.split('\n');
+                            int count = 0;
+                            if (split.isNotEmpty) {
+                              param += '?';
+                            }
+                            for (var i in split) {
+                              ++count;
+                              final split2 = i.split(':');
+                              if (count > 1) {
+                                param += '&';
+                              }
+                              param += split2.first + '=' + split2.last;
+                            }
+                          } else if (parameter.text.isNotEmpty && restApi.text != 'get') {
+                            final split = parameter.text.split('\n');
+
+                            for (var i in split) {
+                              final split2 = i.split(':');
+                              bodys.addAll({split2.first: split2.last});
+                            }
+                          }
                           setState(() {});
+
                           await RequestApiHelper.sendRequest(
                             type: restApiParse(restApi.text),
                             url: name.text,
-                            withLoading: true,
+                            withLoading: false,
+                            replacementId: 1,
                             config: RequestApiHelperData(
-                              debug: false,
+                              debug: true,
                               onTimeout: (data) {
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(json.decode(data.body)['message'])));
                               },
                               body: bodys,
                               onSuccess: (data) {
+                                print(RequestApiHelper.totalDataUsed);
                                 response = data.toString();
                                 setState(() {});
+                              },
+                              onError: (data) {
+                                print(data.statusCode);
                               },
                             ),
                           );

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:request_api_helper/request.dart';
@@ -70,5 +71,13 @@ handlingData(data, {bool debug = false}) {
     if (debug) {
       print(data.toString() + ' // double');
     }
+  }
+}
+
+getSize(title, data, {bool debug = false}) {
+  List<int> bytes = utf8.encode(data);
+  Uint8List conbytes = Uint8List.fromList(bytes);
+  if (debug) {
+    print(title + ' // ' + (conbytes.lengthInBytes).toString() + ' Bytes');
   }
 }

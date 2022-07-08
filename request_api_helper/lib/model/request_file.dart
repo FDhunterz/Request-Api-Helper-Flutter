@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:request_api_helper/helper.dart';
 import 'dart:async';
 import '../request.dart';
 
@@ -22,7 +23,7 @@ Future<String> readResponseAsString(HttpClientResponse response) {
   return completer.future;
 }
 
-Future<Response> requestfile(RequestApiHelperData config, {Function(int uploaded, int total)? onUploadProgress}) async {
+Future<Response> requestfile(RequestApiHelperData config, {Function(int uploaded, int total)? onProgress}) async {
   final httpClients = getHttpClient();
   Uri _http = Uri.parse(config.baseUrl!);
   final response = await httpClients.postUrl(_http);
@@ -45,20 +46,24 @@ Future<Response> requestfile(RequestApiHelperData config, {Function(int uploaded
 
   Stream<List<int>>? streamUpload;
   request.headers.addAll(config.header!);
-  if (onUploadProgress != null) {
+  if (onProgress != null) {
     var msStream = request.finalize();
     var totalByteLength = request.contentLength;
+    if (config.debug ?? false) {
+      print(totalByteLength.toString() + ' Bytes');
+    }
     String decodes = request.headers[HttpHeaders.contentTypeHeader] ?? '';
     response.headers.add(HttpHeaders.authorizationHeader, {request.headers[HttpHeaders.authorizationHeader]});
     response.headers.set(HttpHeaders.contentTypeHeader, {decodes});
 
+    getSize('Header ', response.headers.toString(), debug: config.debug ?? false);
     streamUpload = msStream.transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
           sink.add(data);
 
           byteCount += data.length;
-          onUploadProgress(byteCount, totalByteLength);
+          onProgress(byteCount, totalByteLength);
         },
         handleError: (error, stack, sink) {
           throw error;

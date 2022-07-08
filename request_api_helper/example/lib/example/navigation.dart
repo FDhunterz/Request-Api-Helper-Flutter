@@ -5,6 +5,7 @@ import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
 
 import '../template/body.dart';
+import 'downloader.dart';
 import 'features.dart';
 import 'get.dart';
 
@@ -230,6 +231,33 @@ class _NavigationViewState extends State<NavigationView> {
                         padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         child: Text(
                           'Check Example',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
+                  child: Material(
+                    color: Colors.green,
+                    borderRadius: const BorderRadius.all(Radius.circular(6)),
+                    child: InkWell(
+                      splashColor: Colors.black12,
+                      onTap: () {
+                        Navigator.push(context, fadeIn(page: const DownloadView()));
+                      },
+                      borderRadius: const BorderRadius.all(Radius.circular(6)),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        child: Text(
+                          'Download Example',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),

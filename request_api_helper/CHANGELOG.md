@@ -1,4 +1,8 @@
 ## 4.0.2 - Example In Preview
+* Api.download
+* RequestApiHelper.totalDataUsed in bytes
+
+## 4.0.1+2 - Example In Preview
 * optimize loading
 
 ## 4.0.1 - Example In Preview

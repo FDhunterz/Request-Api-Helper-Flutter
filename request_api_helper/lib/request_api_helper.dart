@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -11,7 +12,7 @@ import '../helper.dart';
 import '../request.dart';
 import '../session.dart';
 
-enum Api { post, get, put, delete }
+enum Api { post, get, put, delete, download }
 
 class RequestApiHelperObserver extends NavigatorObserver {
   final Function(Route, Route?)? didPopFunction;
@@ -56,43 +57,50 @@ class RequestStack {
 }
 
 class RequestApiHelper {
+  /// Of `RequestApiHelperData`,`RequestApiHelperDownloadData`
   static RequestApiHelperData? baseData;
   static Route? nowRoute;
   static Route? loadingRoute;
+  static int totalDataUsed = 0;
 
-  static Future<void> save(RequestApiHelperData data) async {
-    baseData ??= RequestApiHelperData();
-    baseData!.baseUrl = notNullFill(baseData!.baseUrl, data.baseUrl);
-    baseData!.body = notNullFill(baseData!.body, data.body);
-    baseData!.header = notNullFill(baseData!.header, data.header);
-    baseData!.bodyIsJson = notNullFill(baseData!.bodyIsJson, data.bodyIsJson);
-    baseData!.debug = notNullFill(baseData!.debug, data.debug);
-    baseData!.navigatorKey = notNullFill(baseData!.navigatorKey, data.navigatorKey);
-    baseData!.file = notNullFill(baseData!.file, data.file);
-    baseData!.onError = notNullFill(baseData!.onError, data.onError);
-    baseData!.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
-    baseData!.timeout = notNullFill(baseData!.timeout, data.timeout);
-    baseData!.onTimeout = notNullFill(baseData!.onTimeout, data.onTimeout);
+  static Future<void> save(RequestApiHelperConfig data) async {
+    if (data is RequestApiHelperData) {
+      baseData ??= RequestApiHelperData();
+      baseData!.baseUrl = notNullFill(baseData!.baseUrl, data.baseUrl);
+      baseData!.body = notNullFill(baseData!.body, data.body);
+      baseData!.header = notNullFill(baseData!.header, data.header);
+      baseData!.bodyIsJson = notNullFill(baseData!.bodyIsJson, data.bodyIsJson);
+      baseData!.debug = notNullFill(baseData!.debug, data.debug);
+      baseData!.navigatorKey = notNullFill(baseData!.navigatorKey, data.navigatorKey);
+      baseData!.file = notNullFill(baseData!.file, data.file);
+      baseData!.onError = notNullFill(baseData!.onError, data.onError);
+      baseData!.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
+      baseData!.timeout = notNullFill(baseData!.timeout, data.timeout);
+      baseData!.onTimeout = notNullFill(baseData!.onTimeout, data.onTimeout);
+    }
   }
 
-  static Future<RequestApiHelperData> _getCustomConfig(RequestApiHelperData data) async {
-    final _data = RequestApiHelperData();
-    _data.baseUrl = notNullFill(baseData!.baseUrl, data.baseUrl);
-    _data.body = notNullFill(baseData!.body, data.body);
-    _data.header = notNullFill(baseData!.header, data.header);
-    _data.bodyIsJson = notNullFill(baseData!.bodyIsJson, data.bodyIsJson);
-    _data.onSuccess = notNullFill(baseData!.onSuccess, data.onSuccess);
-    _data.debug = notNullFill(baseData!.debug, data.debug);
-    _data.navigatorKey = notNullFill(baseData!.navigatorKey, data.navigatorKey);
-    _data.file = notNullFill(baseData!.file, data.file);
-    _data.onError = notNullFill(baseData!.onError, data.onError);
-    _data.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
-    _data.onTimeout = notNullFill(baseData!.onTimeout, data.onTimeout);
-    _data.timeout = notNullFill(baseData!.timeout, data.timeout);
-    return _data;
+  static Future<RequestApiHelperData> _getCustomConfig(RequestApiHelperConfig data) async {
+    if (data is RequestApiHelperData) {
+      final _data = RequestApiHelperData();
+      _data.baseUrl = notNullFill(baseData!.baseUrl, data.baseUrl);
+      _data.body = notNullFill(baseData!.body, data.body);
+      _data.header = notNullFill(baseData!.header, data.header);
+      _data.bodyIsJson = notNullFill(baseData!.bodyIsJson, data.bodyIsJson);
+      _data.onSuccess = notNullFill(baseData!.onSuccess, data.onSuccess);
+      _data.debug = notNullFill(baseData!.debug, data.debug);
+      _data.navigatorKey = notNullFill(baseData!.navigatorKey, data.navigatorKey);
+      _data.file = notNullFill(baseData!.file, data.file);
+      _data.onError = notNullFill(baseData!.onError, data.onError);
+      _data.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
+      _data.onTimeout = notNullFill(baseData!.onTimeout, data.onTimeout);
+      _data.timeout = notNullFill(baseData!.timeout, data.timeout);
+      return _data;
+    }
+    return RequestApiHelperData();
   }
 
-  static Future<void> init(RequestApiHelperData data) async {
+  static Future<void> init(RequestApiHelperConfig data) async {
     await Session.init();
     await save(data);
   }
@@ -107,14 +115,21 @@ class RequestApiHelper {
   static Future<RequestStack> sendRequest({
     url,
     required Api type,
-    RequestApiHelperData? config,
+
+    /// Of `RequestApiHelperData`,`RequestApiHelperDownloadData`
+    RequestApiHelperConfig? config,
     int? replacementId,
     bool runInBackground = false,
-    Function(int uploaded, int total)? onUploadProgress,
+    Function(int current, int total)? onProgress,
     bool withLoading = false,
   }) async {
     UniqueKey keys = UniqueKey();
-    final RequestApiHelperData getConfig = config == null ? baseData! : (await _getCustomConfig(config));
+    RequestApiHelperData getConfig;
+    if (config is RequestApiHelperData) {
+      getConfig = (await _getCustomConfig(config));
+    } else {
+      getConfig = baseData!;
+    }
     int getLength = requestStack.where((element) => element.withLoading == true).length;
 
     if (replacementId != null) {
@@ -135,7 +150,8 @@ class RequestApiHelper {
         type: type,
         url: url,
         config: getConfig,
-        onUploadProgress: onUploadProgress,
+        download: config is RequestApiHelperDownloadData ? config : null,
+        onProgress: onProgress,
       )
           .timeout(getConfig.timeout ?? Duration(seconds: 60))
           .onError((error, stackTrace) async {
@@ -147,7 +163,7 @@ class RequestApiHelper {
               if (getConfig.onTimeout != null) {
                 await timeTracker('Timeout Clear', () async {
                   await getConfig.onTimeout!(Response(json.encode({'message': 'timeout'}), 408));
-                }, config: config);
+                }, config: (config is RequestApiHelperData) ? config : baseData);
               }
             }
           })
@@ -174,14 +190,14 @@ class RequestApiHelper {
                         decode = await compute(json.decode, res.body);
                         timeTracker('onSuccess Clear', () async {
                           await getConfig.onSuccess!(decode);
-                        }, config: config);
+                        }, config: (config is RequestApiHelperData) ? config : baseData);
                       }
                     } else if (getConfig.onError != null) {
                       decode = await compute(json.decode, res.body);
                       handlingData(decode, debug: getConfig.debug!);
                       timeTracker('onError Clear', () async {
                         await getConfig.onError!(res);
-                      }, config: config);
+                      }, config: (config is RequestApiHelperData) ? config : baseData);
                     }
                   } catch (_) {
                     handlingData(res.body, debug: getConfig.debug!);
@@ -198,7 +214,7 @@ class RequestApiHelper {
     return send;
   }
 
-  static Future<dynamic> request({url, required Api type, required RequestApiHelperData config, Function(int uploaded, int total)? onUploadProgress}) async {
+  static Future<dynamic> request({url, required Api type, required RequestApiHelperData config, RequestApiHelperDownloadData? download, Function(int uploaded, int total)? onProgress}) async {
     String? token;
     await timeTracker('Load Token ($url)', () async {
       token = await Session.load('token');
@@ -234,31 +250,90 @@ class RequestApiHelper {
         });
       }
     }
+
     if (type == Api.post) {
       if (config.file != null) {
         final newConfig = config;
         newConfig.baseUrl = config.baseUrl! + url;
 
         return await timeTracker('Request Post File ($url)', () async {
-          return await requestfile(newConfig, onUploadProgress: onUploadProgress);
+          final send = await requestfile(newConfig, onProgress: onProgress);
+          totalDataUsed += send.request?.contentLength ?? 0;
+          totalDataUsed += send.contentLength ?? 0;
+          return send;
         }, config: config) as Response?;
       } else {
         return await timeTracker('Request Post  ($url)', () async {
-          return await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+          final send = await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+          totalDataUsed += send.request?.contentLength ?? 0;
+          totalDataUsed += send.contentLength ?? 0;
+          return send;
         }, config: config) as Response?;
       }
     } else if (type == Api.get) {
       return await timeTracker('Request Get  ($url)', () async {
-        return await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
+        final send = await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
+        totalDataUsed += send.request?.contentLength ?? 0;
+        totalDataUsed += send.contentLength ?? 0;
+        return send;
       }, config: config) as Response?;
     } else if (type == Api.put) {
       return await timeTracker('Request Put  ($url)', () async {
-        return await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        final send = await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        totalDataUsed += send.request?.contentLength ?? 0;
+        totalDataUsed += send.contentLength ?? 0;
+        return send;
       }, config: config) as Response?;
     } else if (type == Api.delete) {
       return await timeTracker('Request Delete  ($url)', () async {
         return await delete(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
       }, config: config) as Response?;
+    } else if (type == Api.download) {
+      int? lastDownloaded;
+      try {
+        if (download != null) {
+          final req = HttpClient();
+          final file = File((download.path![download.path!.length - 1] == '/' ? download.path! : download.path! + '/') + (download.nameFile ?? url.toString().split('/').last));
+          int fileSize = 0;
+          try {
+            fileSize = (await file.readAsBytes()).lengthInBytes;
+          } catch (_) {}
+          req.getUrl(Uri.parse(url)).asStream().listen((event) {
+            event.close().asStream().listen((event2) async {
+              if (!(event2.contentLength == fileSize)) {
+                final output = await consolidateHttpClientResponseBytes(
+                  event2,
+                  onBytesReceived: (downloaded, total) {
+                    totalDataUsed += (downloaded - (lastDownloaded ?? 0));
+                    lastDownloaded = downloaded;
+                    if (onProgress != null) {
+                      onProgress(downloaded, (total ?? -1));
+                    }
+                  },
+                );
+                try {
+                  await file.writeAsBytes(output);
+                  if (download.onSuccess != null) {
+                    download.onSuccess!(RequestApiHelperDownloader(url: url, name: download.nameFile ?? file.path.split('/').last, path: file.path));
+                  }
+                } catch (_) {
+                  if (download.onError != null) {
+                    download.onError!(Response(json.encode({'message': _.toString()}), 666));
+                  }
+                }
+              } else {
+                if (download.onSuccess != null) {
+                  download.onSuccess!(RequestApiHelperDownloader(url: url, name: download.nameFile ?? file.path.split('/').last, path: file.path));
+                }
+              }
+            });
+          });
+        } else {
+          print('error');
+        }
+      } catch (_) {
+        print(_);
+      }
     }
     return null;
   }
