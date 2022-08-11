@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../main.dart';
+import 'package:request_api_helper/request_api_helper.dart';
 
 double _initital = 0;
 
@@ -31,7 +30,7 @@ Future<bool> _onWillPop() async {
     });
   } else if (currentNow!.difference(now).inSeconds < 4) {
     currentNow = null;
-    if (!Navigator.canPop(navigatorKey.currentContext!)) {
+    if (!Navigator.canPop(navigatorKey!.currentContext!)) {
       SystemNavigator.pop();
     }
     return true;

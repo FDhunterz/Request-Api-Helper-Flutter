@@ -11,14 +11,20 @@ Future<dynamic> timeTracker(name, Function function, {RequestApiHelperData? conf
   if (config?.debug == true) {
     now = DateTime.now();
   }
+  RequestApiHelper.addLog('Start $name');
   dynamic res;
   try {
     res = (await function()); //.timeout(config?.timeout);
-  } catch (_) {}
+  } catch (_) {
+    print(_);
+  }
 
   if (config?.debug == true) {
-    print('$name ' + DateTime.now().difference(now!).inMilliseconds.toString() + ' Millisecond' + (res == null ? '(Timeout)' : ''));
+    RequestApiHelper.addLog('Process $name ${DateTime.now().difference(now!).inMilliseconds.toString()} Millisecond');
+    print('$name ' + DateTime.now().difference(now).inMilliseconds.toString() + ' Millisecond');
   }
+
+  RequestApiHelper.addLog('end process $name');
   return res;
 }
 

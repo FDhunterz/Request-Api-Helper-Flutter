@@ -1,5 +1,6 @@
 import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
+import 'package:request_api_helper/request_api_helper.dart';
 
 import 'example/navigation.dart';
 
@@ -208,7 +209,7 @@ class _StartViewState extends State<StartView> {
                           child: InkWell(
                             splashColor: Colors.black12,
                             onTap: () {
-                              Navigator.push(context, fadeIn(page: const NavigationView()));
+                              RequestApiHelper.to(route: fadeIn(page: const NavigationView()));
                             },
                             borderRadius: const BorderRadius.all(Radius.circular(6)),
                             child: const Padding(

@@ -11,8 +11,10 @@ import 'package:request_api_helper/model/request_file.dart';
 import '../helper.dart';
 import '../request.dart';
 import '../session.dart';
+export 'material/app.dart';
 
 enum Api { post, get, put, delete, download }
+GlobalKey<NavigatorState>? navigatorKey;
 
 class RequestApiHelperObserver extends NavigatorObserver {
   final Function(Route, Route?)? didPopFunction;
@@ -62,10 +64,44 @@ class RequestApiHelper {
   static Route? nowRoute;
   static Route? loadingRoute;
   static int totalDataUsed = 0;
+  static StreamController _downloadController = StreamController();
+  static List<DownloadQueue> _downloadQueue = [];
+  static List<DownloadAdd> _downloadProcess = [];
+  static List<String> log = [];
+  static int _maxDownload = 10;
 
-  static Future<void> save(RequestApiHelperConfig data) async {
+  static addLog(String command) {
+    if (log.length > 500) {
+      log.removeAt(0);
+    }
+    log.add(command);
+  }
+
+  static Future to({Route? route, String? name, Object? arguments}) async {
+    if (route != null) {
+      return await Navigator.push(navigatorKey!.currentContext!, route);
+    } else if (name != null) {
+      return await Navigator.pushNamed(navigatorKey!.currentContext!, name, arguments: arguments);
+    }
+  }
+
+  static Future replaceTo(Route route) async {
+    return await Navigator.pushAndRemoveUntil(navigatorKey!.currentContext!, route, (route) => false);
+  }
+
+  static Future replaceNameTo(String route, {Object? arguments}) async {
+    return await Navigator.pushNamedAndRemoveUntil(navigatorKey!.currentContext!, route, (route) => false, arguments: arguments);
+  }
+
+  static Future<void> save(RequestApiHelperConfig data, {bool initial = false, int maxDownload = 10}) async {
+    _maxDownload = maxDownload;
     if (data is RequestApiHelperData) {
       baseData ??= RequestApiHelperData();
+
+      if (initial) {
+        baseData!.navigatorKey = GlobalKey<NavigatorState>();
+        navigatorKey = baseData!.navigatorKey;
+      }
       baseData!.baseUrl = notNullFill(baseData!.baseUrl, data.baseUrl);
       baseData!.body = notNullFill(baseData!.body, data.body);
       baseData!.header = notNullFill(baseData!.header, data.header);
@@ -77,6 +113,9 @@ class RequestApiHelper {
       baseData!.onAuthError = notNullFill(baseData!.onAuthError, data.onAuthError);
       baseData!.timeout = notNullFill(baseData!.timeout, data.timeout);
       baseData!.onTimeout = notNullFill(baseData!.onTimeout, data.onTimeout);
+      if (data.navigatorKey != null) {
+        navigatorKey = baseData!.navigatorKey;
+      }
     }
   }
 
@@ -100,9 +139,31 @@ class RequestApiHelper {
     return RequestApiHelperData();
   }
 
-  static Future<void> init(RequestApiHelperConfig data) async {
+  static Future<void> init(RequestApiHelperConfig data, {int maxDownload = 10}) async {
+    if (!_downloadController.hasListener) {
+      _downloadController.stream.listen((event) {
+        if (event is DownloadAdd) {
+          _downloadProcess.add(event);
+        } else if (event is DownloadDone) {
+          _downloadProcess.removeWhere((element) => element.id == event.id);
+          if (_downloadQueue.length > 0) {
+            final getData = _downloadQueue.first;
+            sendRequest(
+              type: Api.download,
+              config: getData.data,
+              onProgress: getData.onProgress,
+              url: getData.url,
+              runInBackground: true,
+            );
+            _downloadQueue.remove(getData);
+          }
+        } else if (event is DownloadQueue) {
+          _downloadQueue.add(event);
+        }
+      });
+    }
     await Session.init();
-    await save(data);
+    await save(data, initial: true, maxDownload: maxDownload);
   }
 
   static initState({BuildContext? hasContext}) async {
@@ -290,48 +351,97 @@ class RequestApiHelper {
       }, config: config) as Response?;
     } else if (type == Api.download) {
       int? lastDownloaded;
-      try {
-        if (download != null) {
+      if (download != null) {
+        if (_downloadProcess.length >= _maxDownload) {
+          _downloadController.add(
+            DownloadQueue(
+              download,
+              type: type,
+              download: download,
+              onProgress: onProgress,
+              url: url,
+            ),
+          );
+        } else {
+          final getId = DownloadAdd(
+            download,
+            type: type,
+            download: download,
+            onProgress: onProgress,
+            url: url,
+          );
+          _downloadController.add(getId);
           final req = HttpClient();
           final file = File((download.path![download.path!.length - 1] == '/' ? download.path! : download.path! + '/') + (download.nameFile ?? url.toString().split('/').last));
           int fileSize = 0;
-          try {
-            fileSize = (await file.readAsBytes()).lengthInBytes;
-          } catch (_) {}
+          if (file.existsSync()) {
+            try {
+              fileSize = (await file.readAsBytes()).lengthInBytes;
+            } catch (_) {}
+          } else {
+            try {
+              await file.create(recursive: true);
+            } catch (_) {
+              print(_);
+            }
+          }
           req.getUrl(Uri.parse(url)).asStream().listen((event) {
+            if (download.header != null) {
+              download.header!.forEach((key, value) {
+                event.headers.add(key, value);
+              });
+            }
             event.close().asStream().listen((event2) async {
-              if (!(event2.contentLength == fileSize)) {
-                final output = await consolidateHttpClientResponseBytes(
-                  event2,
-                  onBytesReceived: (downloaded, total) {
-                    totalDataUsed += (downloaded - (lastDownloaded ?? 0));
-                    lastDownloaded = downloaded;
-                    if (onProgress != null) {
-                      onProgress(downloaded, (total ?? -1));
+              if (event2.statusCode == 200) {
+                if (!(event2.contentLength == fileSize)) {
+                  final output = await consolidateHttpClientResponseBytes(
+                    event2,
+                    onBytesReceived: (downloaded, total) {
+                      totalDataUsed += (downloaded - (lastDownloaded ?? 0));
+                      lastDownloaded = downloaded;
+                      if (onProgress != null) {
+                        onProgress(downloaded, (total ?? -1));
+                      }
+                    },
+                  );
+                  try {
+                    await file.writeAsBytes(output);
+                    _downloadController.add(DownloadDone(getId.id));
+                    if (download.onSuccess != null) {
+                      download.onSuccess!(RequestApiHelperDownloader(url: url, name: download.nameFile ?? file.path.split('/').last, path: file.path));
                     }
-                  },
-                );
-                try {
-                  await file.writeAsBytes(output);
-                  if (download.onSuccess != null) {
-                    download.onSuccess!(RequestApiHelperDownloader(url: url, name: download.nameFile ?? file.path.split('/').last, path: file.path));
+                  } catch (_) {
+                    _downloadController.add(DownloadDone(getId.id));
+                    if (download.onError != null) {
+                      download.onError!(Response(json.encode({'message': _.toString()}), 666));
+                    }
                   }
-                } catch (_) {
-                  if (download.onError != null) {
-                    download.onError!(Response(json.encode({'message': _.toString()}), 666));
+                } else {
+                  if (download.onSuccess != null) {
+                    _downloadController.add(DownloadDone(getId.id));
+                    download.onSuccess!(RequestApiHelperDownloader(url: url, name: download.nameFile ?? file.path.split('/').last, path: file.path));
                   }
                 }
               } else {
-                if (download.onSuccess != null) {
-                  download.onSuccess!(RequestApiHelperDownloader(url: url, name: download.nameFile ?? file.path.split('/').last, path: file.path));
+                if (fileSize > 0) {
+                  if (download.onSuccess != null) {
+                    _downloadController.add(DownloadDone(getId.id));
+                    download.onSuccess!(RequestApiHelperDownloader(url: url, name: download.nameFile ?? file.path.split('/').last, path: file.path));
+                  }
+                } else {
+                  if (download.onError != null) {
+                    _downloadController.add(DownloadDone(getId.id));
+                    download.onError!(Response('error', event2.statusCode));
+                  }
                 }
               }
             });
           });
-        } else {
-          print('error');
         }
-      } catch (_) {
+      } else {
+        print('error');
+      }
+      try {} catch (_) {
         print(_);
       }
     }

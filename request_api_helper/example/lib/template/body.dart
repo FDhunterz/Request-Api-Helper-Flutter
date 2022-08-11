@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:request_api_helper/request_api_helper.dart';
 
 import '../main.dart';
 
 Widget body({child}) {
   return Scaffold(
     body: Container(
-      width: MediaQuery.of(navigatorKey.currentContext!).size.width,
-      height: MediaQuery.of(navigatorKey.currentContext!).size.height,
+      width: MediaQuery.of(navigatorKey!.currentContext!).size.width,
+      height: MediaQuery.of(navigatorKey!.currentContext!).size.height,
       decoration: const BoxDecoration(color: Colors.black),
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -38,7 +39,7 @@ Widget card({child, copyText, status = false}) {
       },
       child: Container(
         padding: const EdgeInsets.all(20),
-        width: MediaQuery.of(navigatorKey.currentContext!).size.width,
+        width: MediaQuery.of(navigatorKey!.currentContext!).size.width,
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           color: status ? Colors.green.withOpacity(.2) : Colors.white.withOpacity(.2),

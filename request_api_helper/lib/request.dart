@@ -20,6 +20,7 @@ class RequestApiHelperDownloader {
 class RequestApiHelperDownloadData extends RequestApiHelperConfig {
   String? path, thumnailPath, nameFile;
   Function(dynamic)? onSuccess;
+  Map<String, String>? header;
   Function(Response)? onError;
 
   Duration? timeout;
@@ -30,6 +31,7 @@ class RequestApiHelperDownloadData extends RequestApiHelperConfig {
     this.onError,
     this.timeout,
     this.nameFile,
+    this.header,
   });
 }
 

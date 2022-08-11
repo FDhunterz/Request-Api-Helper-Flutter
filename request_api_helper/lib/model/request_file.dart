@@ -5,6 +5,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:request_api_helper/helper.dart';
 import 'dart:async';
 import '../request.dart';
+import '../request_api_helper.dart';
 
 HttpClient getHttpClient({Duration? duration}) {
   HttpClient httpClient = HttpClient()
@@ -82,5 +83,34 @@ Future<Response> requestfile(RequestApiHelperData config, {Function(int uploaded
   } else {
     final getResponse = await request.send();
     return Response(await getResponse.stream.bytesToString(), getResponse.statusCode);
+  }
+}
+
+class DownloadAdd {
+  int id = 0;
+  RequestApiHelperDownloadData data;
+  String? url;
+  Api type;
+  RequestApiHelperDownloadData? download;
+  Function(int uploaded, int total)? onProgress;
+  DownloadAdd(this.data, {this.download, this.onProgress, required this.type, this.url}) {
+    id = DateTime.now().millisecondsSinceEpoch;
+  }
+}
+
+class DownloadDone {
+  int id;
+  DownloadDone(this.id);
+}
+
+class DownloadQueue {
+  int id = 0;
+  RequestApiHelperDownloadData data;
+  String? url;
+  Api type;
+  RequestApiHelperDownloadData? download;
+  Function(int uploaded, int total)? onProgress;
+  DownloadQueue(this.data, {this.download, this.onProgress, required this.type, this.url}) {
+    id = DateTime.now().millisecondsSinceEpoch;
   }
 }

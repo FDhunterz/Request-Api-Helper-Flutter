@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:example/main.dart';
 import 'package:example/template/base_widget.dart';
 import 'package:example/template/body.dart';
@@ -22,7 +25,7 @@ class DownloadView extends StatefulWidget {
 }
 
 class _DownloadViewState extends State<DownloadView> {
-  final controller = TextEditingController(text: 'https://reqbin.com/');
+  final controller = TextEditingController(text: 'https://mediplus.s3.amazonaws.com/17918/zv49pcvbk4bjxkgwkept.jpg');
   double progress = 0;
   List<DownloadTask> listDownload = [];
 
@@ -132,7 +135,10 @@ class _DownloadViewState extends State<DownloadView> {
                             config: RequestApiHelperDownloadData(
                               path: (await getExternalStorageDirectory())?.path,
                               onSuccess: (data) {
-                                print((RequestApiHelper.totalDataUsed / 1000).toString() + ' KB');
+                                print(RequestApiHelper.log.length);
+                                for (var i in RequestApiHelper.log) {
+                                  print(i);
+                                }
                                 final datas = data as RequestApiHelperDownloader;
                                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('success')));
                                 // print((RequestApiHelper.totalDataUsed / 1000).toString() + ' KB');

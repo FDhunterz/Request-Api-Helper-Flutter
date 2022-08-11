@@ -2,12 +2,16 @@ import 'package:example/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:request_api_helper/loading.dart';
+import 'package:request_api_helper/request.dart';
 import 'package:request_api_helper/request_api_helper.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
-
-void main() {
+void main() async {
   // in main.dart after WidgetsFlutterBinding.ensureInitialized()
+  WidgetsFlutterBinding.ensureInitialized();
+  await RequestApiHelper.init(RequestApiHelperData(
+    baseUrl: '',
+    debug: true,
+  ));
   Loading.widget = (context) async {
     await showDialog(
       barrierColor: Colors.black12,
@@ -35,9 +39,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return MaterialApp(
-      navigatorKey: navigatorKey,
-      navigatorObservers: [RequestApiHelperObserver()],
+    return RequestApiHelperApp(
       title: 'Request Api Helper',
       theme: ThemeData(
         brightness: Brightness.dark,
