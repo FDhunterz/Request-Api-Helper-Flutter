@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
+import 'package:request_api_helper/helper/database.dart';
 import 'package:request_api_helper/loading.dart';
 import 'package:request_api_helper/model/request_file.dart';
+import 'package:request_api_helper/progress_tracker/get_progress.dart';
 
 import '../helper.dart';
 import '../request.dart';
@@ -14,6 +16,7 @@ import '../session.dart';
 export 'material/app.dart';
 
 enum Api { post, get, put, delete, download }
+
 GlobalKey<NavigatorState>? navigatorKey;
 
 class RequestApiHelperObserver extends NavigatorObserver {
@@ -162,6 +165,7 @@ class RequestApiHelper {
         }
       });
     }
+    await StorageBase.init();
     await Session.init();
     await save(data, initial: true, maxDownload: maxDownload);
   }
@@ -219,13 +223,13 @@ class RequestApiHelper {
             if (error.toString().contains('TimeoutException')) {
               Loading.end();
               final getStack = requestStack.where((element) => element.id == keys);
-              getStack.first.stream.cancel();
               requestStack.removeWhere((element) => element.id == keys);
               if (getConfig.onTimeout != null) {
                 await timeTracker('Timeout Clear', () async {
                   await getConfig.onTimeout!(Response(json.encode({'message': 'timeout'}), 408));
                 }, config: (config is RequestApiHelperData) ? config : baseData);
               }
+              getStack.first.stream.cancel();
             }
           })
           .asStream()
@@ -294,8 +298,6 @@ class RequestApiHelper {
     } else if (type != Api.get) {
       body = config.body;
     } else {
-      body = '';
-
       if (config.body is Map) {
         int _counter = 0;
         body = '?';
@@ -313,9 +315,10 @@ class RequestApiHelper {
     }
 
     if (type == Api.post) {
-      if (config.file != null) {
+      if (onProgress != null) {
         final newConfig = config;
         newConfig.baseUrl = config.baseUrl! + url;
+        newConfig.header = config.header;
 
         return await timeTracker('Request Post File ($url)', () async {
           final send = await requestfile(newConfig, onProgress: onProgress);
@@ -333,10 +336,22 @@ class RequestApiHelper {
       }
     } else if (type == Api.get) {
       return await timeTracker('Request Get  ($url)', () async {
-        final send = await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
-        totalDataUsed += send.request?.contentLength ?? 0;
-        totalDataUsed += send.contentLength ?? 0;
-        return send;
+        if (onProgress != null) {
+          return getProgress(
+            baseUrl: config.baseUrl,
+            body: body,
+            config: config,
+            url: url,
+            onProgress: (start, end) {
+              onProgress(start, end);
+            },
+          );
+        } else {
+          final send = await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
+          totalDataUsed += send.request?.contentLength ?? 0;
+          totalDataUsed += send.contentLength ?? 0;
+          return send;
+        }
       }, config: config) as Response?;
     } else if (type == Api.put) {
       return await timeTracker('Request Put  ($url)', () async {

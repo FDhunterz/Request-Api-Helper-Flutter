@@ -37,7 +37,7 @@ class _RequestViewState extends State<RequestView> {
       RequestApiHelperData(
         baseUrl: controller.text,
         navigatorKey: navigatorKey,
-        debug: false,
+        debug: true,
       ),
     );
   }
@@ -84,7 +84,7 @@ class _RequestViewState extends State<RequestView> {
                             RequestApiHelperData(
                               baseUrl: controller.text,
                               navigatorKey: navigatorKey,
-                              debug: false,
+                              debug: true,
                             ),
                           );
                         },
@@ -197,16 +197,16 @@ class _RequestViewState extends State<RequestView> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Text((progress * 100).toStringAsFixed(1) + '%'),
+              child: Text(progress.toStringAsFixed(0) + 'KB'),
             ),
             const SizedBox(
               height: 12,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.0),
               child: LinearProgressIndicator(
                 color: Colors.greenAccent,
-                value: progress,
+                value: null,
               ),
             ),
             Row(
@@ -252,20 +252,24 @@ class _RequestViewState extends State<RequestView> {
                             url: name.text,
                             withLoading: false,
                             replacementId: 1,
+                            onProgress: (current, total) {
+                              progress = current.toDouble();
+                              setState(() {});
+                            },
                             config: RequestApiHelperData(
                               debug: true,
+                              header: {
+                                'Authorization': 'Bearer 9324ikd902ij90ij402d93i4',
+                              },
                               onTimeout: (data) {
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(json.decode(data.body)['message'])));
                               },
                               body: bodys,
                               onSuccess: (data) {
-                                print(RequestApiHelper.totalDataUsed);
                                 response = data.toString();
                                 setState(() {});
                               },
-                              onError: (data) {
-                                print(data.statusCode);
-                              },
+                              onError: (data) {},
                             ),
                           );
                         },
@@ -291,7 +295,7 @@ class _RequestViewState extends State<RequestView> {
               child: card(
                 child: Column(
                   children: [
-                    Text(response),
+                    // Text(response),
                   ],
                 ),
               ),

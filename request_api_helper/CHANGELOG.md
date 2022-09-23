@@ -1,3 +1,14 @@
+## 4.0.4
+* isolate issue fixed
+
+## 4.0.4
+* onProgress post, get now added
+* bug fixed header in file send
+* removing webview
+
+## 4.0.3+4
+* timeout bug fixed
+
 ## 4.0.3 - Download Queue
 * RequestApiHelper.init() => add maxDownload
 * RequestApiHelper now have navigatorKey

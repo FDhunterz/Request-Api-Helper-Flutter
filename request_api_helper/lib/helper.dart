@@ -1,10 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:request_api_helper/request.dart';
 import 'package:request_api_helper/request_api_helper.dart' show RequestApiHelper;
-import 'package:webview_flutter/webview_flutter.dart';
 
 Future<dynamic> timeTracker(name, Function function, {RequestApiHelperData? config}) async {
   DateTime? now;
@@ -46,28 +46,12 @@ handlingData(data, {bool debug = false}) {
     }
   } else if (data is String) {
     if (debug) {
-      // if (data.contains('<script>') || data.contains('</script>')) {
-      if (RequestApiHelper.baseData?.navigatorKey != null) {
-        late WebViewController _controller;
-        showDialog(
-          context: RequestApiHelper.baseData!.navigatorKey!.currentContext!,
-          builder: (context) {
-            return Scaffold(
-              body: StatefulBuilder(builder: (context, state) {
-                return WebView(
-                    initialUrl: 'about:blank',
-                    javascriptMode: JavascriptMode.unrestricted,
-                    onWebViewCreated: (WebViewController webViewController) {
-                      _controller = webViewController;
-                      _controller.loadUrl(Uri.dataFromString(data, mimeType: 'text/html', encoding: Encoding.getByName('utf-8')).toString());
-                      state(() {});
-                    });
-              }),
-            );
-          },
-        );
+      if (data.contains('<script>') || data.contains('</script>') || data.toLowerCase().contains('<html>')) {
+        if (RequestApiHelper.baseData?.navigatorKey != null) {
+          print('// website response');
+          print(data);
+        }
       }
-      // }
     }
   } else if (data is int) {
     if (debug) {

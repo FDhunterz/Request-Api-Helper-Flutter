@@ -1,6 +1,7 @@
 import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:request_api_helper/request_api_helper.dart';
+import 'package:request_api_helper/session.dart';
 
 import 'example/navigation.dart';
 
@@ -12,6 +13,11 @@ class StartView extends StatefulWidget {
 }
 
 class _StartViewState extends State<StartView> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -208,7 +214,8 @@ class _StartViewState extends State<StartView> {
                           borderRadius: const BorderRadius.all(Radius.circular(6)),
                           child: InkWell(
                             splashColor: Colors.black12,
-                            onTap: () {
+                            onTap: () async {
+                              // await Session.save(header: 'header', boolData: true);
                               RequestApiHelper.to(route: fadeIn(page: const NavigationView()));
                             },
                             borderRadius: const BorderRadius.all(Radius.circular(6)),

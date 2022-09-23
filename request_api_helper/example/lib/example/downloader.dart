@@ -1,7 +1,3 @@
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:example/main.dart';
 import 'package:example/template/base_widget.dart';
 import 'package:example/template/body.dart';
 import 'package:flutter/material.dart';

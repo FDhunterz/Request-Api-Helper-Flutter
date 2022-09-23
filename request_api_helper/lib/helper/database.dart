@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:request_api_helper/helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseCompute {
@@ -22,11 +23,9 @@ class StorageBase {
   }
 
   static Future<Database> connect() async {
-    await init();
     Database database = await openDatabase(path, version: 1, onCreate: (Database db, int version) async {
       await db.execute('CREATE TABLE data(id INTEGER PRIMARY KEY,name TEXT, text TEXT,type TEXT)');
     });
-
     return database;
   }
 
@@ -61,6 +60,7 @@ class StorageBase {
   static Future<String?> getString(DatabaseCompute data) async {
     Database db = await connect();
     List<Map> list = await db.rawQuery('SELECT * FROM data WHERE name="${data.name}" AND type="string"');
+
     return list.isEmpty ? null : list.first['text'];
   }
 

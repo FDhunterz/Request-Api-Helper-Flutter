@@ -37,7 +37,7 @@ Future<Response> requestfile(RequestApiHelperData config, {Function(int uploaded
     });
   }
 
-  for (int counterfile = 0; counterfile < config.file!.path.length; counterfile++) {
+  for (int counterfile = 0; counterfile < (config.file?.path ?? []).length; counterfile++) {
     if (config.file!.path[counterfile] == '' || config.file!.path[counterfile] == 'null') {
       request.fields[config.file!.requestName[counterfile]] = 'null';
     } else {
@@ -54,7 +54,12 @@ Future<Response> requestfile(RequestApiHelperData config, {Function(int uploaded
       print(totalByteLength.toString() + ' Bytes');
     }
     String decodes = request.headers[HttpHeaders.contentTypeHeader] ?? '';
-    response.headers.add(HttpHeaders.authorizationHeader, {request.headers[HttpHeaders.authorizationHeader]});
+    config.header?.forEach((key, value) {
+      print(key);
+      if (response.headers.value(key) == null) {
+        response.headers.add(key, value);
+      }
+    });
     response.headers.set(HttpHeaders.contentTypeHeader, {decodes});
 
     getSize('Header ', response.headers.toString(), debug: config.debug ?? false);
