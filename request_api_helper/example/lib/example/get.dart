@@ -1,16 +1,11 @@
 import 'dart:convert';
 
 import 'package:example/example/parse.dart';
-import 'package:example/main.dart';
-import 'package:example/navigator/animation.dart';
 import 'package:example/template/base_widget.dart';
 import 'package:example/template/body.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:request_api_helper/request.dart';
 import 'package:request_api_helper/request_api_helper.dart';
-
-import 'import.dart';
 
 class RequestView extends StatefulWidget {
   const RequestView({Key? key}) : super(key: key);
@@ -20,8 +15,8 @@ class RequestView extends StatefulWidget {
 }
 
 class _RequestViewState extends State<RequestView> {
-  final controller = TextEditingController(text: 'https://reqbin.com/');
-  final name = TextEditingController(text: 'sample/get/json');
+  final controller = TextEditingController(text: 'https://jsonplaceholder.typicode.com/');
+  final name = TextEditingController(text: 'any');
   final parameter = TextEditingController(text: 'title:DNA\nbody:RNA');
   final header = TextEditingController(text: 'Accep:application/json');
   final restApi = TextEditingController(text: 'get');
@@ -83,7 +78,7 @@ class _RequestViewState extends State<RequestView> {
                           RequestApiHelper.save(
                             RequestApiHelperData(
                               baseUrl: controller.text,
-                              navigatorKey: navigatorKey,
+                              // navigatorKey: navigatorKey,
                               debug: true,
                             ),
                           );
@@ -195,20 +190,20 @@ class _RequestViewState extends State<RequestView> {
             const SizedBox(
               height: 12,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Text(progress.toStringAsFixed(0) + 'KB'),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),
-              child: LinearProgressIndicator(
-                color: Colors.greenAccent,
-                value: null,
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            //   child: Text(progress.toStringAsFixed(0) + 'KB'),
+            // ),
+            // const SizedBox(
+            //   height: 12,
+            // ),
+            // const Padding(
+            //   padding: EdgeInsets.symmetric(horizontal: 24.0),
+            //   child: LinearProgressIndicator(
+            //     color: Colors.greenAccent,
+            //     value: null,
+            //   ),
+            // ),
             Row(
               children: [
                 Expanded(
@@ -252,12 +247,12 @@ class _RequestViewState extends State<RequestView> {
                             url: name.text,
                             withLoading: false,
                             replacementId: 1,
-                            onProgress: (current, total) {
-                              progress = current.toDouble();
-                              setState(() {});
-                            },
+                            // onProgress: (current, total) {
+                            //   progress = current.toDouble();
+                            //   setState(() {});
+                            // },
                             config: RequestApiHelperData(
-                              debug: true,
+                              debug: false,
                               header: {
                                 'Authorization': 'Bearer 9324ikd902ij90ij402d93i4',
                               },
@@ -294,7 +289,7 @@ class _RequestViewState extends State<RequestView> {
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: card(
                 child: Column(
-                  children: [
+                  children: const [
                     // Text(response),
                   ],
                 ),

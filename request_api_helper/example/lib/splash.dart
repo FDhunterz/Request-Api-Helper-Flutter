@@ -1,8 +1,6 @@
 import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:request_api_helper/request_api_helper.dart';
-import 'package:request_api_helper/session.dart';
-
 import 'example/navigation.dart';
 
 class StartView extends StatefulWidget {
@@ -65,6 +63,7 @@ class _StartViewState extends State<StartView> {
                     BoxShadow(
                       color: Colors.indigo,
                       blurRadius: 200,
+                      offset: Offset(0, 0),
                     )
                   ],
                 ),

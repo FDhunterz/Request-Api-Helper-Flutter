@@ -1,8 +1,6 @@
-import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
 
 import '../template/body.dart';
-import 'get.dart';
 
 class ImportView extends StatefulWidget {
   const ImportView({Key? key}) : super(key: key);

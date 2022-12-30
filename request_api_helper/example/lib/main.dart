@@ -8,10 +8,13 @@ import 'package:request_api_helper/request_api_helper.dart';
 void main() async {
   // in main.dart after WidgetsFlutterBinding.ensureInitialized()
   WidgetsFlutterBinding.ensureInitialized();
-  await RequestApiHelper.init(RequestApiHelperData(
-    baseUrl: '',
-    debug: true,
-  ));
+  await RequestApiHelper.init(
+    RequestApiHelperData(
+      baseUrl: '',
+      debug: true,
+    ),
+    encryptedSession: true,
+  );
   Loading.widget = (context) async {
     await showDialog(
       barrierColor: Colors.black12,

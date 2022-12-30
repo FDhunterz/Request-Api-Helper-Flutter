@@ -13,6 +13,7 @@ import 'package:request_api_helper/progress_tracker/get_progress.dart';
 import '../helper.dart';
 import '../request.dart';
 import '../session.dart';
+import 'helper/isolate.dart';
 export 'material/app.dart';
 
 enum Api { post, get, put, delete, download }
@@ -142,7 +143,7 @@ class RequestApiHelper {
     return RequestApiHelperData();
   }
 
-  static Future<void> init(RequestApiHelperConfig data, {int maxDownload = 10}) async {
+  static Future<void> init(RequestApiHelperConfig data, {int maxDownload = 10, bool encryptedSession = false}) async {
     if (!_downloadController.hasListener) {
       _downloadController.stream.listen((event) {
         if (event is DownloadAdd) {
@@ -166,7 +167,9 @@ class RequestApiHelper {
       });
     }
     await StorageBase.init();
-    await Session.init();
+    await Session.init(
+      encrypted: encryptedSession,
+    );
     await save(data, initial: true, maxDownload: maxDownload);
   }
 
@@ -328,7 +331,8 @@ class RequestApiHelper {
         }, config: config) as Response?;
       } else {
         return await timeTracker('Request Post  ($url)', () async {
-          final send = await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+          // final send = await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+          final send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.post));
           totalDataUsed += send.request?.contentLength ?? 0;
           totalDataUsed += send.contentLength ?? 0;
           return send;
@@ -347,7 +351,8 @@ class RequestApiHelper {
             },
           );
         } else {
-          final send = await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
+          // final send = await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
+          final send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url + (body ?? '')), headers: config.header, type: Api.get));
           totalDataUsed += send.request?.contentLength ?? 0;
           totalDataUsed += send.contentLength ?? 0;
           return send;
@@ -355,14 +360,16 @@ class RequestApiHelper {
       }, config: config) as Response?;
     } else if (type == Api.put) {
       return await timeTracker('Request Put  ($url)', () async {
-        final send = await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        // final send = await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        final send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.put));
         totalDataUsed += send.request?.contentLength ?? 0;
         totalDataUsed += send.contentLength ?? 0;
         return send;
       }, config: config) as Response?;
     } else if (type == Api.delete) {
       return await timeTracker('Request Delete  ($url)', () async {
-        return await delete(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        // return await delete(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        return await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.delete));
       }, config: config) as Response?;
     } else if (type == Api.download) {
       int? lastDownloaded;

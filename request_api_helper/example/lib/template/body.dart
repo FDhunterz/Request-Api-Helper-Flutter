@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:request_api_helper/request_api_helper.dart';
-
-import '../main.dart';
+import 'package:request_api_helper/session.dart';
 
 Widget body({child}) {
   return Scaffold(
@@ -28,11 +27,13 @@ Widget body({child}) {
 Widget card({child, copyText, status = false}) {
   return StatefulBuilder(builder: (context, state) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        await Session.save(header: 'testing_aja_d', doubleData: 1000.290138091283);
         if (copyText != null) {
           Clipboard.setData(ClipboardData(text: copyText));
           // ignore: avoid_print
           status = true;
+          // ignore: avoid_print
           print('\x1B[38;5;255mtext has been saved to clipboard');
           state(() {});
         }

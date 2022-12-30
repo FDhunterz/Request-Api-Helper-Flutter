@@ -1,3 +1,15 @@
+## 4.0.5
+* attribute encrypted session data to encrypt data (optional)
+
+## 4.0.4+4
+* request isolate bug fixed
+
+## 4.0.4+3
+* request body bug fixed
+
+## 4.0.4+2
+* request with isolate (trial)
+
 ## 4.0.4
 * isolate issue fixed
 

@@ -671,7 +671,6 @@ class RequestApiHelperApp extends StatefulWidget {
 ///
 /// [MaterialScrollBehavior.androidOverscrollIndicator] specifies the
 /// overscroll indicator that is used on [TargetPlatform.android]. When null,
-/// [ThemeData.androidOverscrollIndicator] is used. If also null, the default
 /// overscroll indicator is the [GlowingOverscrollIndicator].
 ///
 /// See also:
@@ -684,12 +683,11 @@ class MaterialScrollBehavior extends ScrollBehavior {
   ///
   /// [MaterialScrollBehavior.androidOverscrollIndicator] specifies the
   /// overscroll indicator that is used on [TargetPlatform.android]. When null,
-  /// [ThemeData.androidOverscrollIndicator] is used. If also null, the default
   /// overscroll indicator is the [GlowingOverscrollIndicator].
   const MaterialScrollBehavior({
     AndroidOverscrollIndicator? androidOverscrollIndicator,
   })  : _androidOverscrollIndicator = androidOverscrollIndicator,
-        super(androidOverscrollIndicator: androidOverscrollIndicator);
+        super();
 
   final AndroidOverscrollIndicator? _androidOverscrollIndicator;
 

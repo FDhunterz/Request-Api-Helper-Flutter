@@ -131,10 +131,6 @@ class _DownloadViewState extends State<DownloadView> {
                             config: RequestApiHelperDownloadData(
                               path: (await getExternalStorageDirectory())?.path,
                               onSuccess: (data) {
-                                print(RequestApiHelper.log.length);
-                                for (var i in RequestApiHelper.log) {
-                                  print(i);
-                                }
                                 final datas = data as RequestApiHelperDownloader;
                                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('success')));
                                 // print((RequestApiHelper.totalDataUsed / 1000).toString() + ' KB');

@@ -1,6 +1,6 @@
 name: request_api_helper
 description: send request with stack request management and cancel request.
-version: 4.0.4+1
+version: 4.0.5
 homepage: https://github.com/FDhunterz/Request-Api-Helper-Flutter-V-2.0.2
 
 environment:
@@ -14,6 +14,7 @@ dependencies:
   http: ^0.13.4
   http_parser: ^4.0.1
   sqflite: ^2.0.2+1
+  encrypt: ^5.0.1
 
 dev_dependencies:
   flutter_test:

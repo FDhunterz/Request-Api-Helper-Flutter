@@ -1,10 +1,33 @@
 import 'dart:convert';
+import 'package:request_api_helper/helper/encrypt.dart';
+
 import 'helper/database.dart';
 
 class Session {
   static List data = [];
+  static Crypt? _keys;
 
-  static Future<void> init() async {
+  static encrypt(text) {
+    if (_keys != null) return _keys?.encode(text);
+    return text;
+  }
+
+  static decrypt(text) {
+    if (_keys != null) return _keys?.decode(text);
+    return text;
+  }
+
+  static Future<void> init({bool encrypted = false}) async {
+    var getE = await StorageBase.getString(DatabaseCompute(
+      name: '_encrypted_session_master',
+    ));
+    if (getE != null) {
+      _keys = Crypt.getKeyFromBase64(getE);
+    } else {
+      final getK = Crypt.getKeyEncrypt().base64;
+      await StorageBase.insert(name: '_encrypted_session_master', text: getK, type: 'text');
+      _keys = Crypt.getKeyFromBase64(getK);
+    }
     var list = await StorageBase.getString(DatabaseCompute(
       name: 'saved_list',
     ));
@@ -28,13 +51,13 @@ class Session {
       if (getData != null) {
         await StorageBase.update(
           name: header,
-          text: stringData,
+          text: encrypt(stringData),
           type: 'string',
         );
       } else {
         await StorageBase.insert(
           name: header,
-          text: stringData,
+          text: encrypt(stringData),
           type: 'string',
         );
       }
@@ -66,14 +89,14 @@ class Session {
       if (getData != null) {
         await StorageBase.update(
           name: header,
-          text: doubleData.toString(),
-          type: 'bool',
+          text: encrypt(doubleData.toString()),
+          type: 'double',
         );
       } else {
         await StorageBase.insert(
           name: header,
-          text: doubleData.toString(),
-          type: 'bool',
+          text: encrypt(doubleData.toString()),
+          type: 'double',
         );
       }
     } else if (integerData != null) {
@@ -85,13 +108,13 @@ class Session {
       if (getData != null) {
         await StorageBase.update(
           name: header,
-          text: integerData.toString(),
+          text: encrypt(integerData.toString()),
           type: 'integer',
         );
       } else {
         await StorageBase.insert(
           name: header,
-          text: integerData.toString(),
+          text: encrypt(integerData.toString()),
           type: 'integer',
         );
       }
@@ -118,18 +141,22 @@ class Session {
     if (datas.first['type'] == 'string') {
       return await StorageBase.getString(DatabaseCompute(
         name: header,
+        encrypt: _keys,
       ));
     } else if (datas.first['type'] == 'double') {
       return await StorageBase.getDouble(DatabaseCompute(
         name: header,
+        encrypt: _keys,
       ));
     } else if (datas.first['type'] == 'integer') {
       return await StorageBase.getInt(DatabaseCompute(
         name: header,
+        encrypt: _keys,
       ));
     } else if (datas.first['type'] == 'bool') {
       return await StorageBase.getBool(DatabaseCompute(
         name: header,
+        encrypt: _keys,
       ));
     }
   }
