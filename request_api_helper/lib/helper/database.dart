@@ -70,6 +70,7 @@ class StorageBase {
   static Future<String?> getString(DatabaseCompute data) async {
     Database db = await connect();
     List<Map> list = await db.rawQuery('SELECT * FROM data WHERE name="${data.name}" AND type="string"');
+    print(list);
     return list.isEmpty ? null : _decrypt(data.encrypt, list.first['text']);
   }
 

@@ -1,3 +1,6 @@
+## 4.0.5+1
+* encrypt bug fixed
+
 ## 4.0.5
 * attribute encrypted session data to encrypt data (optional)
 

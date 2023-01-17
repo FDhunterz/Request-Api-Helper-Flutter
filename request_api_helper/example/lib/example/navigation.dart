@@ -3,6 +3,7 @@ import 'package:example/example/import.dart';
 import 'package:example/example/request.dart';
 import 'package:example/navigator/animation.dart';
 import 'package:flutter/material.dart';
+import 'package:request_api_helper/session.dart';
 
 import '../template/body.dart';
 import 'downloader.dart';
@@ -19,6 +20,15 @@ class NavigationView extends StatefulWidget {
 class _NavigationViewState extends State<NavigationView> {
   String materialAppText = """navigatorKey: navigatorKey,""";
   List<bool> statusCopy = [false, false, false];
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () async {
+      print(await Session.load('testing'));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return body(
@@ -251,6 +261,9 @@ class _NavigationViewState extends State<NavigationView> {
                     child: InkWell(
                       splashColor: Colors.black12,
                       onTap: () {
+                        Future.delayed(Duration.zero, () async {
+                          await Session.save(header: 'testing', stringData: '1 dulu');
+                        });
                         Navigator.push(context, fadeIn(page: const DownloadView()));
                       },
                       borderRadius: const BorderRadius.all(Radius.circular(6)),

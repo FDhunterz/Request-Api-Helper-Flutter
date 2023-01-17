@@ -15,9 +15,12 @@ class RequestView extends StatefulWidget {
 }
 
 class _RequestViewState extends State<RequestView> {
-  final controller = TextEditingController(text: 'https://jsonplaceholder.typicode.com/');
-  final name = TextEditingController(text: 'any');
-  final parameter = TextEditingController(text: 'title:DNA\nbody:RNA');
+  final controller = TextEditingController(
+    text: 'https://sectigostore.com',
+    // 'https://jsonplaceholder.typicode.com/',
+  );
+  final name = TextEditingController(text: '');
+  final parameter = TextEditingController(text: '');
   final header = TextEditingController(text: 'Accep:application/json');
   final restApi = TextEditingController(text: 'get');
   String param = '';
@@ -252,7 +255,7 @@ class _RequestViewState extends State<RequestView> {
                             //   setState(() {});
                             // },
                             config: RequestApiHelperData(
-                              debug: false,
+                              debug: true,
                               header: {
                                 'Authorization': 'Bearer 9324ikd902ij90ij402d93i4',
                               },

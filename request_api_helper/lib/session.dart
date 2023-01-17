@@ -18,15 +18,17 @@ class Session {
   }
 
   static Future<void> init({bool encrypted = false}) async {
-    var getE = await StorageBase.getString(DatabaseCompute(
-      name: '_encrypted_session_master',
-    ));
-    if (getE != null) {
-      _keys = Crypt.getKeyFromBase64(getE);
-    } else {
-      final getK = Crypt.getKeyEncrypt().base64;
-      await StorageBase.insert(name: '_encrypted_session_master', text: getK, type: 'text');
-      _keys = Crypt.getKeyFromBase64(getK);
+    if (encrypted) {
+      var getE = await StorageBase.getString(DatabaseCompute(
+        name: '_encrypted_session_master',
+      ));
+      if (getE != null) {
+        _keys = Crypt.getKeyFromBase64(getE);
+      } else {
+        final getK = Crypt.getKeyEncrypt().base64;
+        await StorageBase.insert(name: '_encrypted_session_master', text: getK, type: 'string');
+        _keys = Crypt.getKeyFromBase64(getK);
+      }
     }
     var list = await StorageBase.getString(DatabaseCompute(
       name: 'saved_list',
@@ -49,12 +51,14 @@ class Session {
         name: header,
       ));
       if (getData != null) {
+        print(encrypt(stringData));
         await StorageBase.update(
           name: header,
           text: encrypt(stringData),
           type: 'string',
         );
       } else {
+        print(encrypt(stringData));
         await StorageBase.insert(
           name: header,
           text: encrypt(stringData),
