@@ -18,6 +18,7 @@ class Session {
   }
 
   static Future<void> init({bool encrypted = false}) async {
+    await StorageBase.init();
     if (encrypted) {
       var getE = await StorageBase.getString(DatabaseCompute(
         name: '_encrypted_session_master',
@@ -123,17 +124,18 @@ class Session {
         );
       }
     }
+    if (typeData != '') {
+      final datas = data.where((e) => e['name'] == header);
 
-    final datas = data.where((e) => e['name'] == header);
-
-    if (datas.isEmpty) {
-      data.add({'type': typeData, 'name': header});
-      final encode = json.encode(data);
-      await StorageBase.update(
-        name: 'saved_list',
-        text: encode,
-        type: 'string',
-      );
+      if (datas.isEmpty) {
+        data.add({'type': typeData, 'name': header});
+        final encode = json.encode(data);
+        await StorageBase.update(
+          name: 'saved_list',
+          text: encode,
+          type: 'string',
+        );
+      }
     }
 
     return feedback;

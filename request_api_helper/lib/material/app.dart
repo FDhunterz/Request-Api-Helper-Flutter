@@ -669,21 +669,10 @@ class RequestApiHelperApp extends StatefulWidget {
 /// When using the desktop platform, if the [Scrollable] widget scrolls in the
 /// [Axis.vertical], a [Scrollbar] is applied.
 ///
-/// [MaterialScrollBehavior.androidOverscrollIndicator] specifies the
-/// overscroll indicator that is used on [TargetPlatform.android]. When null,
-/// overscroll indicator is the [GlowingOverscrollIndicator].
-///
-/// See also:
-///
-///  * [ScrollBehavior], the default scrolling behavior extended by this class.
 class MaterialScrollBehavior extends ScrollBehavior {
   /// Creates a MaterialScrollBehavior that decorates [Scrollable]s with
   /// [GlowingOverscrollIndicator]s and [Scrollbar]s based on the current
   /// platform and provided [ScrollableDetails].
-  ///
-  /// [MaterialScrollBehavior.androidOverscrollIndicator] specifies the
-  /// overscroll indicator that is used on [TargetPlatform.android]. When null,
-  /// overscroll indicator is the [GlowingOverscrollIndicator].
   const MaterialScrollBehavior({
     AndroidOverscrollIndicator? androidOverscrollIndicator,
   })  : _androidOverscrollIndicator = androidOverscrollIndicator,

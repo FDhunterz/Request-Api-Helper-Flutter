@@ -14,6 +14,7 @@ void main() async {
       debug: true,
     ),
     encryptedSession: true,
+    useMultiThread: true,
   );
   Loading.widget = (context) async {
     await showDialog(
@@ -41,15 +42,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return RequestApiHelperApp(
       title: 'Request Api Helper',
       theme: ThemeData(
         brightness: Brightness.dark,
         primarySwatch: Colors.blue,
-        textTheme: GoogleFonts.latoTextTheme(textTheme).copyWith(
-          bodyText2: GoogleFonts.karla(textStyle: textTheme.bodyText2).apply(color: Colors.white),
-        ),
       ),
       home: const StartView(),
     );

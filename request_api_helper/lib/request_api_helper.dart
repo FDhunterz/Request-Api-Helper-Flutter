@@ -73,6 +73,7 @@ class RequestApiHelper {
   static List<DownloadAdd> _downloadProcess = [];
   static List<String> log = [];
   static int _maxDownload = 10;
+  static bool _multithread = false;
 
   static addLog(String command) {
     if (log.length > 500) {
@@ -143,7 +144,8 @@ class RequestApiHelper {
     return RequestApiHelperData();
   }
 
-  static Future<void> init(RequestApiHelperConfig data, {int maxDownload = 10, bool encryptedSession = false}) async {
+  static Future<void> init(RequestApiHelperConfig data, {int maxDownload = 10, bool encryptedSession = false, bool useMultiThread = true}) async {
+    _multithread = useMultiThread;
     if (!_downloadController.hasListener) {
       _downloadController.stream.listen((event) {
         if (event is DownloadAdd) {
@@ -166,7 +168,6 @@ class RequestApiHelper {
         }
       });
     }
-    await StorageBase.init();
     await Session.init(
       encrypted: encryptedSession,
     );
@@ -330,13 +331,30 @@ class RequestApiHelper {
           return send;
         }, config: config) as Response?;
       } else {
-        return await timeTracker('Request Post  ($url)', () async {
-          // final send = await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
-          final send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.post));
-          totalDataUsed += send.request?.contentLength ?? 0;
-          totalDataUsed += send.contentLength ?? 0;
-          return send;
-        }, config: config) as Response?;
+        if (config.file != null) {
+          final newConfig = config;
+          newConfig.baseUrl = config.baseUrl! + url;
+
+          return await timeTracker('Request Post File ($url)', () async {
+            final send = await requestfile(newConfig, onProgress: onProgress);
+            totalDataUsed += send.request?.contentLength ?? 0;
+            totalDataUsed += send.contentLength ?? 0;
+            return send;
+          }, config: config) as Response?;
+        } else {
+          return await timeTracker('Request Post  ($url)', () async {
+            Response? send;
+
+            if (_multithread) {
+              send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.post));
+            } else {
+              send = await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+            }
+            totalDataUsed += send.request?.contentLength ?? 0;
+            totalDataUsed += send.contentLength ?? 0;
+            return send;
+          }, config: config) as Response?;
+        }
       }
     } else if (type == Api.get) {
       return await timeTracker('Request Get  ($url)', () async {
@@ -351,8 +369,12 @@ class RequestApiHelper {
             },
           );
         } else {
-          // final send = await get(Uri.parse(config.baseUrl! + url + body), headers: config.header!);
-          final send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url + (body ?? '')), headers: config.header, type: Api.get));
+          Response? send;
+          if (_multithread) {
+            send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url + (body ?? '')), headers: config.header, type: Api.get));
+          } else {
+            send = await get(Uri.parse(config.baseUrl! + url + (body ?? '')), headers: config.header!);
+          }
           totalDataUsed += send.request?.contentLength ?? 0;
           totalDataUsed += send.contentLength ?? 0;
           return send;
@@ -360,16 +382,28 @@ class RequestApiHelper {
       }, config: config) as Response?;
     } else if (type == Api.put) {
       return await timeTracker('Request Put  ($url)', () async {
-        // final send = await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
-        final send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.put));
+        Response? send;
+        if (_multithread) {
+          send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.put));
+        } else {
+          send = await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        }
         totalDataUsed += send.request?.contentLength ?? 0;
         totalDataUsed += send.contentLength ?? 0;
         return send;
       }, config: config) as Response?;
     } else if (type == Api.delete) {
       return await timeTracker('Request Delete  ($url)', () async {
-        // return await delete(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
-        return await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.delete));
+        Response? send;
+        if (_multithread) {
+          send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.delete));
+        } else {
+          send = await delete(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
+        }
+
+        totalDataUsed += send.request?.contentLength ?? 0;
+        totalDataUsed += send.contentLength ?? 0;
+        return send;
       }, config: config) as Response?;
     } else if (type == Api.download) {
       int? lastDownloaded;
