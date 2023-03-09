@@ -15,7 +15,7 @@ class DatabaseCompute {
 class StorageBase {
   static String path = '';
   static init() async {
-    final databasesPath = Platform.isIOS ? '' : await getDatabasesPath();
+    final databasesPath = Platform.isIOS ? '' : (await getDatabasesPath() + '/');
     // Get a location using getDatabasesPath
     try {
       path = databasesPath + 'sharedPreferences.db';

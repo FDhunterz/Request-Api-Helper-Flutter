@@ -94,6 +94,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_feather_icons:
+    dependency: transitive
+    description:
+      name: flutter_feather_icons
+      sha256: b33b9c276fc8108254632da6644cf01f71af6c17fbfb26e136a86945f5ff9b67
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0+1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -196,10 +204,10 @@ packages:
     dependency: "direct main"
     description:
       name: sql_query
-      sha256: "6fe54ed6aa3a83604952be0fcd21232f1536a9bfa9f42715fe6aa81c8685e8a8"
+      sha256: c012814353a3e2bf39a7c3eae8f93cd3903b1c2d4edd57dfda8b7332664ab620
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.5+1"
+    version: "1.1.0"
   stack_trace:
     dependency: transitive
     description:

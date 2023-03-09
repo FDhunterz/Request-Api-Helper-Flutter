@@ -104,8 +104,8 @@ class RequestApiHelper {
       baseData ??= RequestApiHelperData();
 
       if (initial) {
-        baseData!.navigatorKey = GlobalKey<NavigatorState>();
-        navigatorKey = baseData!.navigatorKey;
+        baseData!.navigatorKey ??= GlobalKey<NavigatorState>();
+        navigatorKey ??= baseData!.navigatorKey;
       }
       baseData!.baseUrl = notNullFill(baseData!.baseUrl, data.baseUrl);
       baseData!.body = notNullFill(baseData!.body, data.body);
