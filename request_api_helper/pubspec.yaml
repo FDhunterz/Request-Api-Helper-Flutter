@@ -13,7 +13,7 @@ dependencies:
   
   http: ^0.13.5
   http_parser: ^4.0.2
-  sql_query: ^1.1.0
+  sql_query: ^1.1.0+1
   encrypt: ^5.0.1
 
 dev_dependencies:
