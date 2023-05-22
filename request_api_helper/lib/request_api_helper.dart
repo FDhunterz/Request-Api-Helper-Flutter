@@ -247,7 +247,6 @@ class RequestApiHelper {
                 if (getLength == 0 && withLoading) {
                   Loading.end();
                 }
-
                 if (res.statusCode == 401) {
                   if (getConfig.onAuthError != null) {
                     getConfig.onAuthError!(getConfig.navigatorKey!.currentContext!);

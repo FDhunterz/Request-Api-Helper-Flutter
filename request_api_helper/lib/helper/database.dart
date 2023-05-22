@@ -22,6 +22,7 @@ class StorageBase {
     } catch (_) {
       print(_);
     }
+    print(path);
   }
 
   static _decrypt(Crypt? keys, text) {
@@ -42,6 +43,7 @@ class StorageBase {
 
   static insert({String? name, String? text, String? type, databasesPath}) async {
     DBMerge db = await connect();
+
     await db.table('data').data({
       'name': name ?? '',
       'text': text ?? '',
@@ -69,6 +71,7 @@ class StorageBase {
   static Future<String?> getString(DatabaseCompute data) async {
     DBMerge db = await connect();
     List<Map> list = await db.table('data').where('name', '=', data.name ?? '').where('type', '=', 'string').get();
+    print(list);
     return list.isEmpty ? null : _decrypt(data.encrypt, list.first['text']);
   }
 

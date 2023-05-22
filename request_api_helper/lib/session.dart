@@ -43,102 +43,104 @@ class Session {
   }
 
   static Future<bool> save({required String header, String? stringData, bool? boolData, double? doubleData, int? integerData}) async {
-    bool feedback = false;
-    String typeData = '';
-    if (stringData != null) {
-      feedback = true;
-      typeData = 'string';
-      String? getData = await StorageBase.getString(DatabaseCompute(
-        name: header,
-      ));
-      if (getData != null) {
-        print(encrypt(stringData));
-        await StorageBase.update(
+    try {
+      bool feedback = false;
+      String typeData = '';
+      if (stringData != null) {
+        feedback = true;
+        typeData = 'string';
+        String? getData = await StorageBase.getString(DatabaseCompute(
           name: header,
-          text: encrypt(stringData),
-          type: 'string',
-        );
-      } else {
-        print(encrypt(stringData));
-        await StorageBase.insert(
+        ));
+        if (getData != null) {
+          await StorageBase.update(
+            name: header,
+            text: encrypt(stringData),
+            type: 'string',
+          );
+        } else {
+          await StorageBase.insert(
+            name: header,
+            text: encrypt(stringData),
+            type: 'string',
+          );
+        }
+      } else if (boolData != null) {
+        feedback = true;
+        typeData = 'bool';
+        bool? getData = await StorageBase.getBool(DatabaseCompute(
           name: header,
-          text: encrypt(stringData),
-          type: 'string',
-        );
+        ));
+        if (getData != null) {
+          await StorageBase.update(
+            name: header,
+            text: boolData ? '1' : '0',
+            type: 'bool',
+          );
+        } else {
+          await StorageBase.insert(
+            name: header,
+            text: boolData ? '1' : '0',
+            type: 'bool',
+          );
+        }
+      } else if (doubleData != null) {
+        feedback = true;
+        typeData = 'double';
+        double? getData = await StorageBase.getDouble(DatabaseCompute(
+          name: header,
+        ));
+        if (getData != null) {
+          await StorageBase.update(
+            name: header,
+            text: encrypt(doubleData.toString()),
+            type: 'double',
+          );
+        } else {
+          await StorageBase.insert(
+            name: header,
+            text: encrypt(doubleData.toString()),
+            type: 'double',
+          );
+        }
+      } else if (integerData != null) {
+        feedback = true;
+        typeData = 'integer';
+        int? getData = await StorageBase.getInt(DatabaseCompute(
+          name: header,
+        ));
+        if (getData != null) {
+          await StorageBase.update(
+            name: header,
+            text: encrypt(integerData.toString()),
+            type: 'integer',
+          );
+        } else {
+          await StorageBase.insert(
+            name: header,
+            text: encrypt(integerData.toString()),
+            type: 'integer',
+          );
+        }
       }
-    } else if (boolData != null) {
-      feedback = true;
-      typeData = 'bool';
-      bool? getData = await StorageBase.getBool(DatabaseCompute(
-        name: header,
-      ));
-      if (getData != null) {
-        await StorageBase.update(
-          name: header,
-          text: boolData ? '1' : '0',
-          type: 'bool',
-        );
-      } else {
-        await StorageBase.insert(
-          name: header,
-          text: boolData ? '1' : '0',
-          type: 'bool',
-        );
-      }
-    } else if (doubleData != null) {
-      feedback = true;
-      typeData = 'double';
-      double? getData = await StorageBase.getDouble(DatabaseCompute(
-        name: header,
-      ));
-      if (getData != null) {
-        await StorageBase.update(
-          name: header,
-          text: encrypt(doubleData.toString()),
-          type: 'double',
-        );
-      } else {
-        await StorageBase.insert(
-          name: header,
-          text: encrypt(doubleData.toString()),
-          type: 'double',
-        );
-      }
-    } else if (integerData != null) {
-      feedback = true;
-      typeData = 'integer';
-      int? getData = await StorageBase.getInt(DatabaseCompute(
-        name: header,
-      ));
-      if (getData != null) {
-        await StorageBase.update(
-          name: header,
-          text: encrypt(integerData.toString()),
-          type: 'integer',
-        );
-      } else {
-        await StorageBase.insert(
-          name: header,
-          text: encrypt(integerData.toString()),
-          type: 'integer',
-        );
-      }
-    }
-    if (typeData != '') {
-      final datas = data.where((e) => e['name'] == header);
+      if (typeData != '') {
+        final datas = data.where((e) => e['name'] == header);
 
-      if (datas.isEmpty) {
-        data.add({'type': typeData, 'name': header});
-        final encode = json.encode(data);
-        await StorageBase.update(
-          name: 'saved_list',
-          text: encode,
-          type: 'string',
-        );
+        if (datas.isEmpty) {
+          data.add({'type': typeData, 'name': header});
+          final encode = json.encode(data);
+          await StorageBase.update(
+            name: 'saved_list',
+            text: encode,
+            type: 'string',
+          );
+        }
       }
-    }
 
-    return feedback;
+      return feedback;
+    } catch (_) {
+      return false;
+    }
   }
 
   static Future<dynamic> load(header) async {

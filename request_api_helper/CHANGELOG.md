@@ -1,3 +1,6 @@
+# 4.0.6+5
+ - update sql_query
+ 
 # 4.0.6+3
  - bug fixed
 
