@@ -74,6 +74,7 @@ class RequestApiHelper {
   static List<String> log = [];
   static int _maxDownload = 10;
   static bool _multithread = false;
+  static bool _openAllSecurityForMultiThread = false;
 
   static addLog(String command) {
     if (log.length > 500) {
@@ -144,8 +145,9 @@ class RequestApiHelper {
     return RequestApiHelperData();
   }
 
-  static Future<void> init(RequestApiHelperConfig data, {int maxDownload = 10, bool encryptedSession = false, bool useMultiThread = true}) async {
+  static Future<void> init(RequestApiHelperConfig data, {int maxDownload = 10, bool encryptedSession = false, bool useMultiThread = true, bool openAllSecurityForMultiThread = false}) async {
     _multithread = useMultiThread;
+    _openAllSecurityForMultiThread = openAllSecurityForMultiThread;
     if (!_downloadController.hasListener) {
       _downloadController.stream.listen((event) {
         if (event is DownloadAdd) {
@@ -269,6 +271,7 @@ class RequestApiHelper {
                     }
                   } catch (_) {
                     handlingData(res.body, debug: getConfig.debug!);
+                    internalHandlingData(_.toString(), debug: getConfig.debug!);
                   }
                 }
               }
@@ -345,7 +348,7 @@ class RequestApiHelper {
             Response? send;
 
             if (_multithread) {
-              send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.post));
+              send = await RequestIsolate.getRequest(RequestIsolate(openAllSecurity: _openAllSecurityForMultiThread, url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.post));
             } else {
               send = await post(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
             }
@@ -370,7 +373,7 @@ class RequestApiHelper {
         } else {
           Response? send;
           if (_multithread) {
-            send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url + (body ?? '')), headers: config.header, type: Api.get));
+            send = await RequestIsolate.getRequest(RequestIsolate(openAllSecurity: _openAllSecurityForMultiThread, url: Uri.parse(config.baseUrl! + url + (body ?? '')), headers: config.header, type: Api.get));
           } else {
             send = await get(Uri.parse(config.baseUrl! + url + (body ?? '')), headers: config.header!);
           }
@@ -383,7 +386,7 @@ class RequestApiHelper {
       return await timeTracker('Request Put  ($url)', () async {
         Response? send;
         if (_multithread) {
-          send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.put));
+          send = await RequestIsolate.getRequest(RequestIsolate(openAllSecurity: _openAllSecurityForMultiThread, url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.put));
         } else {
           send = await put(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
         }
@@ -395,7 +398,7 @@ class RequestApiHelper {
       return await timeTracker('Request Delete  ($url)', () async {
         Response? send;
         if (_multithread) {
-          send = await RequestIsolate.getRequest(RequestIsolate(url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.delete));
+          send = await RequestIsolate.getRequest(RequestIsolate(openAllSecurity: _openAllSecurityForMultiThread, url: Uri.parse(config.baseUrl! + url), body: body, headers: config.header, type: Api.delete));
         } else {
           send = await delete(Uri.parse(config.baseUrl! + url), body: body, headers: config.header!);
         }
@@ -432,12 +435,14 @@ class RequestApiHelper {
           if (file.existsSync()) {
             try {
               fileSize = (await file.readAsBytes()).lengthInBytes;
-            } catch (_) {}
+            } catch (_) {
+              internalHandlingData(_.toString(), debug: kReleaseMode);
+            }
           } else {
             try {
               await file.create(recursive: true);
             } catch (_) {
-              print(_);
+              internalHandlingData(_.toString(), debug: kReleaseMode);
             }
           }
           req.getUrl(Uri.parse(url)).asStream().listen((event) {
@@ -466,6 +471,7 @@ class RequestApiHelper {
                       download.onSuccess!(RequestApiHelperDownloader(url: url, name: download.nameFile ?? file.path.split('/').last, path: file.path));
                     }
                   } catch (_) {
+                    internalHandlingData(_.toString(), debug: kReleaseMode);
                     _downloadController.add(DownloadDone(getId.id));
                     if (download.onError != null) {
                       download.onError!(Response(json.encode({'message': _.toString()}), 666));
@@ -495,9 +501,6 @@ class RequestApiHelper {
         }
       } else {
         print('error');
-      }
-      try {} catch (_) {
-        print(_);
       }
     }
     return null;

@@ -22,7 +22,6 @@ class StorageBase {
     } catch (_) {
       print(_);
     }
-    print(path);
   }
 
   static _decrypt(Crypt? keys, text) {

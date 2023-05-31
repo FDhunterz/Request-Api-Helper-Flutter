@@ -50,12 +50,9 @@ Future<Response> requestfile(RequestApiHelperData config, {Function(int uploaded
   if (onProgress != null) {
     var msStream = request.finalize();
     var totalByteLength = request.contentLength;
-    if (config.debug ?? false) {
-      print(totalByteLength.toString() + ' Bytes');
-    }
+    if (config.debug ?? false) {}
     String decodes = request.headers[HttpHeaders.contentTypeHeader] ?? '';
     config.header?.forEach((key, value) {
-      print(key);
       if (response.headers.value(key) == null) {
         response.headers.add(key, value);
       }

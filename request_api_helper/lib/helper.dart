@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:request_api_helper/request.dart';
 import 'package:request_api_helper/request_api_helper.dart' show RequestApiHelper;
 
@@ -14,7 +15,7 @@ Future<dynamic> timeTracker(name, Function function, {RequestApiHelperData? conf
   try {
     res = (await function()); //.timeout(config?.timeout);
   } catch (_) {
-    print(_);
+    internalHandlingData(_.toString(), debug: kReleaseMode);
   }
 
   if (config?.debug == true) {
@@ -59,6 +60,12 @@ handlingData(data, {bool debug = false}) {
     if (debug) {
       print(data.toString() + ' // double');
     }
+  }
+}
+
+internalHandlingData(data, {bool debug = false}) {
+  if (debug) {
+    print('################ ' + data.toString() + ' // Exception');
   }
 }
 
