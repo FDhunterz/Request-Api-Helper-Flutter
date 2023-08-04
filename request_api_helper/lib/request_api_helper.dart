@@ -56,10 +56,11 @@ class RequestStack {
   StreamSubscription stream;
   bool runInBackground;
   bool withLoading;
+  int repeat;
   BuildContext currentContext;
   Route? route;
 
-  RequestStack({required this.stream, this.replacementId, required this.id, required this.currentContext, this.runInBackground = false, this.withLoading = false, this.route});
+  RequestStack({required this.stream, this.replacementId, required this.id, required this.currentContext, this.runInBackground = false, this.withLoading = false, this.route, this.repeat = 0});
 }
 
 class RequestApiHelper {
@@ -183,6 +184,97 @@ class RequestApiHelper {
     requestStack.removeWhere((element) => (element.currentContext != (hasContext ?? baseData!.navigatorKey!.currentContext) || (element.route != nowRoute && !Loading.loading)) && element.runInBackground == false);
   }
 
+  static StreamSubscription _requests({type, url, getConfig, config, onProgress, withLoading, keys, repeat = 0}) {
+    return request(
+      type: type,
+      url: url,
+      config: getConfig,
+      download: config is RequestApiHelperDownloadData ? config : null,
+      onProgress: onProgress,
+    )
+        .timeout(getConfig.timeout ?? Duration(seconds: 60))
+        .onError((error, stackTrace) async {
+          if (error.toString().contains('TimeoutException')) {
+            Loading.end();
+            final getStack = requestStack.where((element) => element.id == keys);
+            requestStack.removeWhere((element) => element.id == keys);
+            if (getConfig.onTimeout != null) {
+              await timeTracker('Timeout Clear', () async {
+                await getConfig.onTimeout!(Response(json.encode({'message': 'timeout'}), 408));
+              }, config: (config is RequestApiHelperData) ? config : baseData);
+            }
+            if (repeat > 0) {
+              handlingData('Repeat $repeat', debug: getConfig.debug!);
+              _requests(
+                type: type,
+                url: url,
+                getConfig: getConfig,
+                config: config,
+                onProgress: onProgress,
+                withLoading: withLoading,
+                keys: keys,
+                repeat: repeat - 1,
+              );
+            } else {
+              getStack.first.stream.cancel();
+            }
+          }
+        })
+        .asStream()
+        .listen(
+          (response) async {
+            if (!(response == null)) {
+              final res = response as Response;
+              dynamic decode;
+              requestStack.removeWhere((element) => element.id == keys);
+              int getLength = requestStack.where((element) => element.withLoading == true).length;
+              if (getLength == 0 && withLoading) {
+                Loading.end();
+              }
+              if (res.statusCode == 401) {
+                if (getConfig.onAuthError != null) {
+                  getConfig.onAuthError!(getConfig.navigatorKey!.currentContext!);
+                }
+              } else {
+                try {
+                  if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 202) {
+                    if (getConfig.onSuccess != null) {
+                      decode = await compute(json.decode, res.body);
+                      timeTracker('onSuccess Clear', () async {
+                        await getConfig.onSuccess!(decode);
+                      }, config: (config is RequestApiHelperData) ? config : baseData);
+                    }
+                  } else if (getConfig.onError != null) {
+                    if (repeat > 0) {
+                      handlingData('Repeat $repeat', debug: getConfig.debug!);
+                      _requests(
+                        type: type,
+                        url: url,
+                        getConfig: getConfig,
+                        config: config,
+                        onProgress: onProgress,
+                        withLoading: withLoading,
+                        keys: keys,
+                        repeat: repeat - 1,
+                      );
+                    }
+                    decode = await compute(json.decode, res.body);
+                    handlingData(decode, debug: getConfig.debug!);
+
+                    timeTracker('onError Clear', () async {
+                      await getConfig.onError!(res);
+                    }, config: (config is RequestApiHelperData) ? config : baseData);
+                  }
+                } catch (_) {
+                  handlingData(res.body, debug: getConfig.debug!);
+                  internalHandlingData(_.toString(), debug: getConfig.debug!);
+                }
+              }
+            }
+          },
+        );
+  }
+
   static Future<RequestStack> sendRequest({
     url,
     required Api type,
@@ -193,6 +285,7 @@ class RequestApiHelper {
     bool runInBackground = false,
     Function(int current, int total)? onProgress,
     bool withLoading = false,
+    int repeat = 0,
   }) async {
     UniqueKey keys = UniqueKey();
     RequestApiHelperData getConfig;
@@ -216,67 +309,18 @@ class RequestApiHelper {
       currentContext: getConfig.navigatorKey!.currentContext!,
       runInBackground: runInBackground,
       withLoading: withLoading,
+      repeat: repeat,
       route: nowRoute,
-      stream: request(
+      stream: _requests(
         type: type,
         url: url,
-        config: getConfig,
-        download: config is RequestApiHelperDownloadData ? config : null,
+        getConfig: getConfig,
+        config: config,
         onProgress: onProgress,
-      )
-          .timeout(getConfig.timeout ?? Duration(seconds: 60))
-          .onError((error, stackTrace) async {
-            if (error.toString().contains('TimeoutException')) {
-              Loading.end();
-              final getStack = requestStack.where((element) => element.id == keys);
-              requestStack.removeWhere((element) => element.id == keys);
-              if (getConfig.onTimeout != null) {
-                await timeTracker('Timeout Clear', () async {
-                  await getConfig.onTimeout!(Response(json.encode({'message': 'timeout'}), 408));
-                }, config: (config is RequestApiHelperData) ? config : baseData);
-              }
-              getStack.first.stream.cancel();
-            }
-          })
-          .asStream()
-          .listen(
-            (response) async {
-              if (!(response == null)) {
-                final res = response as Response;
-                dynamic decode;
-                requestStack.removeWhere((element) => element.id == keys);
-                int getLength = requestStack.where((element) => element.withLoading == true).length;
-                if (getLength == 0 && withLoading) {
-                  Loading.end();
-                }
-                if (res.statusCode == 401) {
-                  if (getConfig.onAuthError != null) {
-                    getConfig.onAuthError!(getConfig.navigatorKey!.currentContext!);
-                  }
-                } else {
-                  try {
-                    if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 202) {
-                      if (getConfig.onSuccess != null) {
-                        decode = await compute(json.decode, res.body);
-                        timeTracker('onSuccess Clear', () async {
-                          await getConfig.onSuccess!(decode);
-                        }, config: (config is RequestApiHelperData) ? config : baseData);
-                      }
-                    } else if (getConfig.onError != null) {
-                      decode = await compute(json.decode, res.body);
-                      handlingData(decode, debug: getConfig.debug!);
-                      timeTracker('onError Clear', () async {
-                        await getConfig.onError!(res);
-                      }, config: (config is RequestApiHelperData) ? config : baseData);
-                    }
-                  } catch (_) {
-                    handlingData(res.body, debug: getConfig.debug!);
-                    internalHandlingData(_.toString(), debug: getConfig.debug!);
-                  }
-                }
-              }
-            },
-          ),
+        withLoading: withLoading,
+        keys: keys,
+        repeat: repeat,
+      ),
     );
     requestStack.add(send);
     if (getLength == 0 && withLoading) {

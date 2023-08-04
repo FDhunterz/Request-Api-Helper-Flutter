@@ -30,11 +30,11 @@ Future<Response> requestfile(RequestApiHelperData config, {Function(int uploaded
   final response = await httpClients.postUrl(_http);
   int byteCount = 0;
   var request = MultipartRequest("POST", _http);
+  Map<String, String> body = {};
 
   if (config.body is Map) {
-    config.body!.forEach((k, v) {
-      request.fields[k] = v;
-    });
+    body = MapBuilder.build(config.body);
+    request.fields.addAll(body);
   }
 
   for (int counterfile = 0; counterfile < (config.file?.path ?? []).length; counterfile++) {
@@ -83,6 +83,7 @@ Future<Response> requestfile(RequestApiHelperData config, {Function(int uploaded
 
     return Response(getResponse, res.statusCode);
   } else {
+    request.headers['content-type'] = 'multipart/form-data';
     final getResponse = await request.send();
     return Response(await getResponse.stream.bytesToString(), getResponse.statusCode);
   }
@@ -114,5 +115,92 @@ class DownloadQueue {
   Function(int uploaded, int total)? onProgress;
   DownloadQueue(this.data, {this.download, this.onProgress, required this.type, this.url}) {
     id = DateTime.now().millisecondsSinceEpoch;
+  }
+}
+
+class MapBuilder {
+  // {"sparepart" :[
+  //    {
+  //      "nama" : "a",
+  //      "kelas" : "b",
+  //    },
+  //   ],
+  //
+  // }
+  static Map<String, String> buildStringisList(String? key, value, {lastKey}) {
+    Map<String, String> d = {};
+    if (lastKey != null) {
+      for (int i = 0; i < value.length; i++) {
+        if (value[i] is Map) {
+          d.addAll(buildStringisMap(value[i], lastKey: "$lastKey[$i]"));
+        } else {
+          d.addAll({"$lastKey[$i]": value[i].toString()});
+        }
+      }
+    } else {
+      for (int i = 0; i < value.length; i++) {
+        if (value[i] is Map) {
+          d.addAll(buildStringisMap(value[i], lastKey: "$key[$i]"));
+        } else {
+          d.addAll({"$key[$i]": value[i].toString()});
+        }
+      }
+    }
+
+    return d;
+  }
+
+  static Map<String, String> buildStringisMap(data, {lastKey}) {
+    Map<String, String> d = {};
+    if (lastKey != null) {
+      data.forEach((key, value) {
+        if (value is List) {
+          // d.addAll(buildStringisList(key, value));
+          if (value != '') {
+            d.addAll(buildStringisList(key, value, lastKey: '$lastKey[$key]'));
+          }
+        } else if (value is Map) {
+          if (value != '') {
+            d.addAll(buildStringisMap(value, lastKey: '$lastKey[$key]'));
+          }
+        } else {
+          if (value != '') {
+            d.addAll({'$lastKey[$key]': value.toString()});
+          }
+        }
+      });
+    } else {
+      data.forEach((key, value) {
+        if (value is List) {
+          if (value != '') {
+            d.addAll(buildStringisList(key, value));
+          }
+        } else if (value is Map) {
+          if (value != '') {
+            d.addAll(buildStringisMap(value, lastKey: "$key"));
+          }
+        } else {
+          if (value != '') {
+            d.addAll({'$key': value.toString()});
+          }
+        }
+      });
+    }
+
+    return d;
+  }
+
+  static build(data) {
+    Map<String, String> builder = {};
+    if (data is Map) {
+      builder.addAll(buildStringisMap(data));
+    }
+    return builder;
+  }
+
+  static show(data) {
+    data.forEach((k, v) {
+      print('$k : $v');
+    });
   }
 }
