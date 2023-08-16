@@ -119,14 +119,6 @@ class DownloadQueue {
 }
 
 class MapBuilder {
-  // {"sparepart" :[
-  //    {
-  //      "nama" : "a",
-  //      "kelas" : "b",
-  //    },
-  //   ],
-  //
-  // }
   static Map<String, String> buildStringisList(String? key, value, {lastKey}) {
     Map<String, String> d = {};
     if (lastKey != null) {
@@ -156,13 +148,13 @@ class MapBuilder {
       data.forEach((key, value) {
         if (value is List) {
           // d.addAll(buildStringisList(key, value));
-          if (value != '') {
-            d.addAll(buildStringisList(key, value, lastKey: '$lastKey[$key]'));
-          }
+          // if (value != '') {
+          d.addAll(buildStringisList(key, value, lastKey: '$lastKey[$key]'));
+          // }
         } else if (value is Map) {
-          if (value != '') {
-            d.addAll(buildStringisMap(value, lastKey: '$lastKey[$key]'));
-          }
+          // if (value != '') {
+          d.addAll(buildStringisMap(value, lastKey: '$lastKey[$key]'));
+          // }
         } else {
           if (value != '') {
             d.addAll({'$lastKey[$key]': value.toString()});
@@ -172,13 +164,13 @@ class MapBuilder {
     } else {
       data.forEach((key, value) {
         if (value is List) {
-          if (value != '') {
-            d.addAll(buildStringisList(key, value));
-          }
+          // if (value != '') {
+          d.addAll(buildStringisList(key, value));
+          // }
         } else if (value is Map) {
-          if (value != '') {
-            d.addAll(buildStringisMap(value, lastKey: "$key"));
-          }
+          // if (value != '') {
+          d.addAll(buildStringisMap(value, lastKey: "$key"));
+          // }
         } else {
           if (value != '') {
             d.addAll({'$key': value.toString()});
