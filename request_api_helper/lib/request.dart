@@ -15,6 +15,8 @@ class API extends APIFunction {
 
   API._state();
 
+  API();
+
   ENVData readConfig() {
     return _convertENVData(ENV.data ?? ENVData());
   }
@@ -67,7 +69,7 @@ class API extends APIFunction {
       };
 
       if (token != null) data.globalData?.header!.addAll({'Authorization': token!});
-      final d = await APIMultiThread.state.config(data).run(Api.post);
+      final d = await APIMultiThread().config(data).run(Api.post);
 
       if (data.isLoading) {
         Loading.requestStack.remove(data.replacementId ?? random);
@@ -96,7 +98,7 @@ class API extends APIFunction {
 
       if (token != null) data.globalData?.header!.addAll({'Authorization': token!});
 
-      final d = await APIMultiThread.state.config(data).run(Api.get);
+      final d = await APIMultiThread().config(data).run(Api.get);
 
       if (data.isLoading) {
         Loading.requestStack.remove(data.replacementId ?? random);
@@ -126,7 +128,7 @@ class API extends APIFunction {
 
       if (token != null) data.globalData?.header!.addAll({'Authorization': token!});
 
-      final d = await APIMultiThread.state.config(data).run(Api.put);
+      final d = await APIMultiThread().config(data).run(Api.put);
 
       if (data.isLoading) {
         Loading.requestStack.remove(data.replacementId ?? random);
@@ -155,7 +157,7 @@ class API extends APIFunction {
 
       if (token != null) data.globalData?.header!.addAll({'Authorization': token!});
 
-      final d = await APIMultiThread.state.config(data).run(Api.delete);
+      final d = await APIMultiThread().config(data).run(Api.delete);
 
       if (data.isLoading) {
         Loading.requestStack.remove(data.replacementId ?? random);

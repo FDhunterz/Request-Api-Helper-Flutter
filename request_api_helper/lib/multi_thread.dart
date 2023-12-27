@@ -24,6 +24,8 @@ class APIMultiThread {
 
   APIMultiThread._send();
 
+  APIMultiThread();
+
   APIMultiThread config(ENVData config) {
     _config = config;
     return this;
