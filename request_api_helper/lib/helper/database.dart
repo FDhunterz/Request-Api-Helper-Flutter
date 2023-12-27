@@ -1,8 +1,9 @@
 import 'dart:io';
 
-import 'package:request_api_helper/helper/encrypt.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sql_query/query.dart';
+import 'package:sql_query/builder/db_merge.dart';
+import 'package:sql_query/viewer/sqflite_raw.dart';
+
+import 'encrypt.dart';
 
 class DatabaseCompute {
   String? name;
@@ -15,10 +16,10 @@ class DatabaseCompute {
 class StorageBase {
   static String path = '';
   static init() async {
-    final databasesPath = Platform.isIOS ? '' : (await getDatabasesPath() + '/');
+    final databasesPath = Platform.isIOS ? '' : ('${await getDatabasesPath()}/');
     // Get a location using getDatabasesPath
     try {
-      path = databasesPath + 'sharedPreferences.db';
+      path = '${databasesPath}sharedPreferences.db';
     } catch (_) {
       print(_);
     }
@@ -70,7 +71,6 @@ class StorageBase {
   static Future<String?> getString(DatabaseCompute data) async {
     DBMerge db = await connect();
     List<Map> list = await db.table('data').where('name', '=', data.name ?? '').where('type', '=', 'string').get();
-    print(list);
     return list.isEmpty ? null : _decrypt(data.encrypt, list.first['text']);
   }
 

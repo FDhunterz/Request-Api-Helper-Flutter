@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:request_api_helper/helper/encrypt.dart';
 
-import 'helper/database.dart';
+import 'database.dart';
+import 'encrypt.dart';
 
 class Session {
   static List data = [];

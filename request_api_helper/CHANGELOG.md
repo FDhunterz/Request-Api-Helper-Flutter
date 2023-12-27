@@ -1,3 +1,10 @@
+# 5.0.0+1
+ - Session init bug
+
+# 5.0.0
+ - Major Code change
+ - New Code Implementation
+
 # 4.0.8+1
  - send formData bug fixed
 
