@@ -17,26 +17,43 @@ class Session {
     return text;
   }
 
+  static getAllData() async {
+    return await StorageBase.getAllData();
+  }
+
   static Future<void> init({bool encrypted = false}) async {
     await StorageBase.init();
     if (encrypted) {
       var getE = await StorageBase.getString(DatabaseCompute(
         name: '_encrypted_session_master',
       ));
-      if (getE != null) {
-        _keys = Crypt.getKeyFromBase64(getE);
+      var getiv = await StorageBase.getString(DatabaseCompute(
+        name: '_encrypted_session_master_iv',
+      ));
+      if (getE != null && getiv != null) {
+        _keys = Crypt.getKeyFromBase64(getE, ivs: getiv);
       } else {
         final getK = Crypt.getKeyEncrypt().base64;
-        await StorageBase.insert(name: '_encrypted_session_master', text: getK, type: 'string');
         _keys = Crypt.getKeyFromBase64(getK);
+        if (getE != null) {
+          await StorageBase.update(name: '_encrypted_session_master', text: getK, type: 'string');
+        } else {
+          await StorageBase.insert(name: '_encrypted_session_master', text: getK, type: 'string');
+        }
+        if (getiv != null) {
+          await StorageBase.update(name: '_encrypted_session_master_iv', text: getK, type: 'string');
+        } else {
+          await StorageBase.insert(name: '_encrypted_session_master_iv', text: _keys!.ivString, type: 'string');
+        }
       }
     }
     var list = await StorageBase.getString(DatabaseCompute(
       name: 'saved_list',
     ));
-    if (list != null) {
-      final encoded = await json.decode(list);
-      data = encoded;
+
+    if (list?.isNotEmpty ?? false) {
+      final encoded = await json.decode(list!);
+      data.insertAll(0, encoded);
     } else {
       await StorageBase.insert(name: 'saved_list', text: json.encode([]), type: 'string');
     }

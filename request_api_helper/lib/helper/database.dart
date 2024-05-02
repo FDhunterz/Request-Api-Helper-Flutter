@@ -21,7 +21,6 @@ class StorageBase {
     try {
       path = '${databasesPath}sharedPreferences.db';
     } catch (_) {
-      print(_);
     }
   }
 
@@ -58,7 +57,7 @@ class StorageBase {
 
   static deleteAll(DatabaseCompute data) async {
     DBMerge db = await connect();
-    await db.table('data').where('name', '!=', '_encrypted_session_master').delete();
+    await db.table('data').whereNotIn('name', ['_encrypted_session_master', '_encrypted_session_master_iv']).delete();
   }
 
   static update({String? name, String? text, String? type, databasesPath}) async {
@@ -66,6 +65,12 @@ class StorageBase {
     await db.table('data').where('name', '=', name).where('type', '=', type).data({
       'text': text ?? '',
     }).update();
+  }
+
+  static getAllData() async {
+    DBMerge db = await connect();
+    List<Map> list = await db.table('data').get();
+    return list;
   }
 
   static Future<String?> getString(DatabaseCompute data) async {

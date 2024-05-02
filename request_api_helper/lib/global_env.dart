@@ -13,14 +13,13 @@ class ENV {
   static ENV? _globalData;
   static ENV? get globalData => _globalData;
   static final config = ENV._init();
-  
-  ENV._init() {
-    Session.init(encrypted: true);
-  }
 
-  save(ENVData data) {
+  ENV._init();
+
+  save(ENVData data) async {
     _data = data;
     _globalData = this;
+    await Session.init(encrypted: true);
   }
 }
 
@@ -30,6 +29,7 @@ class ENVData {
   String? baseUrl;
   Duration? timeoutDuration;
   bool isLoading;
+  bool processOnlyThisPage;
   String? replacementId;
   RequestData? globalData;
   Future<void> Function(int start, int total)? onProgress;
@@ -37,7 +37,7 @@ class ENVData {
   Future<void> Function(Response success)? onSuccess;
   Future<void> Function(Object exception)? onException;
   Future<void> Function(Object exception)? onTimeout;
-  Future<void> Function(BuildContext context)? onAuthError;
+  Future<void> Function(Response error, BuildContext context)? onAuthError;
 
   String? getUrl() {
     return (baseUrl ?? '') + (globalData?.url ?? '');
@@ -64,6 +64,7 @@ class ENVData {
     this.globalData,
     this.onAuthError,
     this.replacementId,
+    this.processOnlyThisPage = true,
   });
 }
 
@@ -86,10 +87,14 @@ class RequestData {
 
   parseFile(MultipartRequest request) async {
     for (int counterfile = 0; counterfile < (file!).length; counterfile++) {
-      if (file![counterfile].path == '' || file![counterfile].requestName == 'null') {
+      if (file![counterfile].path == '' ||
+          file![counterfile].requestName == 'null') {
         request.fields[file![counterfile].requestName] = 'null';
       } else {
-        request.files.add(await MultipartFile.fromPath(file![counterfile].requestName, file![counterfile].path, contentType: MediaType('application', file![counterfile].path.split('.').last)));
+        request.files.add(await MultipartFile.fromPath(
+            file![counterfile].requestName, file![counterfile].path,
+            contentType: MediaType(
+                'application', file![counterfile].path.split('.').last)));
       }
     }
   }

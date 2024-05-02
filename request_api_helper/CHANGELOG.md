@@ -1,3 +1,12 @@
+# 5.0.0+11
+ - update peformance + bug fixed
+
+# 5.0.0+7
+ - multi threat issue fixed
+
+# 5.0.0+5
+ - bug fixed
+
 # 5.0.0+1
  - Session init bug
 
