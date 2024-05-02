@@ -86,15 +86,11 @@ class RequestData {
   }
 
   parseFile(MultipartRequest request) async {
-    for (int counterfile = 0; counterfile < (file!).length; counterfile++) {
-      if (file![counterfile].path == '' ||
-          file![counterfile].requestName == 'null') {
+    for (int counterfile = 0; counterfile < (file ?? []).length; counterfile++) {
+      if (file![counterfile].path == '' || file![counterfile].requestName == 'null') {
         request.fields[file![counterfile].requestName] = 'null';
       } else {
-        request.files.add(await MultipartFile.fromPath(
-            file![counterfile].requestName, file![counterfile].path,
-            contentType: MediaType(
-                'application', file![counterfile].path.split('.').last)));
+        request.files.add(await MultipartFile.fromPath(file![counterfile].requestName, file![counterfile].path, contentType: MediaType('application', file![counterfile].path.split('.').last)));
       }
     }
   }

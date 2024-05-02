@@ -108,7 +108,7 @@ class APIMultiThread {
                   body: body, headers: config.globalData?.header);
               break;
             case Api.post:
-              if (config.globalData?.file?.isNotEmpty ?? false) {
+              if (config.globalData?.file != null) {
                 var request = MultipartRequest("POST", Uri.parse(url));
                 int byteCount = 0;
                 Map<String, String> body = {};

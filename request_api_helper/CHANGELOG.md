@@ -1,3 +1,6 @@
+# 5.0.0+12
+- minor bug fixed
+
 # 5.0.0+11
  - update peformance + bug fixed
 

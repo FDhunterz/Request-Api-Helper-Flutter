@@ -1,6 +1,6 @@
 name: request_api_helper
 description: send request with stack request management and cancel request.
-version: 5.0.0+11
+version: 5.0.0+12
 homepage: https://github.com/FDhunterz/Request-Api-Helper-Flutter-V-2.0.2
 
 environment:
