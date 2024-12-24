@@ -24,9 +24,6 @@ class MyHttpOverrides extends HttpOverrides {
 
 class APIMultiThread {
   ENVData? _config;
-  static final state = APIMultiThread._send();
-
-  APIMultiThread._send();
 
   APIMultiThread();
 

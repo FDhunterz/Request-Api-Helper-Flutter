@@ -1,3 +1,6 @@
+# 5.0.1
+- update http to 1.2.2
+
 # 5.0.0+12
 - minor bug fixed
 
