@@ -10,7 +10,7 @@ export 'helper/database.dart';
 
 extension RequestExtension on Response {
   Future<dynamic> convert() async {
-    final d = await compute(json.decode, body);
+    final d = jsonDecode(body);
     return d;
   }
 }

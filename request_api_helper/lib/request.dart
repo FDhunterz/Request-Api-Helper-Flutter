@@ -28,37 +28,46 @@ class API extends APIFunction {
     }
   }
 
-  Future<http.Response?> _methodDeploy(
-      ENVData data, Future<http.Response?> Function() method) async {
+  Future<http.Response?> _methodDeploy(ENVData data, Future<http.Response?> Function() method) async {
+    http.Response? res;
     try {
       if (data.isLoading) {
         Loading.start();
       }
+
+      if (Loading.requestStack.contains(data.replacementId)) {
+        return null;
+      }
+
       final d = await method();
-      if(d == null){
+      if (d == null) {
         return null;
       }
       if (data.onSuccess == null && data.onError == null) {
         Track.debug('raw response api');
         return d;
       } else {
-        if ((d.statusCode ) >= 200 && (d.statusCode ) <= 210) {
+        if ((d.statusCode) >= 200 && (d.statusCode) <= 210) {
+          res = d;
           if (data.onSuccess != null) await data.onSuccess!(d);
-        } else if ((d.statusCode ) == 401) {
-          if (data.onAuthError != null)
-            await data.onAuthError!(d, ENV.navigatorKey.currentContext!);
+        } else if ((d.statusCode) == 401) {
+          res = d;
+          if (data.onAuthError != null) await data.onAuthError!(d, ENV.navigatorKey.currentContext!);
         } else {
-      print(d);
+          res = d;
           if (data.onError != null) await data.onError!(d);
         }
         Track.debug('response process done');
       }
-      return null;
+      return res;
     } catch (_) {
       if (data.onException != null) await data.onException!(_);
-        Track.debug('exception process done');
+      Track.debug('exception process done');
+      return http.Response(
+        jsonEncode({'message': 'Internal App Error'}),
+        530,
+      );
     }
-    return null;
   }
 
   Future<http.Response?> post({bool dynamicJson = false}) async {
@@ -73,8 +82,7 @@ class API extends APIFunction {
         'Accept': 'application/json',
       };
 
-      if (token != null)
-        data.globalData?.header!.addAll({'Authorization': token!});
+      if (token != null) data.globalData?.header!.addAll({'Authorization': token!});
       final d = await APIMultiThread().config(data).run(Api.post);
       if (data.isLoading && !Loading.loadingProgress()) {
         Loading.close();
@@ -84,23 +92,44 @@ class API extends APIFunction {
     return null;
   }
 
-  Future<http.Response?> get() async {
+  Future<http.Response?> patch({bool dynamicJson = false}) async {
+    final random = getRandomString(10);
+
+    final ENVData data = readConfig();
+    await _methodDeploy(data, () async {
+      final token = await Session.load('token');
+      data.replacementId ??= random;
+
+      data.globalData?.header ??= {
+        'Accept': 'application/json',
+      };
+
+      if (token != null) data.globalData?.header!.addAll({'Authorization': token!});
+      final d = await APIMultiThread().config(data).run(Api.patch);
+      if (data.isLoading && !Loading.loadingProgress()) {
+        Loading.close();
+      }
+      return d;
+    });
+    return null;
+  }
+
+  Future<http.Response?> get({String? authToken}) async {
     Track.start();
     final random = getRandomString(10);
     final ENVData data = readConfig();
     _alertNotPost(data);
-    await _methodDeploy(data, () async {
+    final d = await _methodDeploy(data, () async {
       data.replacementId ??= random;
 
-      final token = await Session.load('token');
+      final token = authToken ?? await Session.load('token');
       Track.debug('load token');
 
       data.globalData?.header ??= {
         'Accept': 'application/json',
       };
 
-      if (token != null)
-        data.globalData?.header!.addAll({'Authorization': token!});
+      if (token != null) data.globalData?.header!.addAll({'Authorization': token!});
 
       final d = await APIMultiThread().config(data).run(Api.get);
       // final d =  await http.get(Uri.parse((data.getUrl() ?? '') + (data.globalData?.getParams() ?? '')),headers: data.globalData?.header);
@@ -108,14 +137,14 @@ class API extends APIFunction {
 
       if (data.isLoading) {
         Loading.requestStack.remove(data.replacementId ?? random);
+        if (!Loading.loadingProgress()) {
+          Loading.close();
+        }
       }
 
-      if (!Loading.loadingProgress()) {
-        Loading.close();
-      }
       return d;
     });
-    return null;
+    return d;
   }
 
   Future<http.Response?> put() async {
@@ -131,16 +160,16 @@ class API extends APIFunction {
         'Accept': 'application/json',
       };
 
-      if (token != null)
-        data.globalData?.header!.addAll({'Authorization': token!});
+      if (token != null) data.globalData?.header!.addAll({'Authorization': token!});
 
       final d = await APIMultiThread().config(data).run(Api.put);
 
       if (data.isLoading) {
         Loading.requestStack.remove(data.replacementId ?? random);
-      }
-      if (!Loading.loadingProgress()) {
-        Loading.close();
+
+        if (!Loading.loadingProgress()) {
+          Loading.close();
+        }
       }
       return d;
     });
@@ -160,16 +189,16 @@ class API extends APIFunction {
         'Accept': 'application/json',
       };
 
-      if (token != null)
-        data.globalData?.header!.addAll({'Authorization': token!});
+      if (token != null) data.globalData?.header!.addAll({'Authorization': token!});
 
       final d = await APIMultiThread().config(data).run(Api.delete);
 
       if (data.isLoading) {
         Loading.requestStack.remove(data.replacementId ?? random);
-      }
-      if (!Loading.loadingProgress()) {
-        Loading.close();
+
+        if (!Loading.loadingProgress()) {
+          Loading.close();
+        }
       }
       return d;
     });
@@ -198,12 +227,10 @@ abstract class APIFunction {
       onError: NullFill.state().converter(onError, baseConfig.onError),
       onSuccess: NullFill.state().converter(onSuccess, baseConfig.onSuccess),
       processOnlyThisPage: NullFill.state().converter(processOnlyThisPage, baseConfig.processOnlyThisPage),
-      onException:
-          NullFill.state().converter(onException, baseConfig.onException),
+      onException: NullFill.state().converter(onException, baseConfig.onException),
       onTimeout: NullFill.state().converter(onTimeout, baseConfig.onTimeout),
       onProgress: NullFill.state().converter(onProgress, baseConfig.onProgress),
-      onAuthError:
-          NullFill.state().converter(onAuthError, baseConfig.onAuthError),
+      onAuthError: NullFill.state().converter(onAuthError, baseConfig.onAuthError),
       debug: baseConfig.debug,
       ignoreBadCertificate: baseConfig.ignoreBadCertificate,
       timeoutDuration: baseConfig.timeoutDuration,
@@ -211,10 +238,9 @@ abstract class APIFunction {
       replacementId: replacementId,
       globalData: RequestData(
         body: NullFill.state().converter(body, baseConfig.globalData?.body),
-        header:
-            NullFill.state().converter(header, baseConfig.globalData?.header),
+        header: NullFill.state().converter(header, baseConfig.globalData?.header),
         url: NullFill.state().converter(url, baseConfig.globalData?.url),
-        file: NullFill.state().converter(file, baseConfig.globalData?.url),
+        file: file,
       ),
     );
   }

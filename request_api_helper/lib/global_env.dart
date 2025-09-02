@@ -44,9 +44,6 @@ class ENVData {
   }
 
   Future<List<int>> convertUTF8() async {
-    globalData?.header!.addAll({
-      'content-type': 'application/json',
-    });
     return utf8.encode(await compute(json.encode, globalData!.body));
   }
 
@@ -85,23 +82,36 @@ class RequestData {
     return param.substring(0, param.length - 1);
   }
 
-  parseFile(MultipartRequest request) async {
+  Future<MultipartRequest> parseFile(MultipartRequest request) async {
     for (int counterfile = 0; counterfile < (file ?? []).length; counterfile++) {
       if (file![counterfile].path == '' || file![counterfile].requestName == 'null') {
         request.fields[file![counterfile].requestName] = 'null';
       } else {
-        request.files.add(await MultipartFile.fromPath(file![counterfile].requestName, file![counterfile].path, contentType: MediaType('application', file![counterfile].path.split('.').last)));
+        final extension = file![counterfile].path.split('.').last.toLowerCase();
+        String mimeType;
+
+        if (['jpg', 'jpeg', 'png'].contains(extension)) {
+          mimeType = 'image';
+        } else if (['pdf'].contains(extension)) {
+          mimeType = 'application';
+        } else if (['doc', 'docx'].contains(extension)) {
+          mimeType = 'application';
+        } else {
+          mimeType = 'application';
+        }
+
+        request.files.add(await MultipartFile.fromPath(file![counterfile].requestName, file![counterfile].path, filename: file![counterfile].filename ?? '', contentType: MediaType(mimeType, extension)));
       }
     }
+    return request;
   }
 
-  RequestData({this.body, this.header, this.url, this.file}) {
-    file ??= [];
-  }
+  RequestData({this.body, this.header, this.url, this.file});
 }
 
 class FileData {
   String path, requestName;
+  String? filename;
 
-  FileData({required this.path, required this.requestName});
+  FileData({required this.path, required this.requestName, this.filename});
 }
